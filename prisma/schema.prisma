@@ -1,0 +1,196 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model AdminUser {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+}
+
+model Session {
+  id           String    @id @default(uuid())
+  userId       String
+  user         AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AppStoreStatus {
+  COMING_SOON
+  AVAILABLE
+}
+
+model Application {
+  id               String           @id @default(uuid())
+  name             String
+  slug             String           @unique
+  shortDescription String
+  fullDescription  String           @db.Text
+  logoId           String?
+  logo             MediaAsset?      @relation("AppLogo", fields: [logoId], references: [id], onDelete: SetNull)
+  heroImageId      String?
+  heroImage        MediaAsset?      @relation("AppHero", fields: [heroImageId], references: [id], onDelete: SetNull)
+  
+  appStoreStatus   AppStoreStatus   @default(COMING_SOON)
+  appStoreUrl      String?
+  appStoreId       String?
+  platform         String           @default("iOS")
+  releaseDate      DateTime?
+  version          String?
+  price            String?
+  privacyPolicyUrl String?
+  termsOfUseUrl    String?
+  supportUrl       String?
+
+  status           ContentStatus    @default(DRAFT)
+  isFeatured       Boolean          @default(false)
+
+  seoTitle         String?
+  seoDescription   String?
+  ogTitle          String?
+  ogDescription    String?
+  ogImageId        String?
+  ogImage          MediaAsset?      @relation("AppOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  screenshots      ApplicationScreenshot[]
+}
+
+model ApplicationScreenshot {
+  id            String      @id @default(uuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  mediaAssetId  String
+  mediaAsset    MediaAsset  @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+  order         Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model BlogArticle {
+  id             String        @id @default(uuid())
+  title          String
+  slug           String        @unique
+  excerpt        String?       @db.Text
+  content        String        @db.Text
+  coverImageId   String?
+  coverImage     MediaAsset?   @relation("ArticleCover", fields: [coverImageId], references: [id], onDelete: SetNull)
+  author         String?
+  publishedAt    DateTime?
+
+  status         ContentStatus @default(DRAFT)
+  isFeatured     Boolean       @default(false)
+
+  seoTitle       String?
+  seoDescription String?
+  ogTitle        String?
+  ogDescription  String?
+  ogImageId      String?
+  ogImage        MediaAsset?   @relation("ArticleOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model StaticPage {
+  id             String        @id @default(uuid())
+  title          String
+  slug           String        @unique
+  content        String        @db.Text
+
+  status         ContentStatus @default(DRAFT)
+
+  seoTitle       String?
+  seoDescription String?
+  ogImageId      String?
+  ogImage        MediaAsset?   @relation("PageOg", fields: [ogImageId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model MediaAsset {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  url          String
+  altText      String?
+  width        Int?
+  height       Int?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  appsLogo        Application[] @relation("AppLogo")
+  appsHero        Application[] @relation("AppHero")
+  appsOg          Application[] @relation("AppOg")
+  appScreenshots  ApplicationScreenshot[]
+  articlesCover   BlogArticle[] @relation("ArticleCover")
+  articlesOg      BlogArticle[] @relation("ArticleOg")
+  pagesOg         StaticPage[]  @relation("PageOg")
+  siteOg          SiteSettings[] @relation("SiteOg")
+  siteHero        SiteSettings[] @relation("SiteHero")
+}
+
+model SiteSettings {
+  id                 String      @id @default(uuid())
+  siteName           String      @default("ElarioLabs")
+  logoUrl            String?
+  faviconUrl         String?
+  defaultSeoTitle    String?
+  defaultSeoDesc     String?
+  defaultOgImageId   String?
+  heroImageId        String?
+  heroImage          MediaAsset? @relation("SiteHero", fields: [heroImageId], references: [id], onDelete: SetNull)
+  defaultOgImage     MediaAsset? @relation("SiteOg", fields: [defaultOgImageId], references: [id], onDelete: SetNull)
+  maintenanceMode    Boolean     @default(false)
+
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+}
+
+model CompanyInformation {
+  id            String   @id @default(uuid())
+  name          String   @default("ElarioLabs")
+  email         String?
+  about         String?
+  phone         String?
+  country       String?
+  city          String?
+  address       String?
+  copyrightText String?
+  websiteName   String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SocialLink {
+  id        String   @id @default(uuid())
+  platform  String
+  url       String
+  enabled   Boolean  @default(true)
+  order     Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
