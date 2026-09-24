@@ -1,8 +1,13 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { prisma } from '@/lib/db';
+
 export default async function Footer() {
+  await headers(); // Принудительно отключаем статическую генерацию при сборке
+
   const companyInfo = await prisma.companyInformation.findFirst();
   const year = new Date().getFullYear();
+  
   return (
     <footer className="bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 py-12 mt-20">
       <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
