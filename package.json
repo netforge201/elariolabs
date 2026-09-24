@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "apk add --no-cache openssl libc6-compat"
+
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
