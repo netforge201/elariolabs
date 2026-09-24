@@ -4,7 +4,9 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Добавлены бинарные таргеты для решения проблемы с Alpine и OpenSSL:
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x", "linux-musl"]
 }
 
 model AdminUser {
@@ -17,11 +19,11 @@ model AdminUser {
 }
 
 model Session {
-  id           String    @id @default(uuid())
-  userId       String
-  user         AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt    DateTime
-  createdAt    DateTime  @default(now())
+  id        String    @id @default(uuid())
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
 }
 
 enum ContentStatus {
