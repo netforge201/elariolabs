@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { FAQ } from '@/components/FAQ';
 import { ArrowRight, Apple, Code2, Users, Diamond, Smartphone, LayoutTemplate, Rocket, Lightbulb, PenTool, Code, Plus } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const settings = await prisma.siteSettings.findFirst({ include: { heroImage: true } });
 
