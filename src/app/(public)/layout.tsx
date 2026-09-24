@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Mail, ArrowRight, Apple, Globe } from 'lucide-react';
 import { prisma } from '@/lib/db';
 
+export const dynamic = 'force-dynamic'; // ⬅️ Принудительно отключаем статическую генерацию
+
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const socialLinks = await prisma.socialLink.findMany({ where: { enabled: true }, orderBy: { order: 'asc' } });
   const company = await prisma.companyInformation.findFirst();
