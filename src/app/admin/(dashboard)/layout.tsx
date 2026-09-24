@@ -2,6 +2,9 @@ import { getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 import Sidebar from '@/components/admin/Sidebar';
 import Header from '@/components/admin/Header';
+
+export const dynamic = 'force-dynamic'; // ⬅️ Добавляем глобальное правило для всей админки
+
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   if (!session) { redirect('/admin/login'); }
