@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/db';
 import { redirect } from 'next/navigation';
 import SetupForm from './SetupForm';
+
+export const dynamic = 'force-dynamic';
+
 export default async function SetupPage() {
   const adminCount = await prisma.adminUser.count();
   if (adminCount > 0) { redirect('/admin/login'); }
