@@ -2,6 +2,9 @@ import { prisma } from '@/lib/db';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Plus } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
+
 export default async function BlogPage() {
   const articles = await prisma.blogArticle.findMany({ orderBy: { createdAt: 'desc' } });
   return (
