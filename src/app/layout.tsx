@@ -12,7 +12,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Единый правильный блок metadata
 export const metadata: Metadata = {
+  metadataBase: new URL('https://elariolabs.com'),
   title: "ElarioLabs | iOS App Development Studio",
   description: "Independent software studio primarily focused on creating useful, polished, high-quality native applications.",
 };
