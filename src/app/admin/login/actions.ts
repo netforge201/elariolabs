@@ -8,8 +8,8 @@ import { headers } from 'next/headers';
 import rateLimit from '@/lib/rate-limit';
 
 export async function loginAdmin(formData: FormData) {
-  // Получаем IP-адрес из заголовков запроса
-  const headersList = headers();
+  // Добавили await перед headers()
+  const headersList = await headers();
   const ip = headersList.get('x-forwarded-for') || '127.0.0.1';
 
   // Проверяем лимит: максимум 5 попыток в минуту (60000 мс)
