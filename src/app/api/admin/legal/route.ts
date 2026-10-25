@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
-import {currentAdmin,sameOrigin} from '@/lib/auth';
+import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';
 import {db} from '@/lib/db';
 
 const schema=z.object({
@@ -15,17 +15,17 @@ const schema=z.object({
 export async function POST(req:Request){
   if(!await sameOrigin(req))return new Response('Forbidden',{status:403});
   const user=await currentAdmin();
-  if(!user)return NextResponse.redirect(new URL('/admin/login',req.url),303);
+  if(!user)return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);
   const form=await req.formData();
   const parsed=schema.safeParse(Object.fromEntries(form));
-  if(!parsed.success)return NextResponse.redirect(new URL('/admin/legal-compliance?error=invalid',req.url),303);
+  if(!parsed.success)return NextResponse.redirect(new URL('/admin/legal-compliance?error=invalid',publicBase(req)),303);
   const d=parsed.data;
   try{
     const doc=await db.legalDocument.create({data:{title:d.title,slug:d.slug,type:d.type,content:d.content,applicationId:d.applicationId||null,effectiveDate:d.effectiveDate?new Date(d.effectiveDate):null,status:'DRAFT'}});
     await db.auditLog.create({data:{actorId:user.id,action:'create',entity:'legal_document',entityId:doc.id,summary:{title:doc.title,slug:doc.slug}}});
-    return NextResponse.redirect(new URL('/admin/legal-compliance?saved=1',req.url),303);
+    return NextResponse.redirect(new URL('/admin/legal-compliance?saved=1',publicBase(req)),303);
   }catch(error){
     const duplicate=typeof error==='object'&&error!==null&&'code'in error&&(error as {code?:string}).code==='P2002';
-    return NextResponse.redirect(new URL(`/admin/legal-compliance?error=${duplicate?'duplicate':'save'}`,req.url),303);
+    return NextResponse.redirect(new URL(`/admin/legal-compliance?error=${duplicate?'duplicate':'save'}`,publicBase(req)),303);
   }
 }

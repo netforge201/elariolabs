@@ -10,6 +10,18 @@ export async function currentAdmin() {
  return row.user;
 }
 export function newSessionToken(){return randomBytes(32).toString('base64url')}
+export function publicBase(req:Request){
+ const configured=process.env.APP_URL;
+ if(configured){
+  try{
+   const url=new URL(configured);
+   if(!['localhost','127.0.0.1','0.0.0.0'].includes(url.hostname))return url.origin;
+   if(process.env.NODE_ENV!=='production')return url.origin;
+  }catch{}
+ }
+ if(process.env.NODE_ENV==='production')return 'https://elariolabs.com';
+ return new URL(req.url).origin;
+}
 export async function sameOrigin(req:Request){
  const origin=req.headers.get('origin');
  if(!origin)return false;
@@ -20,8 +32,8 @@ export async function sameOrigin(req:Request){
   // headers while req.url (and APP_URL) still point at an internal hostname.
   const forwardedHost=req.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
   const requestHost=(forwardedHost||req.headers.get('host')||new URL(req.url).host).toLowerCase();
-  const configuredHost=process.env.APP_URL?new URL(process.env.APP_URL).host.toLowerCase():'';
-  return originUrl.host.toLowerCase()===requestHost||originUrl.host.toLowerCase()===configuredHost;
+  const publicHost=new URL(publicBase(req)).host.toLowerCase();
+  return originUrl.host.toLowerCase()===requestHost||originUrl.host.toLowerCase()===publicHost;
  }catch{return false}
 }
 export { hash };
