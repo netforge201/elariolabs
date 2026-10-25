@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-container": "#0c9488", "on-surface": "#0b1c30", "surface": "#f8f9ff", "on-error": "#ffffff", "outline-variant": "#c6c6cd", "surface-tint": "#565e74", "surface-container-low": "#eff4ff", "on-error-container": "#93000a", "inverse-primary": "#bec6e0", "error-container": "#ffdad6", "surface-dim": "#cbdbf5", "on-secondary-container": "#fffbff", "on-primary-fixed": "#131b2e", "tertiary-container": "#00201d", "primary-container": "#131b2e", "tertiary-fixed-dim": "#6bd8cb", "surface-container-high": "#dce9ff", "background": "#f8f9ff", "on-secondary-fixed-variant": "#3323cc", "outline": "#76777d", "error": "#ba1a1a", "secondary-container": "#645efb", "surface-container": "#e5eeff", "on-primary": "#ffffff", "on-tertiary-fixed-variant": "#005049", "on-background": "#0b1c30", "secondary-fixed": "#e2dfff", "surface-bright": "#f8f9ff", "on-secondary-fixed": "#0f0069", "primary": "#000000", "on-tertiary-fixed": "#00201d", "inverse-surface": "#213145", "surface-variant": "#d3e4fe", "on-primary-fixed-variant": "#3f465c", "primary-fixed": "#dae2fd", "on-secondary": "#ffffff", "secondary-fixed-dim": "#c3c0ff", "secondary": "#4b41e1", "surface-container-lowest": "#ffffff", "on-primary-container": "#7c839b", "inverse-on-surface": "#eaf1ff", "tertiary": "#000000", "primary-fixed-dim": "#bec6e0", "surface-container-highest": "#d3e4fe", "on-tertiary": "#ffffff", "tertiary-fixed": "#89f5e7", "on-surface-variant": "#45464d" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "2.5rem", "space-md": "1rem", "gutter-dense": "0.75rem", "margin": "3rem", "gutter": "1.5rem", "margin-mobile": "1.25rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-xxs": "0.125rem", "space-sm": "0.5rem", "space-2xl": "4rem", "space-xs": "0.25rem", "space-3xl": "6rem", "margin-dense": "1.5rem" }, "fontFamily": { "code-sm": [ "JetBrains Mono" ], "display": [ "Plus Jakarta Sans" ], "display-mobile": [ "Plus Jakarta Sans" ], "headline-sm": [ "Plus Jakarta Sans" ], "headline-md": [ "Plus Jakarta Sans" ], "label-md": [ "Inter" ], "label-sm": [ "Inter" ], "code-inline": [ "JetBrains Mono" ], "body-md": [ "Inter" ], "body-sm": [ "Inter" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "body-lg": [ "Inter" ], "headline-lg": [ "Plus Jakarta Sans" ] }, "fontSize": { "code-sm": [ "0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.02em", "fontWeight": "400" } ], "display": [ "3.75rem", { "lineHeight": "4.25rem", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "display-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "headline-sm": [ "1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-md": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "label-md": [ "0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.005em", "fontWeight": "500" } ], "label-sm": [ "0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.01em", "fontWeight": "500" } ], "code-inline": [ "0.8125rem", { "lineHeight": "1.125rem", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "body-md": [ "0.9375rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.005em", "fontWeight": "400" } ], "body-sm": [ "0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0", "fontWeight": "400" } ], "headline-lg-mobile": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "body-lg": [ "1.125rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "headline-lg": [ "2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.025em", "fontWeight": "600" } ] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen relative"><header class="fixed top-0 left-0 right-0 z-40 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-md"><img alt="ElarioLabs Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VtwtkSBq80G5X63cLF0tdgFeMBWInIBrai5Wv-GXVjRT--OCOxuHqPUWvjczHTSh-rYC9K3w4TFoeOELqFJqL-ADyb2jmujCvOX4bPI87y8pFzW83NFnKtHQj_N8F-6t1iF_pH5Yyz3pNfi6vDLeivKzUyaR55delmChcyuVwFiTnoOcZhG8tdQZdsHuGt7zi3qH268dAw8hyzm9gZIeuQ1iRPqUSvIOg9mktU75DF"/><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-semibold">ElarioLabs</span></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-sm py-space-xs"><a aria-current="page" class="transition-colors bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-sm py-space-xs" data-path="apps" href="#">Apps</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#">Support</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></nav><div class="flex items-center gap-space-md"><a class="hidden sm:flex items-center gap-space-xs px-space-md py-space-xs bg-surface-container-high text-on-surface font-label-sm text-label-sm rounded-lg hover:bg-surface-container hover:text-on-surface transition-all" data-path="admin-portal" href="#"><span class="material-symbols-outlined text-[16px]">tune</span><span>Admin Portal</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><button aria-label="Toggle Mobile Menu" class="md:hidden flex items-center justify-center p-space-xs text-on-surface hover:bg-surface-container-low rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">menu</span></button></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<!-- Subtle Architectural Radial Glow -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-40 right-1/4 w-[680px] h-[680px] bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-96 -left-32 w-[520px] h-[520px] bg-on-tertiary-container/5 rounded-full blur-3xl pointer-events-none"></div>
+<!-- HERO SECTION -->
+<section class="max-w-[1440px] mx-auto px-margin pt-space-2xl pb-space-3xl relative z-10">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+<!-- Hero Text & Studio Intent -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-space-xxs bg-surface-container-high rounded-full w-fit">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="font-code-sm text-code-sm text-secondary tracking-wider uppercase font-semibold">Studio Dispatch • Q2 Release Cycle</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<h1 class="font-display text-display text-on-surface tracking-tight leading-[1.08] max-w-2xl">
+              Thoughtfully built software for everyday focus, craft, and workflow.
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl pt-space-xs leading-relaxed">
+              ElarioLabs produces quiet, highly articulated tools engineered for deep digital concentration. Zero telemetry clutter. Meticulous typography, tactile interfaces, and native system resonance.
+            </p>
+</div>
+<!-- CTAs & Fast Metrics -->
+<div class="flex flex-wrap items-center gap-space-md pt-space-sm">
+<a class="flex items-center gap-space-xs px-space-xl py-space-sm bg-primary text-on-primary rounded-xl font-label-md text-label-md shadow-md hover:bg-inverse-surface hover:shadow-xl transition-all duration-200" href="#catalog">
+<span>Explore Apps</span>
+<span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+</a>
+<a class="flex items-center gap-space-xs px-space-lg py-space-sm bg-surface-container-low text-on-surface rounded-xl font-label-md text-label-md hover:bg-surface-container-high transition-colors" href="#philosophy">
+<span class="material-symbols-outlined text-[18px] text-secondary">architecture</span>
+<span>Studio Philosophy</span>
+</a>
+<div class="flex items-center gap-space-xs pl-space-sm text-on-surface-variant font-code-sm text-code-sm">
+<span class="font-semibold text-on-surface">10</span> Artifacts Cataloged
+            </div>
+</div>
+<!-- Mini Engineering Highlights Bar -->
+<div class="grid grid-cols-3 gap-space-md pt-space-lg max-w-xl">
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-space-xxs">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Local Latency</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">&lt; 8ms</span>
+<span class="font-body-sm text-body-sm text-on-tertiary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bolt</span> Native runtime
+              </span>
+</div>
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-space-xxs">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Data Privacy</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">100%</span>
+<span class="font-body-sm text-body-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">shield</span> Local storage
+              </span>
+</div>
+<div class="p-space-md bg-surface-container-lowest rounded-xl shadow-sm flex flex-col gap-space-xxs">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Interface Rigor</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">4px</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">grid_4x4</span> Spatial grid
+              </span>
+</div>
+</div>
+</div>
+<!-- Layered Stylized App Visual Showcase -->
+<div class="lg:col-span-5 relative flex items-center justify-center min-h-[460px] select-none">
+<!-- Background Accent Cards -->
+<div class="absolute -top-4 -right-2 w-72 h-80 bg-surface-container rounded-2xl rotate-6 shadow-md opacity-70 transform transition-transform hover:rotate-3 duration-500">
+<div class="p-space-md flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Pixelhaven.engine</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">palette</span>
+</div>
+<div class="p-space-md space-y-2">
+<div class="h-24 bg-surface-container-highest rounded-lg flex items-center justify-center overflow-hidden">
+<span class="font-code-sm text-code-sm text-on-surface-variant opacity-60">RAW Engine: Active</span>
+</div>
+</div>
+</div>
+<div class="absolute -bottom-6 -left-4 w-72 h-72 bg-surface-container-high rounded-2xl -rotate-6 shadow-md opacity-80 transform transition-transform hover:-rotate-2 duration-500">
+<div class="p-space-md flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Focusly // Pacer</span>
+<span class="material-symbols-outlined text-on-tertiary-container text-[18px]">timer</span>
+</div>
+<div class="px-space-md flex items-center gap-space-md">
+<div class="w-16 h-16 rounded-full bg-surface-container-lowest flex items-center justify-center font-headline-sm text-headline-sm text-on-surface font-semibold shadow-sm">
+                25m
+              </div>
+<div class="flex-1 space-y-1">
+<div class="h-2 bg-on-tertiary-container/30 rounded-full w-full"></div>
+<div class="h-2 bg-on-tertiary-container/20 rounded-full w-2/3"></div>
+</div>
+</div>
+</div>
+<!-- Foreground Hero Window Card -->
+<div class="relative w-full max-w-[420px] bg-surface-container-lowest rounded-2xl shadow-xl overflow-hidden z-20 transition-all duration-300 hover:shadow-2xl">
+<!-- Window Bar -->
+<div class="h-10 px-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-surface-dim"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-on-tertiary-container"></span>
+<span class="ml-space-xs font-code-sm text-code-sm text-on-surface-variant">Notebloom Workspace</span>
+</div>
+<span class="font-code-sm text-code-sm text-secondary bg-secondary-fixed/50 px-2 py-0.5 rounded">v2.3.0</span>
+</div>
+<div class="p-space-lg flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[24px]">edit_note</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Notebloom</h4>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Markdown Thought Garden • macOS</p>
+</div>
+</div>
+<!-- Inline Diagram Visualizer -->
+<div class="p-space-md bg-surface-container-low rounded-xl space-y-2">
+<div class="flex justify-between items-center text-on-surface-variant font-code-sm text-code-sm">
+<span>Index Synapse Graph</span>
+<span class="text-secondary font-medium">94 nodes connected</span>
+</div>
+<svg class="w-full h-20 text-secondary" fill="none" stroke="currentColor" viewbox="0 0 320 80">
+<path d="M 10 40 Q 60 10, 110 50 T 210 30 T 310 60" stroke="currentColor" stroke-linecap="round" stroke-width="2.5"></path>
+<circle class="fill-surface-container-lowest" cx="10" cy="40" r="4" stroke-width="2"></circle>
+<circle class="fill-surface-container-lowest" cx="110" cy="50" r="4" stroke-width="2"></circle>
+<circle class="fill-secondary" cx="210" cy="30" r="5" stroke-width="2"></circle>
+<circle class="fill-surface-container-lowest" cx="310" cy="60" r="4" stroke-width="2"></circle>
+</svg>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<div class="flex items-center gap-1 text-on-tertiary-container font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>End-to-End Encrypted</span>
+</div>
+<button class="px-space-md py-space-xs bg-secondary text-on-secondary rounded-lg font-label-sm text-label-sm hover:bg-secondary-container transition-colors" onclick="triggerAppSimulation('Notebloom', 'https://elariolabs.io/apps/notebloom')" type="button">
+                  Launch Demo
+                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- APP CATALOG SECTION -->
+<section class="w-full max-w-[1440px] mx-auto px-margin py-space-2xl" id="catalog">
+<!-- Header & Catalog Meta -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-xl">
+<div>
+<div class="inline-flex items-center gap-space-xs font-code-sm text-code-sm text-secondary uppercase tracking-wider mb-space-xxs">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+<span>Catalog Registry</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">Software Suite</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xl">
+          Filtered by platform, production readiness, and application scope. Interactive cards allow quick preview and simulator dispatch.
+        </p>
+</div>
+<!-- Quick Status Indicators -->
+<div class="flex items-center gap-space-sm font-code-sm text-code-sm">
+<span class="flex items-center gap-1.5 px-space-sm py-1 bg-surface-container-lowest rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>
+<span class="text-on-surface">6 Available</span>
+</span>
+<span class="flex items-center gap-1.5 px-space-sm py-1 bg-surface-container-lowest rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-on-surface">3 In Laboratory</span>
+</span>
+<span class="flex items-center gap-1.5 px-space-sm py-1 bg-surface-container-lowest rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="text-on-surface">1 Archived</span>
+</span>
+</div>
+</div>
+<!-- FILTER & SEARCH CONTROL MATRIX -->
+<div class="p-space-lg bg-surface-container-lowest rounded-2xl shadow-sm mb-space-xl flex flex-col gap-space-md">
+<!-- Search Bar & Sort Dropdown -->
+<div class="flex flex-col md:flex-row gap-space-md items-center justify-between">
+<div class="relative w-full md:max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low text-on-surface rounded-xl font-body-md text-body-md placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest shadow-sm" id="appSearchInput" placeholder="Search apps by keyword, platform, or scope..." type="text"/>
+<button class="hidden absolute right-3 top-2.5 text-on-surface-variant hover:text-on-surface" id="clearSearchBtn" title="Clear search">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<div class="flex items-center gap-space-sm w-full md:w-auto justify-end">
+<label class="font-code-sm text-code-sm text-on-surface-variant uppercase whitespace-nowrap" for="sortSelector">Sort By:</label>
+<select class="bg-surface-container-low text-on-surface font-label-sm text-label-sm py-2 px-3 rounded-lg focus:outline-none" id="sortSelector">
+<option value="featured">Featured First</option>
+<option value="name-asc">Name (A → Z)</option>
+<option value="name-desc">Name (Z → A)</option>
+<option value="status">Availability Status</option>
+</select>
+</div>
+</div>
+<!-- Categories & Platforms Filter Chips -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<!-- Category chips -->
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-code-sm text-code-sm text-on-surface-variant mr-space-xs uppercase">Category:</span>
+<button class="category-chip active px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-primary text-on-primary transition-all" data-category="all" type="button">All</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Productivity" type="button">Productivity</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Photo &amp; Design" type="button">Photo &amp; Design</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Lifestyle" type="button">Lifestyle</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Finance" type="button">Finance</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Developer Tools" type="button">Developer Tools</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Music &amp; Audio" type="button">Music &amp; Audio</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Health" type="button">Health</button>
+<button class="category-chip px-space-sm py-1 rounded-full text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-category="Utilities" type="button">Utilities</button>
+</div>
+<!-- Platform filter pills -->
+<div class="flex flex-wrap items-center gap-space-xs pt-space-xxs">
+<span class="font-code-sm text-code-sm text-on-surface-variant mr-space-xs uppercase">Platform:</span>
+<button class="platform-chip active px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-primary-container text-on-primary hover:bg-primary transition-all" data-platform="all" type="button">ANY</button>
+<button class="platform-chip px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" data-platform="macOS" type="button">macOS</button>
+<button class="platform-chip px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" data-platform="iOS" type="button">iOS</button>
+<button class="platform-chip px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" data-platform="Windows" type="button">Windows</button>
+<button class="platform-chip px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" data-platform="Android" type="button">Android</button>
+<button class="platform-chip px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" data-platform="Web" type="button">Web</button>
+<button class="platform-chip px-space-sm py-0.5 rounded-md text-code-sm font-code-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-all" data-platform="Linux" type="button">Linux</button>
+</div>
+</div>
+</div>
+<!-- CATALOG GRID CONTAINER -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="appsGrid">
+<!-- 1. FOCUSLY -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300 relative overflow-hidden" data-category="Productivity" data-featured="true" data-name="Focusly" data-platforms="iOS,macOS" data-status="Available">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-secondary"></div>
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">hourglass_top</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Focusly</h3>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant">v2.3.0</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Productivity</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container-high text-on-tertiary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Available
+              </span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">★ Featured</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Adaptive temporal pacing with micro-break rituals and neural interval audio cues designed for sustained deep work blocks.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<!-- Platform badges -->
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">iOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">macOS</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Metal Shaders • iCloud Sync</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:bg-inverse-surface transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Focusly', 'https://apps.apple.com/app/focusly')" type="button">
+<span>Inspect</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 2. NOTEBLOOM -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300 relative overflow-hidden" data-category="Productivity" data-featured="true" data-name="Notebloom" data-platforms="iOS,macOS,Web" data-status="Available">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-secondary"></div>
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high text-secondary flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">local_florist</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Notebloom</h3>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant">v1.8.4</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Productivity</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container-high text-on-tertiary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Available
+              </span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">★ Featured</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Non-linear knowledge repository blending bidirectional wikilinks, spontaneous margin scribbles, and visual graph canvases.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">iOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">macOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Web</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Offline First • CRDT</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:bg-inverse-surface transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Notebloom', 'https://notebloom.elariolabs.io')" type="button">
+<span>Inspect</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 3. PIXELHAVEN -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300 relative overflow-hidden" data-category="Photo &amp; Design" data-featured="true" data-name="Pixelhaven" data-platforms="macOS,Windows" data-status="Available">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-secondary"></div>
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">filter_center_focus</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Pixelhaven</h3>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant">v3.1.0</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Photo &amp; Design</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container-high text-on-tertiary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Available
+              </span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">★ Featured</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Non-destructive RAW photo grading studio with custom LUT generation, parametric curves, and architectural perspective correction.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">macOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Windows</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">GPU Compute • HDR Wide</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:bg-inverse-surface transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Pixelhaven', 'https://elariolabs.io/apps/pixelhaven')" type="button">
+<span>Inspect</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 4. TRAILMARK -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300 relative overflow-hidden" data-category="Lifestyle" data-featured="true" data-name="Trailmark" data-platforms="iOS,Android" data-status="Available">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-secondary"></div>
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container-highest text-on-surface flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">alt_route</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Trailmark</h3>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant">v2.0.1</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Lifestyle</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container-high text-on-tertiary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Available
+              </span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">★ Featured</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Topographic route recording with offline vector caching, barometric elevation profiling, and low-energy breadcrumb telemetry.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">iOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Android</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Vector Maps • GPX Sync</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:bg-inverse-surface transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Trailmark', 'https://elariolabs.io/apps/trailmark')" type="button">
+<span>Inspect</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 5. BUDGETLY -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300" data-category="Finance" data-featured="false" data-name="Budgetly" data-platforms="Android,Web" data-status="Available">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Budgetly</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Finance</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container-high text-on-tertiary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Available
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Envelope-method personal ledger emphasizing manual intentional entry, envelope roll-overs, and zero open-banking scraping.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Android</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Web</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Encrypted SQLite DB</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:bg-inverse-surface transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Budgetly', 'https://budgetly.elariolabs.io')" type="button">
+<span>Inspect</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 6. CODESNIP -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300" data-category="Developer Tools" data-featured="false" data-name="Codesnip" data-platforms="macOS,Windows,Linux" data-status="Available">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container text-on-surface flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">terminal</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Codesnip</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Developer Tools</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container-high text-on-tertiary-container font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span> Available
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Instantaneous clipboard code catalog with syntax tree parsing, regex parameter filling, and command pallet integration.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">macOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Windows</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Linux</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Native Rust Core</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-label-sm text-label-sm hover:bg-inverse-surface transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Codesnip', 'https://elariolabs.io/apps/codesnip')" type="button">
+<span>Inspect</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 7. SOUNDLEAF -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300" data-category="Music &amp; Audio" data-featured="false" data-name="Soundleaf" data-platforms="iOS,Android" data-status="Coming Soon">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high text-secondary flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">graphic_eq</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Soundleaf</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Music &amp; Audio</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-secondary-fixed text-on-secondary-fixed-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Coming Soon
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Algorithmic acoustic field generator for acoustic masking, combining binaural harmonic drones and analog room modeling.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">iOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Android</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">DSP Synthesis • Labs</span>
+<button class="px-space-md py-space-xs bg-surface-container-high text-on-surface rounded-lg font-label-sm text-label-sm hover:bg-surface-container transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Soundleaf (Waitlist)', 'https://elariolabs.io/waitlist/soundleaf')" type="button">
+<span>Notify Me</span>
+<span class="material-symbols-outlined text-[14px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 8. LINKLOOM -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300" data-category="Productivity" data-featured="false" data-name="Linkloom" data-platforms="Web,Linux" data-status="Coming Soon">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">hub</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Linkloom</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Productivity</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-secondary-fixed text-on-secondary-fixed-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Coming Soon
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Archival web clipping proxy that preserves full DOM fidelity, styles, and typography in self-contained zero-JS HTML snapshots.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Web</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Linux</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">WARC Compliant • Labs</span>
+<button class="px-space-md py-space-xs bg-surface-container-high text-on-surface rounded-lg font-label-sm text-label-sm hover:bg-surface-container transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Linkloom (Waitlist)', 'https://elariolabs.io/waitlist/linkloom')" type="button">
+<span>Notify Me</span>
+<span class="material-symbols-outlined text-[14px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 9. DAILYGRID -->
+<div class="app-card group bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-xl transition-all duration-300" data-category="Health" data-featured="false" data-name="Dailygrid" data-platforms="iOS,iPadOS" data-status="Coming Soon">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-bold text-lg shadow-sm group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[24px]">calendar_view_week</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Dailygrid</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Health</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-secondary-fixed text-on-secondary-fixed-variant font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Coming Soon
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            Minimalist recurring habit cadence matrix measuring consistency percentage and momentum vectors with zero gamification noise.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">iOS</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">iPadOS</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant">HealthKit Link • Labs</span>
+<button class="px-space-md py-space-xs bg-surface-container-high text-on-surface rounded-lg font-label-sm text-label-sm hover:bg-surface-container transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Dailygrid (Waitlist)', 'https://elariolabs.io/waitlist/dailygrid')" type="button">
+<span>Notify Me</span>
+<span class="material-symbols-outlined text-[14px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<!-- 10. RETROCLOCK -->
+<div class="app-card group bg-surface-container-lowest/80 rounded-2xl shadow-sm p-space-lg flex flex-col justify-between hover:shadow-md transition-all duration-300 opacity-75 hover:opacity-100" data-category="Utilities" data-featured="false" data-name="Retroclock" data-platforms="Windows" data-status="Discontinued">
+<div>
+<div class="flex items-start justify-between gap-space-xs mb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-12 h-12 rounded-xl bg-surface-container text-outline flex items-center justify-center font-bold text-lg shadow-sm">
+<span class="material-symbols-outlined text-[24px]">schedule</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Retroclock</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Utilities</span>
+</div>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-code-sm text-code-sm bg-surface-container text-outline font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Discontinued
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md line-clamp-2">
+            VFD mechanical flip clock screensaver utility originally built for multi-monitor setups. Replaced by open-source legacy branch.
+          </p>
+</div>
+<div class="space-y-space-md pt-space-xs">
+<div class="flex flex-wrap gap-1.5">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface">Windows</span>
+</div>
+<div class="flex items-center justify-between pt-space-sm bg-surface-container-low -mx-space-lg -mb-space-lg p-space-md">
+<span class="font-code-sm text-code-sm text-outline">Archived Repository</span>
+<button class="px-space-md py-space-xs bg-surface-container text-on-surface-variant rounded-lg font-label-sm text-label-sm hover:bg-surface-container-high transition-colors flex items-center gap-1" onclick="triggerAppSimulation('Retroclock (Archive)', 'https://github.com/elariolabs-archive/retroclock')" type="button">
+<span>Repository</span>
+<span class="material-symbols-outlined text-[14px]">archive</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State for Search -->
+<div class="hidden p-space-2xl bg-surface-container-lowest rounded-2xl shadow-sm text-center flex-col items-center justify-center" id="noResultsNotice">
+<span class="material-symbols-outlined text-outline text-[48px] mb-space-xs">travel_explore</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">No matching applications found</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm mt-1">Try resetting the category filters or adjusting search keywords.</p>
+<button class="mt-space-md px-space-lg py-space-xs bg-primary text-on-primary rounded-xl font-label-sm text-label-sm" id="resetCatalogFiltersBtn" type="button">
+        Reset All Filters
+      </button>
+</div>
+</section>
+<!-- LATEST RELEASES TIMELINE & STUDIO LOG -->
+<section class="w-full bg-surface-container-low py-space-3xl mt-space-2xl">
+<div class="max-w-[1440px] mx-auto px-margin">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<div class="lg:col-span-4 space-y-space-sm">
+<div class="inline-flex items-center gap-space-xs font-code-sm text-code-sm text-secondary uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">history_edu</span>
+<span>Changelog Stream</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">Recent Shipping Cycles</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Every commit, release candidate, and architectural refactoring is documented in public studio registries with full build provenance.
+          </p>
+<div class="pt-space-md">
+<a class="inline-flex items-center gap-space-xs text-secondary font-label-md text-label-md hover:underline font-semibold" href="#" onclick="triggerAppSimulation('Full Studio Changelog', 'https://elariolabs.io/changelog'); return false;">
+<span>View complete version archives</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<div class="lg:col-span-8 space-y-space-md">
+<!-- Release Item 1 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-space-xxs">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Focusly 2.3.0</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-tertiary-container font-code-sm text-code-sm font-semibold">STABLE</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">May 14, 2025</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Introduced spatial audio binaural generator engine, battery telemetry throttling, and Live Activities macOS widget sync.
+              </p>
+</div>
+<button class="px-space-md py-space-xs bg-surface-container text-on-surface rounded-lg font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap self-start md:self-center" onclick="triggerAppSimulation('Focusly Release Notes v2.3.0', 'https://elariolabs.io/releases/focusly-230')" type="button">
+              Release Notes
+            </button>
+</div>
+<!-- Release Item 2 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-space-xxs">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Pixelhaven 3.1.0</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-on-tertiary-container font-code-sm text-code-sm font-semibold">STABLE</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">April 28, 2025</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Added hardware-accelerated color grading matrices, 16-bit DNG export pipelines, and multi-display calibration profiles.
+              </p>
+</div>
+<button class="px-space-md py-space-xs bg-surface-container text-on-surface rounded-lg font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap self-start md:self-center" onclick="triggerAppSimulation('Pixelhaven Release Notes v3.1.0', 'https://elariolabs.io/releases/pixelhaven-310')" type="button">
+              Release Notes
+            </button>
+</div>
+<!-- Release Item 3 -->
+<div class="p-space-lg bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="space-y-space-xxs">
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Notebloom 1.8.4</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-code-sm text-code-sm">MAINTENANCE</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">April 12, 2025</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Resolved edge-case CRDT concurrent merge race condition when working across simultaneous offline peer bridges.
+              </p>
+</div>
+<button class="px-space-md py-space-xs bg-surface-container text-on-surface rounded-lg font-label-sm text-label-sm hover:bg-surface-container-high whitespace-nowrap self-start md:self-center" onclick="triggerAppSimulation('Notebloom Release Notes v1.8.4', 'https://elariolabs.io/releases/notebloom-184')" type="button">
+              Release Notes
+            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- STUDIO PHILOSOPHY TRILOGY -->
+<section class="max-w-[1440px] mx-auto px-margin py-space-3xl" id="philosophy">
+<div class="text-center max-w-2xl mx-auto mb-space-2xl space-y-space-xxs">
+<div class="inline-flex items-center gap-space-xs font-code-sm text-code-sm text-secondary uppercase tracking-wider">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span>The Craft Tenets</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">How ElarioLabs Works</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Software is permanent architecture. We design for clarity, longevity, and structural calm.
+      </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Pillar 1 -->
+<div class="p-space-xl bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col justify-between space-y-space-lg hover:shadow-lg transition-shadow">
+<div class="space-y-space-md">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-high text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">speed</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Sub-Millisecond Touch Response</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Every UI interaction is bound to native hardware refresh events. No framework bloat, zero unnecessary paint cycles, zero animation frames lost to garbage collection.
+          </p>
+</div>
+<div class="pt-space-md flex items-center gap-2 font-code-sm text-code-sm text-on-tertiary-container">
+<span class="material-symbols-outlined text-[16px]">done_all</span>
+<span>Validated 120Hz ProMotion</span>
+</div>
+</div>
+<!-- Pillar 2 -->
+<div class="p-space-xl bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col justify-between space-y-space-lg hover:shadow-lg transition-shadow">
+<div class="space-y-space-md">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-high text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">lock</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Local-First Sovereign Ownership</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Your notes, images, metrics, and workflows exist physically in human-readable plain files and open relational engines directly on your machine. We cannot read your records.
+          </p>
+</div>
+<div class="pt-space-md flex items-center gap-2 font-code-sm text-code-sm text-secondary">
+<span class="material-symbols-outlined text-[16px]">key</span>
+<span>Zero Surveillance Model</span>
+</div>
+</div>
+<!-- Pillar 3 -->
+<div class="p-space-xl bg-surface-container-lowest rounded-2xl shadow-sm flex flex-col justify-between space-y-space-lg hover:shadow-lg transition-shadow">
+<div class="space-y-space-md">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-high text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">nature_people</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Quiet, Respectful Interfaces</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            No unsolicited push tokens, no manufactured urgency countdowns, no gamified streak badges. Our products fade quietly into the background until summoned for duty.
+          </p>
+</div>
+<div class="pt-space-md flex items-center gap-2 font-code-sm text-code-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">visibility_off</span>
+<span>Dignified Ergonomics</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SUPPORT / CONTACT CTA BANNER -->
+<section class="max-w-[1440px] mx-auto px-margin pb-space-3xl w-full">
+<div class="p-space-2xl bg-primary text-on-primary rounded-3xl shadow-xl flex flex-col lg:flex-row items-center justify-between gap-space-xl relative overflow-hidden">
+<!-- Abstract Geometry in Card Background -->
+<div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-secondary/20 blur-2xl pointer-events-none"></div>
+<div class="max-w-xl space-y-space-sm relative z-10">
+<div class="inline-flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-high/10 rounded-full text-on-primary font-code-sm text-code-sm uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]">support_agent</span>
+<span>Architect Support Desk</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg font-semibold tracking-tight">Need technical consultation or studio inquiry?</h3>
+<p class="font-body-md text-body-md text-on-primary/80">
+          We provide human engineering support for all active licenses, integration guides for teams, and open beta feedback channels.
+        </p>
+</div>
+<div class="flex flex-col sm:flex-row items-center gap-space-md relative z-10 w-full sm:w-auto">
+<button class="w-full sm:w-auto px-space-xl py-space-sm bg-on-primary text-primary font-label-md text-label-md rounded-xl hover:bg-surface-container-high transition-colors font-medium" onclick="triggerAppSimulation('Support Helpdesk', 'https://elariolabs.io/support')" type="button">
+          Open Support Ticket
+        </button>
+<button class="w-full sm:w-auto px-space-lg py-space-sm bg-surface-container-highest/20 text-on-primary font-label-md text-label-md rounded-xl hover:bg-surface-container-highest/30 transition-colors" onclick="triggerAppSimulation('Studio Contact Form', 'https://elariolabs.io/contact')" type="button">
+          Contact Principals
+        </button>
+</div>
+</div>
+</section>
+<!-- INTERACTIVE SIMULATION MODAL -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-inverse-surface/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200" id="simulationModal">
+<div class="bg-surface-container-lowest max-w-md w-full rounded-2xl shadow-2xl p-space-xl flex flex-col gap-space-md transform scale-95 transition-transform duration-200" id="simulationModalContent">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs text-secondary font-code-sm text-code-sm font-semibold">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+<span>STUDIO DISPATCH ENGINE</span>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high flex items-center justify-center text-on-surface" onclick="closeSimulationModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="space-y-space-xs">
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface" id="modalTargetTitle">Demo Simulation</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          In a live production environment, this link initiates a secure transport routing directly to:
+        </p>
+<div class="p-space-sm bg-surface-container-low rounded-lg font-code-sm text-code-sm text-secondary break-all select-all" id="modalTargetUrl">
+          https://elariolabs.io/apps
+        </div>
+</div>
+<div class="p-space-sm bg-surface-container rounded-xl flex items-start gap-space-xs text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[18px] shrink-0">info</span>
+<span>Studio Architecture Demo Mode is currently activated. Navigation triggers simulated events with zero external network dispatch.</span>
+</div>
+<div class="flex items-center justify-end gap-space-sm pt-space-xs">
+<button class="px-space-lg py-space-xs bg-primary text-on-primary rounded-xl font-label-md text-label-md hover:bg-inverse-surface transition-colors" onclick="closeSimulationModal()" type="button">
+          Acknowledge
+        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- CLIENT INTERACTIVITY LOGIC -->
+<script>
+  let currentCategory = 'all';
+  let currentPlatform = 'all';
+  let searchQuery = '';
+
+  const searchInput = document.getElementById('appSearchInput');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const sortSelector = document.getElementById('sortSelector');
+  const categoryChips = document.querySelectorAll('.category-chip');
+  const platformChips = document.querySelectorAll('.platform-chip');
+  const appsGrid = document.getElementById('appsGrid');
+  const noResultsNotice = document.getElementById('noResultsNotice');
+  const resetFiltersBtn = document.getElementById('resetCatalogFiltersBtn');
+
+  // Modal elements
+  const simModal = document.getElementById('simulationModal');
+  const simModalContent = document.getElementById('simulationModalContent');
+  const modalTargetTitle = document.getElementById('modalTargetTitle');
+  const modalTargetUrl = document.getElementById('modalTargetUrl');
+
+  function filterAndSortApps() {
+    const cards = Array.from(document.querySelectorAll('.app-card'));
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const name = (card.getAttribute('data-name') || '').toLowerCase();
+      const cat = card.getAttribute('data-category') || '';
+      const platforms = (card.getAttribute('data-platforms') || '').split(',');
+      const status = card.getAttribute('data-status') || '';
+      const textContent = card.innerText.toLowerCase();
+
+      const matchesCategory = currentCategory === 'all' || cat.toLowerCase() === currentCategory.toLowerCase();
+      const matchesPlatform = currentPlatform === 'all' || platforms.some(p => p.trim().toLowerCase() === currentPlatform.toLowerCase());
+      const matchesSearch = searchQuery === '' || textContent.includes(searchQuery.toLowerCase()) || name.includes(searchQuery.toLowerCase());
+
+      if (matchesCategory && matchesPlatform && matchesSearch) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Handle Empty State
+    if (visibleCount === 0) {
+      noResultsNotice.classList.remove('hidden');
+      noResultsNotice.classList.add('flex');
+    } else {
+      noResultsNotice.classList.add('hidden');
+      noResultsNotice.classList.remove('flex');
+    }
+
+    // Sort Visible Cards
+    const sortVal = sortSelector.value;
+    const sorted = cards.sort((a, b) => {
+      if (sortVal === 'name-asc') {
+        return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+      }
+      if (sortVal === 'name-desc') {
+        return b.getAttribute('data-name').localeCompare(a.getAttribute('data-name'));
+      }
+      if (sortVal === 'status') {
+        return a.getAttribute('data-status').localeCompare(b.getAttribute('data-status'));
+      }
+      // Featured first (default)
+      const aFeat = a.getAttribute('data-featured') === 'true' ? 1 : 0;
+      const bFeat = b.getAttribute('data-featured') === 'true' ? 1 : 0;
+      return bFeat - aFeat;
+    });
+
+    sorted.forEach(card => appsGrid.appendChild(card));
+  }
+
+  // Category filter clicks
+  categoryChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      categoryChips.forEach(c => {
+        c.classList.remove('active', 'bg-primary', 'text-on-primary');
+        c.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      });
+      chip.classList.add('active', 'bg-primary', 'text-on-primary');
+      chip.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+
+      currentCategory = chip.getAttribute('data-category');
+      filterAndSortApps();
+    });
+  });
+
+  // Platform filter clicks
+  platformChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      platformChips.forEach(c => {
+        c.classList.remove('active', 'bg-primary-container', 'text-on-primary');
+        c.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      });
+      chip.classList.add('active', 'bg-primary-container', 'text-on-primary');
+      chip.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+
+      currentPlatform = chip.getAttribute('data-platform');
+      filterAndSortApps();
+    });
+  });
+
+  // Search input handler
+  searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value.trim();
+    if (searchQuery.length > 0) {
+      clearSearchBtn.classList.remove('hidden');
+    } else {
+      clearSearchBtn.classList.add('hidden');
+    }
+    filterAndSortApps();
+  });
+
+  clearSearchBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    clearSearchBtn.classList.add('hidden');
+    filterAndSortApps();
+  });
+
+  sortSelector.addEventListener('change', () => {
+    filterAndSortApps();
+  });
+
+  resetFiltersBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    clearSearchBtn.classList.add('hidden');
+
+    currentCategory = 'all';
+    categoryChips.forEach((c, idx) => {
+      if (idx === 0) {
+        c.classList.add('active', 'bg-primary', 'text-on-primary');
+        c.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+      } else {
+        c.classList.remove('active', 'bg-primary', 'text-on-primary');
+        c.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      }
+    });
+
+    currentPlatform = 'all';
+    platformChips.forEach((c, idx) => {
+      if (idx === 0) {
+        c.classList.add('active', 'bg-primary-container', 'text-on-primary');
+        c.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+      } else {
+        c.classList.remove('active', 'bg-primary-container', 'text-on-primary');
+        c.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      }
+    });
+
+    filterAndSortApps();
+  });
+
+  // Modal Dispatch Helpers
+  function triggerAppSimulation(appName, destinationUrl) {
+    modalTargetTitle.textContent = 'App Simulation: ' + appName;
+    modalTargetUrl.textContent = destinationUrl;
+
+    simModal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      simModal.classList.remove('opacity-0');
+      simModalContent.classList.remove('scale-95');
+    });
+  }
+
+  function closeSimulationModal() {
+    simModal.classList.add('opacity-0');
+    simModalContent.classList.add('scale-95');
+    setTimeout(() => {
+      simModal.classList.add('hidden');
+    }, 200);
+  }
+
+  // Close modal on escape or background click
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSimulationModal();
+  });
+
+  simModal.addEventListener('click', (e) => {
+    if (e.target === simModal) closeSimulationModal();
+  });
+</script></main><footer class="w-full bg-surface-container-low py-space-2xl mt-space-3xl"><div class="max-w-[1440px] mx-auto px-margin flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">ElarioLabs</span><span class="font-code-sm text-code-sm text-on-surface-variant">v2.4.0 Studio Architecture</span></div><div class="flex items-center gap-space-lg"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#">Support</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></div><p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 ElarioLabs Studio. Engineering &amp; Interface Precision.</p></div></footer><div class="fixed bottom-space-lg left-space-lg z-50 flex items-center gap-space-xs p-space-xxs bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_10px_15px_-3px_rgba(15,23,42,0.05),0_4px_6px_-4px_rgba(15,23,42,0.03)]"><button class="flex items-center gap-space-xs px-space-sm py-space-xxs rounded-full bg-primary text-on-primary font-code-sm text-code-sm transition-all" title="Toggle Mode" type="button"><span class="material-symbols-outlined text-[14px]">toggle_on</span><span>Public</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Simulate Viewport" type="button"><span class="material-symbols-outlined text-[16px]">devices</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Toggle Theme" type="button"><span class="material-symbols-outlined text-[16px]">light_mode</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Reset Demo Data" type="button"><span class="material-symbols-outlined text-[16px]">restart_alt</span></button></div><aside class="fixed top-0 right-0 h-full w-80 bg-surface-container-lowest z-50 transform translate-x-full transition-transform duration-300 ease-in-out shadow-[0_20px_25px_-5px_rgba(15,23,42,0.08)] p-space-lg flex flex-col md:hidden"><div class="flex items-center justify-between pb-space-md"><div class="flex items-center gap-space-xs"><img alt="ElarioLabs Logo" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VtwtkSBq80G5X63cLF0tdgFeMBWInIBrai5Wv-GXVjRT--OCOxuHqPUWvjczHTSh-rYC9K3w4TFoeOELqFJqL-ADyb2jmujCvOX4bPI87y8pFzW83NFnKtHQj_N8F-6t1iF_pH5Yyz3pNfi6vDLeivKzUyaR55delmChcyuVwFiTnoOcZhG8tdQZdsHuGt7zi3qH268dAw8hyzm9gZIeuQ1iRPqUSvIOg9mktU75DF"/><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Menu</span></div><button aria-label="Close Drawer" class="p-space-xs text-on-surface-variant hover:text-on-surface rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">close</span></button></div><nav class="flex flex-col gap-space-xs flex-1" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-md py-space-sm"><a aria-current="page" class="transition-colors bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-md py-space-sm" data-path="apps" href="#">Apps</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="about" href="#">About</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="support" href="#">Support</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="contact" href="#">Contact</a></nav><div class="pt-space-md"><a class="flex items-center justify-center gap-space-xs w-full py-space-sm bg-surface-container-high text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors" data-path="admin-portal" href="#"><span class="material-symbols-outlined text-[18px]">tune</span><span>Admin Portal</span></a></div></aside><div class="fixed bottom-space-lg right-space-lg z-50 flex flex-col gap-space-xs pointer-events-none"><div class="pointer-events-auto flex items-center gap-space-sm px-space-md py-space-sm bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.05)] text-on-surface"><span class="material-symbols-outlined text-secondary text-[18px]">info</span><span class="font-body-sm text-body-sm text-on-surface">Studio Workspace Loaded</span><button class="text-on-surface-variant hover:text-on-surface ml-space-xs" type="button"><span class="material-symbols-outlined text-[14px]">close</span></button></div></div></body></html>
