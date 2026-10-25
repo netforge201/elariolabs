@@ -10,5 +10,18 @@ export async function currentAdmin() {
  return row.user;
 }
 export function newSessionToken(){return randomBytes(32).toString('base64url')}
-export async function sameOrigin(req:Request){const origin=req.headers.get('origin');if(!origin)return false;try{return new URL(origin).host===new URL(process.env.APP_URL??req.url).host}catch{return false}}
+export async function sameOrigin(req:Request){
+ const origin=req.headers.get('origin');
+ if(!origin)return false;
+ try{
+  const originUrl=new URL(origin);
+  if(originUrl.protocol!=='http:'&&originUrl.protocol!=='https:')return false;
+  // Deployzy and other reverse proxies may expose the public host in forwarded
+  // headers while req.url (and APP_URL) still point at an internal hostname.
+  const forwardedHost=req.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+  const requestHost=(forwardedHost||req.headers.get('host')||new URL(req.url).host).toLowerCase();
+  const configuredHost=process.env.APP_URL?new URL(process.env.APP_URL).host.toLowerCase():'';
+  return originUrl.host.toLowerCase()===requestHost||originUrl.host.toLowerCase()===configuredHost;
+ }catch{return false}
+}
 export { hash };
