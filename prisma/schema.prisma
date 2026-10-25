@@ -1,0 +1,360 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AppContentState {
+  DRAFT
+  PUBLISHED
+}
+enum AppAvailability {
+  AVAILABLE
+  COMING_SOON
+  DISCONTINUED
+}
+enum ReleaseState {
+  DRAFT
+  PUBLISHED
+}
+enum MessageKind {
+  GENERAL
+  SUPPORT
+}
+enum MessageStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
+}
+enum ArticleState {
+  DRAFT
+  PUBLISHED
+}
+enum MediaRole {
+  ICON
+  COVER
+  SCREENSHOT
+  OG
+}
+enum ReleaseChangeKind {
+  ADDED
+  IMPROVED
+  FIXED
+  REMOVED
+  SECURITY
+}
+
+model Role {
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String     @unique
+  permissions Json       @default("[]")
+  users       AdminUser[]
+  createdAt   DateTime   @default(now()) @map("created_at")
+  @@map("roles")
+}
+
+model AdminUser {
+  id           String         @id @default(uuid()) @db.Uuid
+  email        String         @unique
+  passwordHash String         @map("password_hash")
+  name         String
+  roleId       String         @db.Uuid @map("role_id")
+  role         Role           @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  active       Boolean        @default(true)
+  sessions     AdminSession[]
+  assets       MediaAsset[]
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  @@map("admin_users")
+}
+
+model AdminSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid @map("user_id")
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([expiresAt])
+  @@map("admin_sessions")
+}
+
+model Category {
+  id        String        @id @default(uuid()) @db.Uuid
+  name      String        @unique
+  slug      String        @unique
+  sortOrder Int           @default(0) @map("sort_order")
+  apps      Application[]
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  @@map("categories")
+}
+
+model Platform {
+  id        String               @id @default(uuid()) @db.Uuid
+  name      String               @unique
+  slug      String               @unique
+  sortOrder Int                  @default(0) @map("sort_order")
+  apps      ApplicationPlatform[]
+  createdAt DateTime             @default(now()) @map("created_at")
+  updatedAt DateTime             @updatedAt @map("updated_at")
+  @@map("platforms")
+}
+
+model Application {
+  id              String                @id @default(uuid()) @db.Uuid
+  name            String
+  slug            String                @unique
+  tagline         String                @default("")
+  shortDescription String               @default("") @map("short_description")
+  description     String                @default("")
+  categoryId      String?               @db.Uuid @map("category_id")
+  category        Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  pricingLabel    String?               @map("pricing_label")
+  bundleId        String?               @map("bundle_id")
+  featured        Boolean               @default(false)
+  displayOrder    Int                   @default(0) @map("display_order")
+  contentState    AppContentState       @default(DRAFT) @map("content_state")
+  availability    AppAvailability       @default(AVAILABLE)
+  seoTitle        String?               @map("seo_title")
+  seoDescription  String?               @map("seo_description")
+  iconUrl         String?               @map("icon_url")
+  coverUrl        String?               @map("cover_url")
+  platforms       ApplicationPlatform[]
+  features        ApplicationFeature[]
+  media           ApplicationMedia[]
+  releases        Release[]
+  faqs            FAQ[]
+  articles        HelpArticle[]
+  legalDocuments  LegalDocument[]
+  messages        ContactMessage[]
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  @@index([contentState, availability, featured, displayOrder])
+  @@map("applications")
+}
+
+model ApplicationPlatform {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @db.Uuid @map("application_id")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  platformId    String      @db.Uuid @map("platform_id")
+  platform      Platform    @relation(fields: [platformId], references: [id], onDelete: Restrict)
+  url           String?
+  label         String?
+  @@unique([applicationId, platformId])
+  @@map("application_platforms")
+}
+
+model ApplicationFeature {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @db.Uuid @map("application_id")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  title         String
+  body          String      @default("")
+  sortOrder     Int         @default(0) @map("sort_order")
+  @@index([applicationId, sortOrder])
+  @@map("application_features")
+}
+
+model MediaAsset {
+  id               String            @id @default(uuid()) @db.Uuid
+  storageKey       String            @unique @map("storage_key")
+  deleteUrl        String?           @map("delete_url")
+  originalFilename String            @map("original_filename")
+  storedName       String            @map("stored_name")
+  mimeType         String            @map("mime_type")
+  size             Int
+  width            Int?
+  height           Int?
+  altText          String            @default("") @map("alt_text")
+  uploadedBy       String?           @db.Uuid @map("uploaded_by")
+  uploader         AdminUser?        @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  links            ApplicationMedia[]
+  @@map("media_assets")
+}
+
+model ApplicationMedia {
+  id            String      @id @default(uuid()) @db.Uuid
+  applicationId String      @db.Uuid @map("application_id")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  assetId       String      @db.Uuid @map("asset_id")
+  asset         MediaAsset  @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  role          MediaRole
+  sortOrder     Int         @default(0) @map("sort_order")
+  @@unique([applicationId, assetId, role])
+  @@map("application_media")
+}
+
+model Release {
+  id            String        @id @default(uuid()) @db.Uuid
+  applicationId String        @db.Uuid @map("application_id")
+  application   Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  version       String
+  title         String
+  description   String        @default("")
+  releaseDate   DateTime      @default(now()) @map("release_date")
+  status        ReleaseState  @default(DRAFT)
+  changes       ReleaseChange[]
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  @@unique([applicationId, version])
+  @@index([applicationId, status, releaseDate])
+  @@map("releases")
+}
+
+model ReleaseChange {
+  id        String            @id @default(uuid()) @db.Uuid
+  releaseId String            @db.Uuid @map("release_id")
+  release   Release           @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  kind      ReleaseChangeKind
+  text      String
+  sortOrder Int               @default(0) @map("sort_order")
+  @@map("release_changes")
+}
+
+model Page {
+  id             String        @id @default(uuid()) @db.Uuid
+  slug           String        @unique
+  title          String
+  content        Json          @default("{}")
+  published      Boolean       @default(true)
+  seoTitle       String?       @map("seo_title")
+  seoDescription String?       @map("seo_description")
+  sections       PageSection[]
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  @@map("pages")
+}
+
+model PageSection {
+  id        String   @id @default(uuid()) @db.Uuid
+  pageId    String   @db.Uuid @map("page_id")
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  kind      String
+  data      Json
+  visible   Boolean  @default(true)
+  sortOrder Int      @default(0) @map("sort_order")
+  @@map("page_sections")
+}
+
+model LegalDocument {
+  id             String       @id @default(uuid()) @db.Uuid
+  title          String
+  slug           String       @unique
+  type           String
+  content        String       @db.Text
+  effectiveDate  DateTime?    @map("effective_date")
+  updatedDate    DateTime?    @map("updated_date")
+  status         ArticleState @default(DRAFT)
+  applicationId  String?      @db.Uuid @map("application_id")
+  application    Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  seoTitle       String?      @map("seo_title")
+  seoDescription String?      @map("seo_description")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  @@map("legal_documents")
+}
+
+model SupportCategory {
+  id          String        @id @default(uuid()) @db.Uuid
+  title       String
+  slug        String        @unique
+  description String        @default("")
+  sortOrder   Int           @default(0) @map("sort_order")
+  faqs        FAQ[]
+  articles    HelpArticle[]
+  @@map("support_categories")
+}
+
+model FAQ {
+  id            String           @id @default(uuid()) @db.Uuid
+  question      String
+  answer        String           @db.Text
+  categoryId    String?          @db.Uuid @map("category_id")
+  category      SupportCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  applicationId String?          @db.Uuid @map("application_id")
+  application   Application?     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  status        ArticleState     @default(DRAFT)
+  sortOrder     Int              @default(0) @map("sort_order")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  @@map("faqs")
+}
+
+model HelpArticle {
+  id            String           @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String           @unique
+  excerpt       String           @default("")
+  content       String           @db.Text
+  categoryId    String?          @db.Uuid @map("category_id")
+  category      SupportCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  applicationId String?          @db.Uuid @map("application_id")
+  application   Application?     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  status        ArticleState     @default(DRAFT)
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  @@map("help_articles")
+}
+
+model ContactMessage {
+  id            String        @id @default(uuid()) @db.Uuid
+  name          String
+  email         String
+  subject       String
+  message       String        @db.Text
+  kind          MessageKind   @default(GENERAL)
+  status        MessageStatus @default(NEW)
+  applicationId String?       @db.Uuid @map("application_id")
+  application   Application?  @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  abuseHash     String?       @map("abuse_hash")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  @@index([status, createdAt])
+  @@map("contact_messages")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+  @@map("site_settings")
+}
+
+model NavigationItem {
+  id        String  @id @default(uuid()) @db.Uuid
+  label     String
+  href      String
+  group     String
+  sortOrder Int     @default(0) @map("sort_order")
+  visible   Boolean @default(true)
+  @@index([group, visible, sortOrder])
+  @@map("navigation_items")
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  event     String
+  path      String
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([createdAt, event])
+  @@map("analytics_events")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String?  @db.Uuid @map("actor_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  summary   Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@index([createdAt])
+  @@map("audit_logs")
+}

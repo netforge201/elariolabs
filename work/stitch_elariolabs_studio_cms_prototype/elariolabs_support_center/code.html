@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-container": "#0c9488", "on-surface": "#0b1c30", "surface": "#f8f9ff", "on-error": "#ffffff", "outline-variant": "#c6c6cd", "surface-tint": "#565e74", "surface-container-low": "#eff4ff", "on-error-container": "#93000a", "inverse-primary": "#bec6e0", "error-container": "#ffdad6", "surface-dim": "#cbdbf5", "on-secondary-container": "#fffbff", "on-primary-fixed": "#131b2e", "tertiary-container": "#00201d", "primary-container": "#131b2e", "tertiary-fixed-dim": "#6bd8cb", "surface-container-high": "#dce9ff", "background": "#f8f9ff", "on-secondary-fixed-variant": "#3323cc", "outline": "#76777d", "error": "#ba1a1a", "secondary-container": "#645efb", "surface-container": "#e5eeff", "on-primary": "#ffffff", "on-tertiary-fixed-variant": "#005049", "on-background": "#0b1c30", "secondary-fixed": "#e2dfff", "surface-bright": "#f8f9ff", "on-secondary-fixed": "#0f0069", "primary": "#000000", "on-tertiary-fixed": "#00201d", "inverse-surface": "#213145", "surface-variant": "#d3e4fe", "on-primary-fixed-variant": "#3f465c", "primary-fixed": "#dae2fd", "on-secondary": "#ffffff", "secondary-fixed-dim": "#c3c0ff", "secondary": "#4b41e1", "surface-container-lowest": "#ffffff", "on-primary-container": "#7c839b", "inverse-on-surface": "#eaf1ff", "tertiary": "#000000", "primary-fixed-dim": "#bec6e0", "surface-container-highest": "#d3e4fe", "on-tertiary": "#ffffff", "tertiary-fixed": "#89f5e7", "on-surface-variant": "#45464d" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "2.5rem", "space-md": "1rem", "gutter-dense": "0.75rem", "margin": "3rem", "gutter": "1.5rem", "margin-mobile": "1.25rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-xxs": "0.125rem", "space-sm": "0.5rem", "space-2xl": "4rem", "space-xs": "0.25rem", "space-3xl": "6rem", "margin-dense": "1.5rem" }, "fontFamily": { "code-sm": [ "JetBrains Mono" ], "display": [ "Plus Jakarta Sans" ], "display-mobile": [ "Plus Jakarta Sans" ], "headline-sm": [ "Plus Jakarta Sans" ], "headline-md": [ "Plus Jakarta Sans" ], "label-md": [ "Inter" ], "label-sm": [ "Inter" ], "code-inline": [ "JetBrains Mono" ], "body-md": [ "Inter" ], "body-sm": [ "Inter" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "body-lg": [ "Inter" ], "headline-lg": [ "Plus Jakarta Sans" ] }, "fontSize": { "code-sm": [ "0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.02em", "fontWeight": "400" } ], "display": [ "3.75rem", { "lineHeight": "4.25rem", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "display-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "headline-sm": [ "1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-md": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "label-md": [ "0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.005em", "fontWeight": "500" } ], "label-sm": [ "0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.01em", "fontWeight": "500" } ], "code-inline": [ "0.8125rem", { "lineHeight": "1.125rem", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "body-md": [ "0.9375rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.005em", "fontWeight": "400" } ], "body-sm": [ "0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0", "fontWeight": "400" } ], "headline-lg-mobile": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "body-lg": [ "1.125rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "headline-lg": [ "2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.025em", "fontWeight": "600" } ] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen relative"><header class="fixed top-0 left-0 right-0 z-40 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-md"><img alt="ElarioLabs Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VtwtkSBq80G5X63cLF0tdgFeMBWInIBrai5Wv-GXVjRT--OCOxuHqPUWvjczHTSh-rYC9K3w4TFoeOELqFJqL-ADyb2jmujCvOX4bPI87y8pFzW83NFnKtHQj_N8F-6t1iF_pH5Yyz3pNfi6vDLeivKzUyaR55delmChcyuVwFiTnoOcZhG8tdQZdsHuGt7zi3qH268dAw8hyzm9gZIeuQ1iRPqUSvIOg9mktU75DF"/><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-semibold">ElarioLabs</span></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-sm py-space-xs"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#">Support</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></nav><div class="flex items-center gap-space-md"><a class="hidden sm:flex items-center gap-space-xs px-space-md py-space-xs bg-surface-container-high text-on-surface font-label-sm text-label-sm rounded-lg hover:bg-surface-container hover:text-on-surface transition-all" data-path="admin-portal" href="#"><span class="material-symbols-outlined text-[16px]">tune</span><span>Admin Portal</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><button aria-label="Toggle Mobile Menu" class="md:hidden flex items-center justify-center p-space-xs text-on-surface hover:bg-surface-container-low rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">menu</span></button></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<!-- Top Ambient Glow Line -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[720px] h-[280px] bg-gradient-to-b from-secondary/10 to-transparent blur-3xl pointer-events-none rounded-full"></div>
+<!-- Main Container -->
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-xl md:py-space-2xl">
+<!-- Breadcrumb & Studio Status Pill -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm mb-space-lg">
+<nav aria-label="Breadcrumb" class="flex items-center gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<a class="hover:text-on-surface transition-colors" href="#">Home</a>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface font-medium">Support Center</span>
+</nav>
+<div class="inline-flex items-center gap-space-xs px-space-sm py-space-xxs bg-surface-container-low rounded-full shadow-sm w-fit">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-on-tertiary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-on-tertiary-container"></span>
+</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">
+            All Systems Operational <span class="text-outline-variant">•</span> Mean Response <strong class="text-on-surface font-medium">3.8h</strong>
+</span>
+</div>
+</div>
+<!-- Hero Header -->
+<div class="max-w-3xl mb-space-xl">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-secondary font-medium block mb-space-xs">Engineering Support &amp; Knowledgebase</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mb-space-sm">
+          Support &amp; Knowledge Center
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+          Comprehensive documentation, diagnostics, zero-telemetry architecture guides, and direct engineering dispatch for all ElarioLabs applications.
+        </p>
+</div>
+<!-- Real-Time Interactive Search Interface -->
+<div class="w-full max-w-4xl bg-surface-container-lowest p-space-sm md:p-space-md rounded-xl shadow-md mb-space-lg">
+<div class="relative flex items-center bg-surface-container-low rounded-lg px-space-md py-space-sm transition-all focus-within:bg-surface-container-lowest focus-within:shadow-[0_0_0_2px_rgba(75,65,225,0.25)]">
+<span class="material-symbols-outlined text-outline text-[22px] mr-space-sm">search</span>
+<input autocomplete="off" class="w-full bg-transparent border-0 p-0 text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none" id="kb-search-input" placeholder="Search documentation, error codes, hotkey guides, or app diagnostics across the studio..." type="text"/>
+<div class="hidden sm:flex items-center gap-1 pl-space-sm">
+<kbd class="px-space-xs py-0.5 bg-surface-container text-on-surface-variant font-code-sm text-code-sm rounded">⌘</kbd>
+<kbd class="px-space-xs py-0.5 bg-surface-container text-on-surface-variant font-code-sm text-code-sm rounded">K</kbd>
+</div>
+</div>
+<!-- Quick Filter Tags -->
+<div class="flex flex-wrap items-center gap-space-xs mt-space-sm pt-space-xs">
+<span class="font-label-sm text-label-sm text-outline-variant pr-space-xs">Quick index:</span>
+<button class="quick-tag px-space-sm py-0.5 bg-surface-container-high hover:bg-secondary-fixed hover:text-on-secondary-fixed text-on-surface-variant font-code-sm text-code-sm rounded-full transition-all" type="button">
+            CloudKit Sync
+          </button>
+<button class="quick-tag px-space-sm py-0.5 bg-surface-container-high hover:bg-secondary-fixed hover:text-on-secondary-fixed text-on-surface-variant font-code-sm text-code-sm rounded-full transition-all" type="button">
+            CoreAudio DSP
+          </button>
+<button class="quick-tag px-space-sm py-0.5 bg-surface-container-high hover:bg-secondary-fixed hover:text-on-secondary-fixed text-on-surface-variant font-code-sm text-code-sm rounded-full transition-all" type="button">
+            RAW Pipeline
+          </button>
+<button class="quick-tag px-space-sm py-0.5 bg-surface-container-high hover:bg-secondary-fixed hover:text-on-secondary-fixed text-on-surface-variant font-code-sm text-code-sm rounded-full transition-all" type="button">
+            Markdown CRDT
+          </button>
+<button class="quick-tag px-space-sm py-0.5 bg-surface-container-high hover:bg-secondary-fixed hover:text-on-secondary-fixed text-on-surface-variant font-code-sm text-code-sm rounded-full transition-all" type="button">
+            License Recovery
+          </button>
+</div>
+<!-- Dynamic Search Results Overlay / Container (Client State) -->
+<div class="hidden mt-space-md pt-space-md" id="search-results-panel">
+<div class="flex items-center justify-between pb-space-xs mb-space-sm">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold">Matched Studio Articles</span>
+<span class="font-code-sm text-code-sm text-secondary" id="results-count">3 results</span>
+</div>
+<div class="flex flex-col gap-space-xs" id="results-list">
+<!-- Dynamically populated or toggled -->
+</div>
+</div>
+</div>
+<!-- Studio Telemetry Banner (Low profile, high contrast) -->
+<div class="w-full bg-surface-container-low p-space-md rounded-xl shadow-sm mb-space-2xl flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-secondary shadow-sm">
+<span class="material-symbols-outlined text-[20px]">format_image_left</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-on-surface font-semibold">
+<span>Universal Sovereign Architecture</span>
+<span class="px-space-xs py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-code-sm text-code-sm font-normal">v2.4 Live</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Zero external telemetry servers • CloudKit daemon integrity: 99.98% • Machine licensing node: Active</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<a class="px-space-md py-space-xs rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-sm text-label-sm shadow-sm transition-all flex items-center gap-space-xs" href="#">
+<span class="material-symbols-outlined text-[16px]">monitoring</span>
+<span>Studio Live Telemetry</span>
+</a>
+</div>
+</div>
+<!-- SECTION 1: Application Knowledge Hubs -->
+<section class="mb-space-2xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-lg gap-space-xs">
+<div>
+<span class="font-code-sm text-code-sm text-secondary uppercase tracking-widest font-semibold block mb-space-xxs">01 // Ecosystem</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">App Knowledge Hubs</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Dedicated technical manuals, crash diagnostics, and native pipeline references.</p>
+</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">
+<span>8 Modular Applications Active</span>
+</div>
+</div>
+<!-- 4-Column Responsive Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- App 1: Focusly -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">timer</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">v2.3.0</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">Active Hub</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Focusly</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                Temporal pacing, binaural synthesizers, and CloudKit sync diagnostics.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">18 Guides</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Hub <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 2: Notebloom -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">edit_note</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">v1.8.4</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">Active Hub</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Notebloom</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                CRDT conflict resolution, encrypted local vaults, and wikilink syntax.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">24 Guides</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Hub <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 3: Pixelhaven -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">photo_camera_back</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">v3.1.0</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">Active Hub</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Pixelhaven</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                Metal GPU acceleration, 16-bit DNG color pipelines, and LUT imports.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">31 Guides</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Hub <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 4: Trailmark -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">explore</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">v2.0.1</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">Active Hub</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Trailmark</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                Offline vector topo tile caching, GPX telemetry, and battery coalescing.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">15 Guides</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Hub <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 5: Codesnip -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">code</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">v1.2.0</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">Active Hub</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Codesnip</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                Treesitter syntax engines, native CLI bridges, and terminal pipelines.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">12 Guides</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Hub <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 6: Budgetly -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">v1.0.2</span>
+<span class="px-space-xs py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">Active Hub</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Budgetly</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                Encrypted SQLite schema, manual double-entry, and CSV bank exports.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">9 Guides</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Browse Hub <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 7: Soundleaf (Beta/Labs) -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">graphic_eq</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">Beta</span>
+<span class="px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-code-sm text-code-sm font-semibold">In Lab</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Soundleaf</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                Algorithmic pink noise, binaural acoustics, and low-latency CoreAudio drivers.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">Early Lab Spec</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Lab Docs <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+<!-- App 8: Linkloom (Beta/Labs) -->
+<a class="group relative flex flex-col justify-between p-space-lg bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-200" href="#">
+<div>
+<div class="flex items-start justify-between mb-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-[24px]">hub</span>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container text-on-surface font-medium">Beta</span>
+<span class="px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-code-sm text-code-sm font-semibold">In Lab</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xxs">Linkloom</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md line-clamp-2">
+                WARC web archive fidelity, local DOM parsing, and browser storage limits.
+              </p>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-outline">
+<span class="font-code-sm text-code-sm">Early Lab Spec</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                Lab Docs <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</a>
+</div>
+</section>
+<!-- SECTION 2: Browse by Core Support Category -->
+<section class="mb-space-2xl">
+<div class="mb-space-lg">
+<span class="font-code-sm text-code-sm text-secondary uppercase tracking-widest font-semibold block mb-space-xxs">02 // Foundations</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Browse by Studio Topic</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Core operational principles shared across all software created in our studio.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-space-md">
+<!-- Category 1 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface mb-space-md">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Getting Started &amp; Install</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                Universal binaries, notarization hashes, and DMG vs Mac App Store parity.
+              </p>
+</div>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline flex items-center gap-1" href="#">
+              7 Articles <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- Category 2 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface mb-space-md">
+<span class="material-symbols-outlined text-[20px]">lock_reset</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Data Sovereignty &amp; Sync</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                Local-first encrypted SQLite schemas and Apple CloudKit zero-telemetry sync.
+              </p>
+</div>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline flex items-center gap-1" href="#">
+              11 Articles <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- Category 3 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface mb-space-md">
+<span class="material-symbols-outlined text-[20px]">speed</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Performance &amp; Hardware</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                Apple Silicon NEON tuning, Metal shaders, and low power timer coalescing.
+              </p>
+</div>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline flex items-center gap-1" href="#">
+              8 Articles <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- Category 4 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface mb-space-md">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Licensing &amp; Purchases</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                Perpetual sovereign ownership, cryptographic receipt validation, and transfers.
+              </p>
+</div>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline flex items-center gap-1" href="#">
+              6 Articles <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<!-- Category 5 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface mb-space-md">
+<span class="material-symbols-outlined text-[20px]">bug_report</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Roadmap &amp; Bug Bounty</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+                Open RFC proposals, sanitized crash filing protocols, and security disclosures.
+              </p>
+</div>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline flex items-center gap-1" href="#">
+              5 Articles <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- SECTION 3: Deep Dives & Studio FAQ Split Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl mb-space-2xl">
+<!-- Left: Popular Help Articles & Deep Dives (5 cols) -->
+<div class="lg:col-span-5 flex flex-col">
+<div class="mb-space-md">
+<span class="font-code-sm text-code-sm text-secondary uppercase tracking-widest font-semibold block mb-space-xxs">03 // Field Notes</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Technical Deep Dives</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Recommended architecture readings and critical troubleshooting procedures.</p>
+</div>
+<div class="flex flex-col gap-space-sm flex-1">
+<a class="group p-space-md bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between" href="#">
+<div>
+<div class="flex items-center justify-between mb-space-xs font-code-sm text-code-sm text-outline">
+<span class="px-space-xs py-0.5 bg-surface-container-high rounded text-on-surface">Architecture</span>
+<span>5 min read</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary transition-colors mb-space-xs">
+                  Configuring Zero-Knowledge CloudKit Synchronization across macOS and iOS
+                </h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Learn how private database containers isolate record sync from studio vision and prevent data leaks.
+                </p>
+</div>
+<div class="mt-space-sm font-label-sm text-label-sm text-secondary flex items-center gap-1">
+                Read Blueprint <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</a>
+<a class="group p-space-md bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between" href="#">
+<div>
+<div class="flex items-center justify-between mb-space-xs font-code-sm text-code-sm text-outline">
+<span class="px-space-xs py-0.5 bg-surface-container-high rounded text-on-surface">Billing &amp; Keys</span>
+<span>3 min read</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary transition-colors mb-space-xs">
+                  Recovering Lost License Keys via Cryptographic Proof of Purchase
+                </h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Verify historical order hashes and regenerate Ed25519 license blobs offline without email verification delays.
+                </p>
+</div>
+<div class="mt-space-sm font-label-sm text-label-sm text-secondary flex items-center gap-1">
+                Read Blueprint <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</a>
+<a class="group p-space-md bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between" href="#">
+<div>
+<div class="flex items-center justify-between mb-space-xs font-code-sm text-code-sm text-outline">
+<span class="px-space-xs py-0.5 bg-surface-container-high rounded text-on-surface">Diagnostics</span>
+<span>7 min read</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary transition-colors mb-space-xs">
+                  Resolving Metal Shader Pipeline Compilation Warnings on macOS Sonoma
+                </h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Clearing stale metallib caches and handling GPU family fallback errors in high-bit-depth color work.
+                </p>
+</div>
+<div class="mt-space-sm font-label-sm text-label-sm text-secondary flex items-center gap-1">
+                Read Blueprint <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</a>
+<a class="group p-space-md bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between" href="#">
+<div>
+<div class="flex items-center justify-between mb-space-xs font-code-sm text-code-sm text-outline">
+<span class="px-space-xs py-0.5 bg-surface-container-high rounded text-on-surface">Data Sovereignty</span>
+<span>4 min read</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary transition-colors mb-space-xs">
+                  Exporting Studio Application Data to Standard Open Formats
+                </h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Direct sqlite3 dump instructions and automated export to JSON, CSV, and standard Markdown structures.
+                </p>
+</div>
+<div class="mt-space-sm font-label-sm text-label-sm text-secondary flex items-center gap-1">
+                Read Blueprint <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</a>
+</div>
+</div>
+<!-- Right: Studio-Wide FAQ Accordion (7 cols) -->
+<div class="lg:col-span-7 flex flex-col">
+<div class="mb-space-md">
+<span class="font-code-sm text-code-sm text-secondary uppercase tracking-widest font-semibold block mb-space-xxs">04 // Principles</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Frequently Addressed Inquiries</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Engineering answers to the most common questions surrounding data models and licensing.</p>
+</div>
+<div class="flex flex-col gap-space-sm" id="faq-accordion-group">
+<!-- FAQ 1 -->
+<div class="faq-item bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden transition-all">
+<button class="faq-trigger w-full px-space-lg py-space-md text-left flex items-center justify-between focus:outline-none" type="button">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold pr-space-md">
+                  How do ElarioLabs apps handle user data and telemetry?
+                </span>
+<span class="faq-icon material-symbols-outlined text-outline transition-transform duration-200">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-md pt-space-xs text-on-surface-variant font-body-md text-body-md">
+<div class="bg-surface-container-low p-space-md rounded-lg mb-space-sm font-code-sm text-code-sm text-on-surface">
+                  Zero analytics SDKs • Zero tracking beacons • Zero external user DBs
+                </div>
+                All ElarioLabs applications operate on an absolute zero-telemetry doctrine. We do not integrate third-party metric trackers, session recorders, or advertising SDKs. Data generated inside our applications lives locally on your physical drive inside an encrypted SQLite database. When synchronization is enabled, records flow exclusively through your private Apple CloudKit or user-configured WebDAV instances.
+              </div>
+</div>
+<!-- FAQ 2 -->
+<div class="faq-item bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden transition-all">
+<button class="faq-trigger w-full px-space-lg py-space-md text-left flex items-center justify-between focus:outline-none" type="button">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold pr-space-md">
+                  What is the difference between Direct DMG and Mac App Store builds?
+                </span>
+<span class="faq-icon material-symbols-outlined text-outline transition-transform duration-200">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-md pt-space-xs text-on-surface-variant font-body-md text-body-md">
+                The compilation flags, engine performance, and feature parity between Direct DMG and Mac App Store releases are 100% equivalent. The Direct DMG distributions utilize Sparkle with EdDSA signatures for instantaneous bug patch delivery without App Store review latency, and allow CLI binary integration inside your system <code>/usr/local/bin</code> directory.
+              </div>
+</div>
+<!-- FAQ 3 -->
+<div class="faq-item bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden transition-all">
+<button class="faq-trigger w-full px-space-lg py-space-md text-left flex items-center justify-between focus:outline-none" type="button">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold pr-space-md">
+                  How does the Perpetual Sovereign License model work?
+                </span>
+<span class="faq-icon material-symbols-outlined text-outline transition-transform duration-200">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-md pt-space-xs text-on-surface-variant font-body-md text-body-md">
+                When you purchase any ElarioLabs application, you receive a perpetual, non-revocable cryptographic license for that major revision cycle (e.g., version 2.x). Your purchase includes free point updates and minor feature refinements for the lifetime of that major branch. No ongoing subscriptions, no remote kill-switches, and complete offline authorization capabilities.
+              </div>
+</div>
+<!-- FAQ 4 -->
+<div class="faq-item bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden transition-all">
+<button class="faq-trigger w-full px-space-lg py-space-md text-left flex items-center justify-between focus:outline-none" type="button">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold pr-space-md">
+                  How do I migrate my local application databases to a new Mac or PC?
+                </span>
+<span class="faq-icon material-symbols-outlined text-outline transition-transform duration-200">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-md pt-space-xs text-on-surface-variant font-body-md text-body-md">
+                Because our applications adhere to open standards, migration is as simple as copying your local container folder located at <code>~/Library/Application Support/ElarioLabs/[AppName]</code>. Alternatively, use the built-in "Export Sovereign Vault" tool located in Preferences &gt; Storage to produce an atomic portable bundle containing schema, media assets, and WAL logs.
+              </div>
+</div>
+<!-- FAQ 5 -->
+<div class="faq-item bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden transition-all">
+<button class="faq-trigger w-full px-space-lg py-space-md text-left flex items-center justify-between focus:outline-none" type="button">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold pr-space-md">
+                  What should I include when filing a bug report with engineering?
+                </span>
+<span class="faq-icon material-symbols-outlined text-outline transition-transform duration-200">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-md pt-space-xs text-on-surface-variant font-body-md text-body-md">
+                To help our engineers isolate anomalies rapidly, provide: (1) macOS version and hardware configuration, (2) the exact build number, (3) reproducible trigger steps, and (4) the sanitized diagnostic log generated via <code>Help &gt; Export Diagnostics Packet</code>. These diagnostic packets automatically scrub private personal content and key data.
+              </div>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 4: Engineering Direct Dispatch & Contact Band -->
+<section class="bg-surface-container-lowest rounded-2xl shadow-md p-space-lg md:p-space-xl mb-space-xl relative overflow-hidden">
+<div class="max-w-2xl mb-space-xl">
+<span class="font-code-sm text-code-sm text-secondary uppercase tracking-widest font-semibold block mb-space-xxs">Direct Channels</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface tracking-tight mb-space-xs">
+            Can’t find what you need?
+          </h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Our core engineering team answers inquiries directly. There are no support tier layers or automated bot deflectors. Average resolution turnaround is under 4 hours.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Dispatch Card 1 -->
+<div class="p-space-lg bg-surface-container-low rounded-xl flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-surface shadow-sm mb-space-md">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Submit a Technical Ticket</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
+                Direct dispatch to the engineering queue for reproducible anomalies, crash logs, or Metal pipeline regressions.
+              </p>
+</div>
+<button class="w-full py-space-xs px-space-md bg-primary hover:bg-on-surface-variant text-on-primary font-label-md text-label-md rounded-lg shadow-sm transition-all flex items-center justify-center gap-space-xs" id="open-ticket-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>Open Ticket</span>
+</button>
+</div>
+<!-- Dispatch Card 2 -->
+<div class="p-space-lg bg-surface-container-low rounded-xl flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-surface shadow-sm mb-space-md">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Studio General Inquiries</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
+                Licensing queries, academic volume licenses, enterprise zero-trust deployments, or design collaborations.
+              </p>
+</div>
+<button class="w-full py-space-xs px-space-md bg-surface-container-high hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-lg shadow-sm transition-all flex items-center justify-center gap-space-xs" type="button">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span>Contact Principals</span>
+</button>
+</div>
+<!-- Dispatch Card 3 -->
+<div class="p-space-lg bg-surface-container-low rounded-xl flex flex-col justify-between">
+<div>
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest flex items-center justify-center text-on-surface shadow-sm mb-space-md">
+<span class="material-symbols-outlined text-[20px]">rss_feed</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-space-xs">Real-time Status &amp; Incidents</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-lg">
+                Inspect public service telemetry, CloudKit replication health logs, and current sprint maintenance schedules.
+              </p>
+</div>
+<button class="w-full py-space-xs px-space-md bg-surface-container-high hover:bg-surface-container text-on-surface font-label-md text-label-md rounded-lg shadow-sm transition-all flex items-center justify-center gap-space-xs" type="button">
+<span class="material-symbols-outlined text-[18px]">radar</span>
+<span>Inspect Incident Board</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Local Client State Modal: Submit Ticket Simulation -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/40 backdrop-blur-md hidden" id="ticket-modal">
+<div class="bg-surface-container-lowest rounded-2xl shadow-2xl max-w-lg w-full p-space-xl relative">
+<div class="flex items-center justify-between pb-space-sm mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[20px]">confirmation_number</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Engineering Dispatch</h3>
+</div>
+<button class="text-outline hover:text-on-surface p-1" id="close-modal-btn" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<form class="flex flex-col gap-space-md" id="ticket-form">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface font-medium mb-1">Target Application</label>
+<select class="w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-lg px-space-sm py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+<option>Focusly (v2.3.0)</option>
+<option>Notebloom (v1.8.4)</option>
+<option>Pixelhaven (v3.1.0)</option>
+<option>Trailmark (v2.0.1)</option>
+<option>Codesnip (v1.2.0)</option>
+<option>Budgetly (v1.0.2)</option>
+<option>Soundleaf (Beta)</option>
+<option>Linkloom (Beta)</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface font-medium mb-1">Incident Classification</label>
+<select class="w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-lg px-space-sm py-2 focus:outline-none focus:ring-2 focus:ring-secondary">
+<option>App Crash / Fatal Exception</option>
+<option>CloudKit Sync Desynchronization</option>
+<option>License Authorization Fault</option>
+<option>High Memory / Metal Leak</option>
+<option>Feature Specification RFC</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface font-medium mb-1">Telemetry &amp; Reproduction Steps</label>
+<textarea class="w-full bg-surface-container-low text-on-surface font-body-sm text-body-sm rounded-lg p-space-sm focus:outline-none focus:ring-2 focus:ring-secondary placeholder:text-outline" placeholder="Paste sanitized stack trace or exact steps..." rows="3"></textarea>
+</div>
+<div class="flex items-center justify-between pt-space-xs">
+<span class="font-code-sm text-code-sm text-outline">Telemetry sanitized automatically</span>
+<button class="px-space-md py-space-xs bg-primary text-on-primary font-label-sm text-label-sm rounded-lg shadow-sm hover:bg-on-surface-variant transition-all" type="submit">
+                Dispatch to Engine
+              </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Prototype Simulation Notice / Micro-copy -->
+<div class="mt-space-lg text-center">
+<p class="font-code-sm text-code-sm text-outline">
+          Demonstration prototype • All tickets, search indexing, and troubleshooting simulations are local client state.
+        </p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Search Simulation Data
+  const searchArticles = [
+    { title: "Configuring Zero-Knowledge CloudKit Synchronization across macOS and iOS", tag: "CloudKit Sync", app: "Focusly & Notebloom" },
+    { title: "CoreAudio DSP Low-Latency Buffer Allocations in Soundleaf", tag: "CoreAudio DSP", app: "Soundleaf" },
+    { title: "Resolving Metal Shader Pipeline Compilation Warnings on macOS Sonoma", tag: "RAW Pipeline", app: "Pixelhaven" },
+    { title: "Markdown CRDT Conflict-Free Replicated Data Types", tag: "Markdown CRDT", app: "Notebloom" },
+    { title: "Recovering Lost License Keys via Cryptographic Proof of Purchase", tag: "License Recovery", app: "Studio Licensing" },
+    { title: "Optimizing GPX Telemetry & Vector Topo Tile Caches", tag: "Trailmark", app: "Trailmark" }
+  ];
+
+  const searchInput = document.getElementById('kb-search-input');
+  const resultsPanel = document.getElementById('search-results-panel');
+  const resultsList = document.getElementById('results-list');
+  const resultsCount = document.getElementById('results-count');
+
+  function renderSearchResults(query) {
+    if (!query || query.trim().length === 0) {
+      resultsPanel.classList.add('hidden');
+      return;
+    }
+    const q = query.toLowerCase();
+    const filtered = searchArticles.filter(item => 
+      item.title.toLowerCase().includes(q) || 
+      item.tag.toLowerCase().includes(q) || 
+      item.app.toLowerCase().includes(q)
+    );
+
+    resultsList.innerHTML = '';
+    if (filtered.length > 0) {
+      resultsCount.textContent = `${filtered.length} match${filtered.length > 1 ? 'es' : ''}`;
+      filtered.forEach(item => {
+        const row = document.createElement('a');
+        row.href = "#";
+        row.className = "flex items-center justify-between p-space-sm bg-surface-container-low hover:bg-surface-container rounded-lg transition-colors";
+        row.innerHTML = `
+          <div class="flex items-center gap-space-sm">
+            <span class="material-symbols-outlined text-[16px] text-secondary">description</span>
+            <span class="font-body-sm text-body-sm text-on-surface font-medium">${item.title}</span>
+          </div>
+          <span class="font-code-sm text-code-sm px-space-xs py-0.5 bg-surface-container-lowest rounded text-on-surface-variant">${item.app}</span>
+        `;
+        resultsList.appendChild(row);
+      });
+    } else {
+      resultsCount.textContent = '0 matches';
+      resultsList.innerHTML = `
+        <div class="p-space-sm text-outline font-body-sm text-body-sm text-center">
+          No engineering guides matching "${query}". Try searching for keywords like "CloudKit", "Metal", or "License".
+        </div>
+      `;
+    }
+    resultsPanel.classList.remove('hidden');
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      renderSearchResults(e.target.value);
+    });
+
+    // Keyboard shortcut handler (CMD+K)
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+  }
+
+  // Quick Tags Click
+  document.querySelectorAll('.quick-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const text = tag.textContent.trim();
+      searchInput.value = text;
+      renderSearchResults(text);
+      searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  });
+
+  // Accordion Interaction
+  document.querySelectorAll('.faq-trigger').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const content = trigger.nextElementSibling;
+      const icon = trigger.querySelector('.faq-icon');
+      const isHidden = content.classList.contains('hidden');
+
+      // Close all others
+      document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+      document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+
+      if (isHidden) {
+        content.classList.remove('hidden');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+      }
+    });
+  });
+
+  // Modal Interaction (Direct Dispatch)
+  const ticketModal = document.getElementById('ticket-modal');
+  const openTicketBtn = document.getElementById('open-ticket-btn');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+  const ticketForm = document.getElementById('ticket-form');
+
+  if (openTicketBtn && ticketModal) {
+    openTicketBtn.addEventListener('click', () => {
+      ticketModal.classList.remove('hidden');
+    });
+  }
+
+  if (closeModalBtn && ticketModal) {
+    closeModalBtn.addEventListener('click', () => {
+      ticketModal.classList.add('hidden');
+    });
+  }
+
+  if (ticketModal) {
+    ticketModal.addEventListener('click', (e) => {
+      if (e.target === ticketModal) {
+        ticketModal.classList.add('hidden');
+      }
+    });
+  }
+
+  if (ticketForm) {
+    ticketForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Local Simulation: Incident ticket successfully dispatched into local queue with ID: EL-' + Math.floor(1000 + Math.random() * 9000));
+      ticketModal.classList.add('hidden');
+      ticketForm.reset();
+    });
+  }
+</script></main><footer class="w-full bg-surface-container-low py-space-2xl mt-space-3xl"><div class="max-w-[1440px] mx-auto px-margin flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">ElarioLabs</span><span class="font-code-sm text-code-sm text-on-surface-variant">v2.4.0 Studio Architecture</span></div><div class="flex items-center gap-space-lg"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#">Support</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></div><p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 ElarioLabs Studio. Engineering &amp; Interface Precision.</p></div></footer><div class="fixed bottom-space-lg left-space-lg z-50 flex items-center gap-space-xs p-space-xxs bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_10px_15px_-3px_rgba(15,23,42,0.05),0_4px_6px_-4px_rgba(15,23,42,0.03)]"><button class="flex items-center gap-space-xs px-space-sm py-space-xxs rounded-full bg-primary text-on-primary font-code-sm text-code-sm transition-all" title="Toggle Mode" type="button"><span class="material-symbols-outlined text-[14px]">toggle_on</span><span>Public</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Simulate Viewport" type="button"><span class="material-symbols-outlined text-[16px]">devices</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Toggle Theme" type="button"><span class="material-symbols-outlined text-[16px]">light_mode</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Reset Demo Data" type="button"><span class="material-symbols-outlined text-[16px]">restart_alt</span></button></div><aside class="fixed top-0 right-0 h-full w-80 bg-surface-container-lowest z-50 transform translate-x-full transition-transform duration-300 ease-in-out shadow-[0_20px_25px_-5px_rgba(15,23,42,0.08)] p-space-lg flex flex-col md:hidden"><div class="flex items-center justify-between pb-space-md"><div class="flex items-center gap-space-xs"><img alt="ElarioLabs Logo" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VtwtkSBq80G5X63cLF0tdgFeMBWInIBrai5Wv-GXVjRT--OCOxuHqPUWvjczHTSh-rYC9K3w4TFoeOELqFJqL-ADyb2jmujCvOX4bPI87y8pFzW83NFnKtHQj_N8F-6t1iF_pH5Yyz3pNfi6vDLeivKzUyaR55delmChcyuVwFiTnoOcZhG8tdQZdsHuGt7zi3qH268dAw8hyzm9gZIeuQ1iRPqUSvIOg9mktU75DF"/><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Menu</span></div><button aria-label="Close Drawer" class="p-space-xs text-on-surface-variant hover:text-on-surface rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">close</span></button></div><nav class="flex flex-col gap-space-xs flex-1" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-md py-space-sm"><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="about" href="#">About</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="support" href="#">Support</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="contact" href="#">Contact</a></nav><div class="pt-space-md"><a class="flex items-center justify-center gap-space-xs w-full py-space-sm bg-surface-container-high text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors" data-path="admin-portal" href="#"><span class="material-symbols-outlined text-[18px]">tune</span><span>Admin Portal</span></a></div></aside><div class="fixed bottom-space-lg right-space-lg z-50 flex flex-col gap-space-xs pointer-events-none"><div class="pointer-events-auto flex items-center gap-space-sm px-space-md py-space-sm bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.05)] text-on-surface"><span class="material-symbols-outlined text-secondary text-[18px]">info</span><span class="font-body-sm text-body-sm text-on-surface">Studio Workspace Loaded</span><button class="text-on-surface-variant hover:text-on-surface ml-space-xs" type="button"><span class="material-symbols-outlined text-[14px]">close</span></button></div></div></body></html>

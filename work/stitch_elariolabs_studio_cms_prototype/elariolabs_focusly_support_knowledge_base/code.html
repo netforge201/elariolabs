@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-container": "#0c9488", "on-surface": "#0b1c30", "surface": "#f8f9ff", "on-error": "#ffffff", "outline-variant": "#c6c6cd", "surface-tint": "#565e74", "surface-container-low": "#eff4ff", "on-error-container": "#93000a", "inverse-primary": "#bec6e0", "error-container": "#ffdad6", "surface-dim": "#cbdbf5", "on-secondary-container": "#fffbff", "on-primary-fixed": "#131b2e", "tertiary-container": "#00201d", "primary-container": "#131b2e", "tertiary-fixed-dim": "#6bd8cb", "surface-container-high": "#dce9ff", "background": "#f8f9ff", "on-secondary-fixed-variant": "#3323cc", "outline": "#76777d", "error": "#ba1a1a", "secondary-container": "#645efb", "surface-container": "#e5eeff", "on-primary": "#ffffff", "on-tertiary-fixed-variant": "#005049", "on-background": "#0b1c30", "secondary-fixed": "#e2dfff", "surface-bright": "#f8f9ff", "on-secondary-fixed": "#0f0069", "primary": "#000000", "on-tertiary-fixed": "#00201d", "inverse-surface": "#213145", "surface-variant": "#d3e4fe", "on-primary-fixed-variant": "#3f465c", "primary-fixed": "#dae2fd", "on-secondary": "#ffffff", "secondary-fixed-dim": "#c3c0ff", "secondary": "#4b41e1", "surface-container-lowest": "#ffffff", "on-primary-container": "#7c839b", "inverse-on-surface": "#eaf1ff", "tertiary": "#000000", "primary-fixed-dim": "#bec6e0", "surface-container-highest": "#d3e4fe", "on-tertiary": "#ffffff", "tertiary-fixed": "#89f5e7", "on-surface-variant": "#45464d" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "2.5rem", "space-md": "1rem", "gutter-dense": "0.75rem", "margin": "3rem", "gutter": "1.5rem", "margin-mobile": "1.25rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-xxs": "0.125rem", "space-sm": "0.5rem", "space-2xl": "4rem", "space-xs": "0.25rem", "space-3xl": "6rem", "margin-dense": "1.5rem" }, "fontFamily": { "code-sm": [ "JetBrains Mono" ], "display": [ "Plus Jakarta Sans" ], "display-mobile": [ "Plus Jakarta Sans" ], "headline-sm": [ "Plus Jakarta Sans" ], "headline-md": [ "Plus Jakarta Sans" ], "label-md": [ "Inter" ], "label-sm": [ "Inter" ], "code-inline": [ "JetBrains Mono" ], "body-md": [ "Inter" ], "body-sm": [ "Inter" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "body-lg": [ "Inter" ], "headline-lg": [ "Plus Jakarta Sans" ] }, "fontSize": { "code-sm": [ "0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.02em", "fontWeight": "400" } ], "display": [ "3.75rem", { "lineHeight": "4.25rem", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "display-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "700" } ], "headline-sm": [ "1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "600" } ], "headline-md": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "label-md": [ "0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.005em", "fontWeight": "500" } ], "label-sm": [ "0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.01em", "fontWeight": "500" } ], "code-inline": [ "0.8125rem", { "lineHeight": "1.125rem", "letterSpacing": "-0.01em", "fontWeight": "500" } ], "body-md": [ "0.9375rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.005em", "fontWeight": "400" } ], "body-sm": [ "0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0", "fontWeight": "400" } ], "headline-lg-mobile": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "body-lg": [ "1.125rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "headline-lg": [ "2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.025em", "fontWeight": "600" } ] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased min-h-screen relative"><header class="fixed top-0 left-0 right-0 z-40 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 max-w-[1440px] mx-auto px-margin flex items-center justify-between"><div class="flex items-center gap-space-md"><img alt="ElarioLabs Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VtwtkSBq80G5X63cLF0tdgFeMBWInIBrai5Wv-GXVjRT--OCOxuHqPUWvjczHTSh-rYC9K3w4TFoeOELqFJqL-ADyb2jmujCvOX4bPI87y8pFzW83NFnKtHQj_N8F-6t1iF_pH5Yyz3pNfi6vDLeivKzUyaR55delmChcyuVwFiTnoOcZhG8tdQZdsHuGt7zi3qH268dAw8hyzm9gZIeuQ1iRPqUSvIOg9mktU75DF"/><span class="font-headline-sm text-headline-sm tracking-tight text-on-surface font-semibold">ElarioLabs</span></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-sm py-space-xs"><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#">Support</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></nav><div class="flex items-center gap-space-md"><a class="hidden sm:flex items-center gap-space-xs px-space-md py-space-xs bg-surface-container-high text-on-surface font-label-sm text-label-sm rounded-lg hover:bg-surface-container hover:text-on-surface transition-all" data-path="admin-portal" href="#"><span class="material-symbols-outlined text-[16px]">tune</span><span>Admin Portal</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><button aria-label="Toggle Mobile Menu" class="md:hidden flex items-center justify-center p-space-xs text-on-surface hover:bg-surface-container-low rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">menu</span></button></div></div></header><main class="w-full pt-16 bg-surface"><div class="flex flex-col w-full">
+<!-- Top Ambient Glow & Architectural Grid Anchor -->
+<div class="relative w-full overflow-hidden">
+<!-- Ambient Light Spill -->
+<div class="absolute -top-32 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-12 -left-20 w-80 h-80 bg-surface-container-highest/60 rounded-full blur-2xl pointer-events-none"></div>
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin pt-space-xl pb-space-2xl">
+<!-- Section 1: Breadcrumbs & Header -->
+<nav class="flex items-center gap-space-xs text-label-sm font-label-sm text-on-surface-variant mb-space-lg select-none">
+<a class="hover:text-on-surface transition-colors flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[15px]">home</span>
+<span>Home</span>
+</a>
+<span class="text-outline-variant font-code-sm">/</span>
+<a class="hover:text-on-surface transition-colors" data-path="apps" href="#">Apps</a>
+<span class="text-outline-variant font-code-sm">/</span>
+<a class="hover:text-on-surface transition-colors" href="#">Focusly</a>
+<span class="text-outline-variant font-code-sm">/</span>
+<span class="text-on-surface font-semibold">Support &amp; Diagnostics</span>
+</nav>
+<!-- Main Header Block with Visual Contrast -->
+<div class="flex flex-col lg:flex-row lg:items-start justify-between gap-space-xl">
+<div class="flex items-start gap-space-lg max-w-3xl">
+<!-- Geometric Sandglass App Symbol -->
+<div class="relative shrink-0 w-16 h-16 rounded-xl bg-surface-container-lowest shadow-md flex items-center justify-center p-space-xs overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-secondary/10 via-transparent to-primary/5 pointer-events-none"></div>
+<!-- Custom Hourglass / Sandglass Geometry -->
+<svg class="w-9 h-9 text-secondary" fill="none" viewbox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 6H29M7 30H29" stroke="currentColor" stroke-linecap="round" stroke-width="2.5"></path>
+<path d="M9 7C9 14 15 16 18 18C15 20 9 22 9 29M27 7C27 14 21 16 18 18C21 20 27 22 27 29" stroke="currentColor" stroke-linejoin="round" stroke-width="2"></path>
+<circle cx="18" cy="23" fill="currentColor" r="1.5"></circle>
+<circle cx="18" cy="26" fill="currentColor" r="1"></circle>
+<path d="M14 10H22" stroke="currentColor" stroke-dasharray="1 2" stroke-width="1.2"></path>
+</svg>
+</div>
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-sm flex-wrap">
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Focusly Support Desk</h1>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-secondary font-code-sm text-code-sm font-semibold tracking-wide">v2.3.0 Engine</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+              Technical documentation, direct architecture diagnostics, and prompt user guides for Focusly v2.3.0 across macOS, iOS, and iPadOS.
+            </p>
+</div>
+</div>
+<!-- Fast Action Buttons Group -->
+<div class="flex flex-wrap sm:flex-nowrap items-center gap-space-sm self-start lg:self-center">
+<a class="px-space-md py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-inverse-surface active:scale-[0.99] transition-all flex items-center gap-space-xs shadow-sm" href="#ticket-dispatch">
+<span class="material-symbols-outlined text-[18px]">build</span>
+<span>Submit Diagnostic Ticket</span>
+</a>
+<button class="px-space-md py-space-sm rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md font-medium hover:bg-surface-container transition-all flex items-center gap-space-xs shadow-sm" id="btn-quick-log" type="button">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span>Inspect Logs</span>
+</button>
+<a class="px-space-sm py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all flex items-center justify-center" href="#" title="Back to Focusly Overview">
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Quick Metadata Status Badges Strip -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-space-sm mt-space-xl">
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[18px]">speed</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Engine Core</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">v2.3.0 Stable CoreAudio</span>
+</div>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-tertiary-container text-[18px]">shield</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Telemetry Policy</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">Zero External Network</span>
+</div>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[18px]">schedule</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Studio Response</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">&lt; 24h Human SLA</span>
+</div>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0">
+<span class="w-2.5 h-2.5 rounded-full bg-on-tertiary-container animate-pulse"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase tracking-wider">Local Diagnostics</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface truncate">Operational (CoreSync)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Diagnostic Search & Filter Module -->
+<section class="w-full bg-surface-container-low py-space-xl">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin flex flex-col gap-space-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-secondary font-semibold">Knowledge Graph</span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">Focusly Technical Index</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Real-time indexed across kernel daemons, CoreAudio buffers, and sync modules.</p>
+</div>
+<!-- Search Input Frame -->
+<div class="relative w-full">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-space-md text-on-surface-variant text-[22px] pointer-events-none">search</span>
+<input class="w-full h-14 pl-12 pr-28 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all" id="kb-search-input" placeholder="Search Focusly documentation, CoreAudio DSP, CloudKit sync, shortcuts..." type="text"/>
+<div class="absolute right-space-md flex items-center gap-1.5 pointer-events-none">
+<kbd class="px-2 py-1 rounded bg-surface-container text-on-surface-variant font-code-sm text-code-sm shadow-xs font-mono">⌘K</kbd>
+</div>
+</div>
+</div>
+<!-- Category Filter Chips -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1 scrollbar-none" id="filter-chip-container">
+<button class="filter-chip px-space-md py-space-xs rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-medium whitespace-nowrap shadow-xs transition-all active:scale-95" data-category="all">
+          All Topics
+        </button>
+<button class="filter-chip px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium whitespace-nowrap shadow-xs transition-all active:scale-95" data-category="audio">
+          Getting Started &amp; Audio Rhythms
+        </button>
+<button class="filter-chip px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium whitespace-nowrap shadow-xs transition-all active:scale-95" data-category="cloudkit">
+          CloudKit Sync &amp; Sovereignty
+        </button>
+<button class="filter-chip px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium whitespace-nowrap shadow-xs transition-all active:scale-95" data-category="macos">
+          macOS Menubar &amp; Hotkeys
+        </button>
+<button class="filter-chip px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium whitespace-nowrap shadow-xs transition-all active:scale-95" data-category="ios">
+          iOS Dynamic Island
+        </button>
+<button class="filter-chip px-space-md py-space-xs rounded-full bg-surface-container-lowest text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-medium whitespace-nowrap shadow-xs transition-all active:scale-95" data-category="troubleshooting">
+          Troubleshooting &amp; Crashes
+        </button>
+</div>
+</div>
+</section>
+<!-- Section 3: Structured Step-by-Step Usage Guides (Quick-Start Cards) -->
+<section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-2xl w-full">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xl gap-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-space-xxs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-secondary font-semibold">Architecture Guides</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Structured Operational Playbooks</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+        Field-verified procedures for low-latency configuration, audio clock integrity, and encrypted peer synchronization.
+      </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md" id="guides-grid">
+<!-- Card 1: Calibrating Neural Flow Intervals -->
+<article class="guide-item group flex flex-col justify-between p-space-lg rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300" data-category="audio">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase font-semibold">01 / Biological Pacing</span>
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">graphic_eq</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-space-xs group-hover:text-secondary transition-colors">
+            Calibrating Neural Flow Intervals
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            Understand physiological 90-minute ultradian cycles versus arbitrary 25-minute timers, powered by zero-fatigue 40Hz binaural synthesis.
+          </p>
+<!-- Step Walkthrough -->
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-sm rounded-lg mb-space-md">
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">A.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Enable <em>Ultradian Flow</em> mode in Session Settings.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">B.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Set Binaural Tone Carrier to 216Hz with 40Hz offset.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">C.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Toggle Gentle Chime fallback to avoid startle arousal.</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant font-code-sm">DSP v2 Engine</span>
+<button class="text-secondary font-semibold flex items-center gap-0.5 hover:gap-1.5 transition-all" type="button">
+<span>Read Flow Protocol</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Card 2: Configuring Private CloudKit Keychains -->
+<article class="guide-item group flex flex-col justify-between p-space-lg rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300" data-category="cloudkit">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase font-semibold">02 / Data Sovereignty</span>
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">cloud_sync</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-space-xs group-hover:text-secondary transition-colors">
+            Configuring Private CloudKit Keychains
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            Direct peer synchronization across macOS and iOS strictly through your own iCloud Private Database without intermediary servers.
+          </p>
+<!-- Step Walkthrough -->
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-sm rounded-lg mb-space-md">
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">A.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Authenticate with primary Apple Account in Settings.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">B.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Confirm Focusly Keychain partition is active (AES-256).</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">C.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Run one-click cryptographic handshake test.</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant font-code-sm">Zero-Knowledge</span>
+<button class="text-secondary font-semibold flex items-center gap-0.5 hover:gap-1.5 transition-all" type="button">
+<span>Setup Keychain</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Card 3: Global macOS Hotkey Daemon Setup -->
+<article class="guide-item group flex flex-col justify-between p-space-lg rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300" data-category="macos">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase font-semibold">03 / Platform Control</span>
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">keyboard</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-space-xs group-hover:text-secondary transition-colors">
+            Global macOS Hotkey Daemon Setup
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            Enable sub-millisecond shortcut capture across full-screen spaces and configure the subtle Desktop Glaze dimming engine.
+          </p>
+<!-- Step Walkthrough -->
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-sm rounded-lg mb-space-md">
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">A.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Open System Settings &gt; Privacy &amp; Security.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">B.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Grant Accessibility permission to Focusly Daemon.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">C.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Define global triggers for Session Dim and Pause.</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant font-code-sm">macOS 13+ Daemon</span>
+<button class="text-secondary font-semibold flex items-center gap-0.5 hover:gap-1.5 transition-all" type="button">
+<span>Daemon Config</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Card 4: Dynamic Island & Live Activity Pacing -->
+<article class="guide-item group flex flex-col justify-between p-space-lg rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all duration-300" data-category="ios">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase font-semibold">04 / Mobility Engine</span>
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[16px]">notifications_active</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-space-xs group-hover:text-secondary transition-colors">
+            Dynamic Island &amp; Live Activity Pacing
+          </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-space-md">
+            Maintain non-intrusive flow presence with ambient expansion rings and synchronized watchOS ultra-low-energy haptics.
+          </p>
+<!-- Step Walkthrough -->
+<div class="flex flex-col gap-space-xs bg-surface-container-low p-space-sm rounded-lg mb-space-md">
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">A.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Toggle Live Activities ON in iOS Focusly Settings.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">B.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Choose 'Silent Halo' aesthetic in Display Options.</span>
+</div>
+<div class="flex items-start gap-space-xs">
+<span class="font-code-sm text-code-sm font-semibold text-secondary">C.</span>
+<span class="font-body-sm text-body-sm text-on-surface">Pair watchOS companion app for interval taps.</span>
+</div>
+</div>
+</div>
+<div class="pt-space-sm flex items-center justify-between text-label-sm font-label-sm">
+<span class="text-on-surface-variant font-code-sm">iOS 17+ WidgetKit</span>
+<button class="text-secondary font-semibold flex items-center gap-0.5 hover:gap-1.5 transition-all" type="button">
+<span>Review Live Activities</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</article>
+</div>
+</section>
+<!-- Section 4: Known Issues & Real-Time Engineering Tracker -->
+<section class="w-full bg-surface-container-low py-space-2xl">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin">
+<div class="flex flex-col lg:flex-row lg:items-end justify-between mb-space-xl gap-space-md">
+<div>
+<div class="flex items-center gap-space-xs mb-space-xxs">
+<span class="material-symbols-outlined text-secondary text-[16px]">developer_mode</span>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-secondary font-semibold">Live Incident Board</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Engineering Issue Tracker</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-xl mt-space-xs">
+            Direct visibility into ongoing regressions, hardware edge cases, and upstream OS compatibility items.
+          </p>
+</div>
+<!-- Status Legend Filter -->
+<div class="flex items-center gap-space-xs flex-wrap bg-surface-container-lowest p-space-xs rounded-xl shadow-xs">
+<span class="font-code-sm text-code-sm text-on-surface-variant px-space-xs">Filter Status:</span>
+<button class="status-filter-btn px-space-sm py-1 rounded text-label-sm font-label-sm bg-primary text-on-primary font-medium" data-status="all">All (3)</button>
+<button class="status-filter-btn px-space-sm py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface" data-status="investigating">Investigating (1)</button>
+<button class="status-filter-btn px-space-sm py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface" data-status="workaround">Workaround (1)</button>
+<button class="status-filter-btn px-space-sm py-1 rounded text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface" data-status="beta">Fixed in Beta (1)</button>
+</div>
+</div>
+<!-- Tracker Items List -->
+<div class="flex flex-col gap-space-sm" id="issues-list">
+<!-- Issue 1 -->
+<div class="issue-row p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-space-md transition-all hover:bg-surface-bright" data-status="workaround">
+<div class="flex items-start gap-space-md">
+<span class="material-symbols-outlined text-on-surface-variant text-[22px] mt-1 shrink-0">display_settings</span>
+<div>
+<div class="flex items-center gap-space-sm flex-wrap mb-space-xxs">
+<span class="font-code-sm text-code-sm font-mono text-on-surface-variant">#ISS-4091</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">macOS Sonoma 14.5 Stage Manager Dimmer Flickering</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-secondary font-code-sm text-code-sm font-semibold">
+                  Workaround Available
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed max-w-3xl">
+                When Stage Manager switches active application sets while Focusly Glaze Dimmer is above 60% opacity, the Metal compositing pipeline occasionally renders a 1-frame strobe on secondary monitors.
+              </p>
+<div class="mt-space-sm p-space-sm rounded-lg bg-surface-container-low text-on-surface flex items-center gap-space-sm text-body-sm font-body-sm">
+<span class="font-code-sm text-code-sm font-bold text-secondary uppercase tracking-wider shrink-0">Immediate Fix:</span>
+<span>Open Preferences &gt; Display Glaze &gt; check <em>“Disable Hardware Compositing Layer on Secondary Displays”</em> until 2.3.1 patch applies.</span>
+</div>
+</div>
+</div>
+<div class="flex lg:flex-col items-center lg:items-end justify-between shrink-0 gap-space-xs text-right">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Reported: 3d ago</span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">Affects macOS 14.5</span>
+</div>
+</div>
+<!-- Issue 2 -->
+<div class="issue-row p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-space-md transition-all hover:bg-surface-bright" data-status="beta">
+<div class="flex items-start gap-space-md">
+<span class="material-symbols-outlined text-on-surface-variant text-[22px] mt-1 shrink-0">headphones</span>
+<div>
+<div class="flex items-center gap-space-sm flex-wrap mb-space-xxs">
+<span class="font-code-sm text-code-sm font-mono text-on-surface-variant">#ISS-4084</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">CoreAudio buffer underrun when connecting AirPods Max over USB-C</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-low text-on-tertiary-container font-code-sm text-code-sm font-semibold">
+                  Fixed in v2.3.1-beta
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed max-w-3xl">
+                Hot-plugging high-res lossless audio over direct USB-C cables caused our SIMD binaural frequency generator to misread the hardware clock sync, leading to faint micro-clicks in the left ear channel.
+              </p>
+<div class="mt-space-sm p-space-sm rounded-lg bg-surface-container-low text-on-surface flex items-center gap-space-sm text-body-sm font-body-sm">
+<span class="font-code-sm text-code-sm font-bold text-on-tertiary-container uppercase tracking-wider shrink-0">Resolution:</span>
+<span>NEON SIMD audio generator re-anchored to instantaneous 48kHz clock synchronizer. Included in build 2.3.1-beta (Build 412).</span>
+</div>
+</div>
+</div>
+<div class="flex lg:flex-col items-center lg:items-end justify-between shrink-0 gap-space-xs text-right">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Resolved: Beta 412</span>
+<span class="font-code-sm text-code-sm text-on-tertiary-container font-medium">CoreAudio Unit</span>
+</div>
+</div>
+<!-- Issue 3 -->
+<div class="issue-row p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-space-md transition-all hover:bg-surface-bright" data-status="investigating">
+<div class="flex items-start gap-space-md">
+<span class="material-symbols-outlined text-on-surface-variant text-[22px] mt-1 shrink-0">hourglass_disabled</span>
+<div>
+<div class="flex items-center gap-space-sm flex-wrap mb-space-xxs">
+<span class="font-code-sm text-code-sm font-mono text-on-surface-variant">#ISS-4078</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">Dynamic Island timer desync after 12h device deep sleep</h3>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-code-sm text-code-sm font-semibold">
+                  Investigating
+                </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed max-w-3xl">
+                On iPhone 15 Pro and 16 Pro models running iOS 17.5+, prolonged standby in Low Power Mode occasionally drops the silent background CloudKit push notification required to refresh the live activity widget timestamp.
+              </p>
+<div class="mt-space-sm p-space-sm rounded-lg bg-surface-container-low text-on-surface flex items-center gap-space-sm text-body-sm font-body-sm">
+<span class="font-code-sm text-code-sm font-bold text-on-surface-variant uppercase tracking-wider shrink-0">Current Action:</span>
+<span>Testing local chronometer fallbacks using monotonic system time in place of APNs background awake packets.</span>
+</div>
+</div>
+</div>
+<div class="flex lg:flex-col items-center lg:items-end justify-between shrink-0 gap-space-xs text-right">
+<span class="font-code-sm text-code-sm text-on-surface-variant">Opened: 5d ago</span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">iOS Standby Daemon</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Comprehensive Focusly FAQ Accordion -->
+<section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin py-space-2xl w-full">
+<div class="flex flex-col lg:flex-row gap-space-2xl">
+<!-- Left Editorial Column -->
+<div class="lg:w-1/3 flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-code-sm text-code-sm uppercase tracking-widest text-secondary font-semibold">Knowledge Clarification</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Frequently Addressed Inquiries</h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Focusly is engineered around biological rhythms, silent data sovereignty, and zero-telemetry architecture. Here is how our execution differs from standard productivity software.
+        </p>
+<!-- Quick Help Card -->
+<div class="p-space-lg rounded-xl bg-surface-container-low shadow-xs mt-space-md flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-xs text-secondary">
+<span class="material-symbols-outlined text-[20px]">encrypted</span>
+<span class="font-label-md text-label-md font-semibold">The Zero-Surveillance Promise</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            We operate zero central databases. Your focus telemetry, session logs, and tags are physically stored on your local disk in an encrypted SQLite vault and synced directly via Apple CloudKit.
+          </p>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline inline-flex items-center gap-1 mt-space-xs" href="#">
+<span>Read ElarioLabs Zero-Surveillance Charter</span>
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</a>
+</div>
+</div>
+<!-- Right Accordion List -->
+<div class="lg:w-2/3 flex flex-col gap-space-xs" id="faq-accordion">
+<!-- FAQ Item 1 -->
+<div class="faq-item rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden transition-all duration-200">
+<button class="faq-trigger w-full px-space-lg py-space-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" type="button">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface pr-space-md">
+              How does Focusly differ from traditional Pomodoro timers?
+            </span>
+<span class="faq-icon material-symbols-outlined text-on-surface-variant transform transition-transform duration-200 shrink-0">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-lg pt-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Standard Pomodoro software imposes an arbitrary 25-minute clock regardless of your cognitive state, often triggering micro-anxiety and interrupting deep problem-solving flow. Focusly implements <strong>Biological Pacing</strong> based on 90-minute ultradian rhythm curves. Rather than ticking countdowns, it generates low-distortion 40Hz binaural waves that gently anchor beta/gamma brainwave coherence, notifying you of natural replenishment windows through soft physical cues rather than abrasive alarms.
+            </p>
+</div>
+</div>
+<!-- FAQ Item 2 -->
+<div class="faq-item rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden transition-all duration-200">
+<button class="faq-trigger w-full px-space-lg py-space-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" type="button">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface pr-space-md">
+              Does Focusly send any audio data or usage metrics to ElarioLabs servers?
+            </span>
+<span class="faq-icon material-symbols-outlined text-on-surface-variant transform transition-transform duration-200 shrink-0">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-lg pt-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+<strong>Absolutely zero.</strong> Focusly contains no third-party analytics SDKs, no behavioral crash reporters (e.g., Sentry, Firebase), and no tracking pixels. All sound generators run purely client-side through local CoreAudio graphs. Session history is encrypted at rest using Apple Keychain hardware keys in a local SQLite file. We cannot view, monetize, or decrypt your productivity timestamps under any circumstance.
+            </p>
+</div>
+</div>
+<!-- FAQ Item 3 -->
+<div class="faq-item rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden transition-all duration-200">
+<button class="faq-trigger w-full px-space-lg py-space-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" type="button">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface pr-space-md">
+              How do I backup or export my temporal session history?
+            </span>
+<span class="faq-icon material-symbols-outlined text-on-surface-variant transform transition-transform duration-200 shrink-0">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-lg pt-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Navigate to <strong>Focusly Preferences &gt; Data Vault</strong>. You can trigger an instant, raw export in three formats:
+            </p>
+<ul class="list-disc list-inside mt-space-xs space-y-1 font-body-sm text-body-sm text-on-surface-variant">
+<li><strong>JSON:</strong> Structured schema including session duration, heart rate variability markers (if Apple Watch connected), and tags.</li>
+<li><strong>CSV:</strong> Clean tabular format ready for import into spreadsheets, Obsidian, or Notion.</li>
+<li><strong>Markdown:</strong> Clean human-readable journal entries partitioned by project tags.</li>
+</ul>
+</div>
+</div>
+<!-- FAQ Item 4 -->
+<div class="faq-item rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden transition-all duration-200">
+<button class="faq-trigger w-full px-space-lg py-space-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" type="button">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface pr-space-md">
+              Can I use external noise generators alongside Focusly's binaural synthesizer?
+            </span>
+<span class="faq-icon material-symbols-outlined text-on-surface-variant transform transition-transform duration-200 shrink-0">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-lg pt-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Yes. Focusly's audio output engine is designed as a non-exclusive CoreAudio node. It dynamically ducks or gracefully overlays with Spotify, Apple Music, podcast streams, or system white noise generators. You can configure ducking attenuation under <em>Preferences &gt; Audio Synthesis &gt; Background Stream Coexistence</em>.
+            </p>
+</div>
+</div>
+<!-- FAQ Item 5 -->
+<div class="faq-item rounded-xl bg-surface-container-lowest shadow-sm overflow-hidden transition-all duration-200">
+<button class="faq-trigger w-full px-space-lg py-space-md flex items-center justify-between text-left hover:bg-surface-container-low transition-colors" type="button">
+<span class="font-headline-sm text-headline-sm font-semibold text-on-surface pr-space-md">
+              Where can I download direct DMG updates if I purchased via Mac App Store?
+            </span>
+<span class="faq-icon material-symbols-outlined text-on-surface-variant transform transition-transform duration-200 shrink-0">expand_more</span>
+</button>
+<div class="faq-content hidden px-space-lg pb-space-lg pt-space-xs">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+              Every Mac App Store license includes an universal license entitlement. Download the standalone DMG directly from the ElarioLabs Release Archive, drag it to Applications, and click “Verify Existing App Store Receipt” during first launch. No additional purchase or license key input is necessary.
+            </p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 6: Interactive Support & Diagnostic Dispatch Form -->
+<section class="w-full bg-surface-container-low py-space-3xl scroll-mt-20" id="ticket-dispatch">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin">
+<div class="max-w-4xl mx-auto rounded-2xl bg-surface-container-lowest p-space-lg md:p-space-2xl shadow-md">
+<!-- Form Header -->
+<div class="flex flex-col gap-space-xs pb-space-lg mb-space-lg border-b border-surface-container">
+<div class="flex items-center gap-space-xs text-secondary">
+<span class="material-symbols-outlined text-[20px]">send</span>
+<span class="font-code-sm text-code-sm uppercase tracking-widest font-semibold">Direct Engineering Dispatch</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">Initiate Technical Ticket</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Directly route your diagnostic crash dump or reproducible edge case to the Focusly core engineering squad.
+          </p>
+</div>
+<!-- Feedback Notification (Hidden by default) -->
+<div class="hidden mb-space-lg p-space-md rounded-xl bg-surface-container-low text-on-surface flex items-start gap-space-sm" id="dispatch-success-banner">
+<span class="material-symbols-outlined text-on-tertiary-container text-[20px] shrink-0 mt-0.5">check_circle</span>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Diagnostic Dispatch Queued (#FL-89304)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Your ticket payload and anonymous CoreAudio trace have been bundled. Our lead engineers review incoming logs every 12 hours.</span>
+</div>
+</div>
+<form class="flex flex-col gap-space-lg" id="support-ticket-form" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Full Name -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm font-semibold text-on-surface" for="input-fullname">Full Name</label>
+<input class="w-full h-11 px-space-md rounded-lg bg-surface font-body-md text-body-md text-on-surface placeholder:text-outline shadow-xs focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all" id="input-fullname" placeholder="Julian Vance" required="" type="text"/>
+</div>
+<!-- Contact Email -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm font-semibold text-on-surface" for="input-email">Contact Email</label>
+<input class="w-full h-11 px-space-md rounded-lg bg-surface font-body-md text-body-md text-on-surface placeholder:text-outline shadow-xs focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all" id="input-email" placeholder="vance@arch-studio.ch" required="" type="email"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Issue Category -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm font-semibold text-on-surface" for="select-category">Issue Category</label>
+<div class="relative">
+<select class="w-full h-11 px-space-md rounded-lg bg-surface font-body-md text-body-md text-on-surface shadow-xs focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all appearance-none pr-10 cursor-pointer" id="select-category">
+<option value="audio">CoreAudio DSP &amp; Synthesizer Pacing</option>
+<option value="sync">CloudKit Keychain Synchronization</option>
+<option value="hotkeys">macOS Menubar Glaze &amp; Global Daemon</option>
+<option value="ios">Dynamic Island &amp; WatchOS Complication</option>
+<option value="licensing">Universal License &amp; Receipt Validation</option>
+<option value="bug">Reproducible Crash / Kernel Assertion</option>
+</select>
+<span class="material-symbols-outlined absolute right-space-md top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-[20px]">arrow_drop_down</span>
+</div>
+</div>
+<!-- Platform & OS Build -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm font-semibold text-on-surface" for="input-platform">Platform &amp; Hardware Profile</label>
+<input class="w-full h-11 px-space-md rounded-lg bg-surface font-code-sm text-code-sm text-on-surface placeholder:text-outline shadow-xs focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all" id="input-platform" type="text" value="macOS 14.5 (23F79) • Apple M3 Max (36GB)"/>
+</div>
+</div>
+<!-- Diagnostic Log Attachment Dropzone -->
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Attach Anonymous Diagnostic Trace</span>
+<div class="p-space-lg rounded-xl bg-surface-container-low flex flex-col items-center justify-center text-center gap-space-xs cursor-pointer hover:bg-surface-container transition-all" id="log-dropzone">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">attachment</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Drag and drop sanitized crash dumps or click to attach</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Focusly automatically redacts system usernames, volume labels, and paths.</span>
+</div>
+<!-- Pre-attached sample log badge -->
+<div class="mt-space-xs inline-flex items-center gap-space-xs px- space-sm py-1 bg-surface-container-lowest rounded-full shadow-xs text-on-surface font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[15px] text-on-tertiary-container">description</span>
+<span>focusly_coreaudio_trace_202502.log (24 KB)</span>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant hover:text-error cursor-pointer">cancel</span>
+</div>
+</div>
+</div>
+<!-- Detailed Description -->
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm font-semibold text-on-surface" for="textarea-desc">Reproduction Steps &amp; Observed Behavior</label>
+<textarea class="w-full p-space-md rounded-lg bg-surface font-body-md text-body-md text-on-surface placeholder:text-outline shadow-xs focus:outline-none focus:ring-2 focus:ring-secondary/30 transition-all leading-relaxed" id="textarea-desc" placeholder="Describe the steps to reproduce the issue, what behavior occurred, and expected results..." required="" rows="4"></textarea>
+</div>
+<!-- Zero-Surveillance Compliance Checkbox -->
+<div class="flex items-start gap-space-sm pt-space-xs">
+<input class="mt-1 w-4 h-4 rounded text-secondary focus:ring-secondary/40 cursor-pointer" id="charter-consent" required="" type="checkbox"/>
+<label class="font-body-sm text-body-sm text-on-surface-variant select-none" for="charter-consent">
+              I agree to provide anonymous local system diagnostics solely for engineering assistance under the terms of the <a class="text-secondary font-medium hover:underline" href="#">ElarioLabs Zero-Surveillance Charter</a>. No ambient audio or keystrokes are included.
+            </label>
+</div>
+<!-- Action Buttons Bar -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-sm">
+<button class="w-full sm:w-auto px-space-md py-space-sm rounded-lg bg-surface-container text-on-surface font-label-md text-label-md font-medium hover:bg-surface-container-high active:scale-[0.99] transition-all flex items-center justify-center gap-space-xs" id="btn-copy-diagnostics" type="button">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+<span id="copy-btn-text">Copy Diagnostic Info to Clipboard</span>
+</button>
+<button class="w-full sm:w-auto px-space-xl py-space-sm rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold hover:bg-inverse-surface active:scale-[0.99] transition-all flex items-center justify-center gap-space-xs shadow-sm" id="btn-submit-ticket" type="submit">
+<span class="material-symbols-outlined text-[18px]">mark_email_read</span>
+<span>Dispatch Ticket to Engineering</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+<!-- Section 7: Bottom Footer / Resource Gateway -->
+<section class="w-full py-space-2xl bg-surface-container-lowest">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin">
+<div class="flex flex-col md:flex-row items-center justify-between gap-space-lg pb-space-lg">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Focusly Architecture &amp; Maintenance Network</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Continuous integration, zero-telemetry client integrity, and cryptographic sync audit.</p>
+</div>
+</div>
+<!-- Quick Links -->
+<div class="flex items-center gap-space-lg flex-wrap">
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1" href="#">
+<span>Focusly Privacy Charter</span>
+<span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1" href="#">
+<span>Terms of Use</span>
+<span class="material-symbols-outlined text-[14px]">arrow_outward</span>
+</a>
+<a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1" href="#">
+<span>Full v2.3.0 Changelog</span>
+<span class="material-symbols-outlined text-[14px]">history</span>
+</a>
+<a class="font-label-sm text-label-sm text-secondary font-semibold hover:underline flex items-center gap-1" data-path="support" href="#">
+<span>ElarioLabs Studio Central</span>
+<span class="material-symbols-outlined text-[14px]">hub</span>
+</a>
+</div>
+</div>
+<!-- Prototype Disclaimer -->
+<div class="text-center pt-space-md">
+<p class="font-code-sm text-code-sm text-outline">
+          Demonstration prototype • All tickets, search indexing, and troubleshooting simulations are local client state.
+        </p>
+</div>
+</div>
+</section>
+</div>
+<!-- Inline Interactive Script for Micro-Interactions -->
+<script>
+  (function initFocuslySupport() {
+    // 1. FAQ Accordion Logic
+    const faqTriggers = document.querySelectorAll('.faq-trigger');
+    faqTriggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const parent = trigger.parentElement;
+        const content = parent.querySelector('.faq-content');
+        const icon = trigger.querySelector('.faq-icon');
+        const isOpen = !content.classList.contains('hidden');
+
+        // Close all other items for clean accordion behavior
+        document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.faq-icon').forEach(i => i.style.transform = 'rotate(0deg)');
+
+        if (!isOpen) {
+          content.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+        }
+      });
+    });
+
+    // 2. Knowledge Base Filter Chips
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const guideItems = document.querySelectorAll('.guide-item');
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.category;
+        
+        filterChips.forEach(c => {
+          c.classList.remove('bg-primary', 'text-on-primary');
+          c.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+        });
+        chip.classList.add('bg-primary', 'text-on-primary');
+        chip.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+
+        guideItems.forEach(item => {
+          if (cat === 'all' || item.dataset.category === cat) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // 3. Status Filter in Engineering Tracker
+    const statusBtns = document.querySelectorAll('.status-filter-btn');
+    const issueRows = document.querySelectorAll('.issue-row');
+
+    statusBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const status = btn.dataset.status;
+
+        statusBtns.forEach(b => {
+          b.classList.remove('bg-primary', 'text-on-primary');
+          b.classList.add('text-on-surface-variant');
+        });
+        btn.classList.add('bg-primary', 'text-on-primary');
+        btn.classList.remove('text-on-surface-variant');
+
+        issueRows.forEach(row => {
+          if (status === 'all' || row.dataset.status === status) {
+            row.style.display = 'flex';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // 4. Client Search Filter
+    const searchInput = document.getElementById('kb-search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        guideItems.forEach(item => {
+          const text = item.textContent.toLowerCase();
+          if (text.includes(query)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+
+      // Quick ⌘K handler
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+    }
+
+    // 5. Copy Diagnostic Info to Clipboard Simulation
+    const copyBtn = document.getElementById('btn-copy-diagnostics');
+    const copyBtnText = document.getElementById('copy-btn-text');
+    if (copyBtn && copyBtnText) {
+      copyBtn.addEventListener('click', () => {
+        const mockLog = `FOCUSLY ARCHITECTURE DIAGNOSTIC DUMP
+Version: Focusly v2.3.0 (Build 411)
+Host: macOS 14.5 (23F79) Darwin 23.5.0
+Architecture: arm64 (NEON SIMD active)
+CoreAudio Buffer: 48000Hz / 512 frames (0.0106s latency)
+CloudKit Database: CKRecordZone(ZoneWidePrivate) [Handshake OK]
+Active Engine Mode: Ultradian 90m (40Hz offset at 216Hz carrier)
+Telemetry: Disabled (Charter Compliant)`;
+
+        navigator.clipboard.writeText(mockLog).then(() => {
+          const original = copyBtnText.textContent;
+          copyBtnText.textContent = "Copied to Clipboard!";
+          setTimeout(() => {
+            copyBtnText.textContent = original;
+          }, 2500);
+        }).catch(() => {
+          copyBtnText.textContent = "Diagnostics Extracted!";
+          setTimeout(() => {
+            copyBtnText.textContent = "Copy Diagnostic Info to Clipboard";
+          }, 2000);
+        });
+      });
+    }
+
+    // 6. Form Submission Simulation
+    const form = document.getElementById('support-ticket-form');
+    const successBanner = document.getElementById('dispatch-success-banner');
+    if (form && successBanner) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        successBanner.classList.remove('hidden');
+        successBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        form.reset();
+      });
+    }
+
+    // 7. Quick log preview button
+    const quickLogBtn = document.getElementById('btn-quick-log');
+    if (quickLogBtn) {
+      quickLogBtn.addEventListener('click', () => {
+        alert("Focusly Diagnostic Console:\n\n[INFO] CoreAudio Unit synchronized at 48.0 kHz\n[INFO] Private CloudKit RecordZone verified\n[WARN] Stage Manager overlay: Hardware composition bypass active\n[OK] Zero telemetry policy enforced.");
+      });
+    }
+  })();
+</script></main><footer class="w-full bg-surface-container-low py-space-2xl mt-space-3xl"><div class="max-w-[1440px] mx-auto px-margin flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">ElarioLabs</span><span class="font-code-sm text-code-sm text-on-surface-variant">v2.4.0 Studio Architecture</span></div><div class="flex items-center gap-space-lg"><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="about" href="#">About</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="support" href="#">Support</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="contact" href="#">Contact</a></div><p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 ElarioLabs Studio. Engineering &amp; Interface Precision.</p></div></footer><div class="fixed bottom-space-lg left-space-lg z-50 flex items-center gap-space-xs p-space-xxs bg-surface-container-lowest/90 backdrop-blur-xl rounded-full shadow-[0_10px_15px_-3px_rgba(15,23,42,0.05),0_4px_6px_-4px_rgba(15,23,42,0.03)]"><button class="flex items-center gap-space-xs px-space-sm py-space-xxs rounded-full bg-primary text-on-primary font-code-sm text-code-sm transition-all" title="Toggle Mode" type="button"><span class="material-symbols-outlined text-[14px]">toggle_on</span><span>Public</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Simulate Viewport" type="button"><span class="material-symbols-outlined text-[16px]">devices</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Toggle Theme" type="button"><span class="material-symbols-outlined text-[16px]">light_mode</span></button><button class="flex items-center justify-center w-7 h-7 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" title="Reset Demo Data" type="button"><span class="material-symbols-outlined text-[16px]">restart_alt</span></button></div><aside class="fixed top-0 right-0 h-full w-80 bg-surface-container-lowest z-50 transform translate-x-full transition-transform duration-300 ease-in-out shadow-[0_20px_25px_-5px_rgba(15,23,42,0.08)] p-space-lg flex flex-col md:hidden"><div class="flex items-center justify-between pb-space-md"><div class="flex items-center gap-space-xs"><img alt="ElarioLabs Logo" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VtwtkSBq80G5X63cLF0tdgFeMBWInIBrai5Wv-GXVjRT--OCOxuHqPUWvjczHTSh-rYC9K3w4TFoeOELqFJqL-ADyb2jmujCvOX4bPI87y8pFzW83NFnKtHQj_N8F-6t1iF_pH5Yyz3pNfi6vDLeivKzUyaR55delmChcyuVwFiTnoOcZhG8tdQZdsHuGt7zi3qH268dAw8hyzm9gZIeuQ1iRPqUSvIOg9mktU75DF"/><span class="font-headline-sm text-headline-sm font-semibold text-on-surface">Menu</span></div><button aria-label="Close Drawer" class="p-space-xs text-on-surface-variant hover:text-on-surface rounded-lg transition-colors" type="button"><span class="material-symbols-outlined">close</span></button></div><nav class="flex flex-col gap-space-xs flex-1" data-active-classes="bg-primary-container text-on-primary-container font-semibold rounded-lg px-space-md py-space-sm"><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="apps" href="#">Apps</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="about" href="#">About</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="support" href="#">Support</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="legal" href="#">Legal</a><a class="font-label-md text-label-md px-space-md py-space-sm text-on-surface-variant hover:bg-surface-container hover:text-on-surface rounded-lg transition-colors" data-path="contact" href="#">Contact</a></nav><div class="pt-space-md"><a class="flex items-center justify-center gap-space-xs w-full py-space-sm bg-surface-container-high text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors" data-path="admin-portal" href="#"><span class="material-symbols-outlined text-[18px]">tune</span><span>Admin Portal</span></a></div></aside><div class="fixed bottom-space-lg right-space-lg z-50 flex flex-col gap-space-xs pointer-events-none"><div class="pointer-events-auto flex items-center gap-space-sm px-space-md py-space-sm bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.05)] text-on-surface"><span class="material-symbols-outlined text-secondary text-[18px]">info</span><span class="font-body-sm text-body-sm text-on-surface">Studio Workspace Loaded</span><button class="text-on-surface-variant hover:text-on-surface ml-space-xs" type="button"><span class="material-symbols-outlined text-[14px]">close</span></button></div></div></body></html>

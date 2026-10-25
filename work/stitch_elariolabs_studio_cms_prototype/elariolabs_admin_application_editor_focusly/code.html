@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"secondary-fixed":"#e2dfff","on-tertiary":"#ffffff","on-secondary-fixed":"#0f0069","primary-fixed":"#dae2fd","inverse-primary":"#bec6e0","surface-container":"#e5eeff","error":"#ba1a1a","on-tertiary-fixed":"#00201d","on-secondary-container":"#fffbff","primary":"#000000","secondary":"#4b41e1","surface":"#f8f9ff","on-surface":"#0b1c30","surface-container-highest":"#d3e4fe","background":"#f8f9ff","error-container":"#ffdad6","primary-container":"#131b2e","tertiary-fixed":"#89f5e7","on-primary-container":"#7c839b","tertiary-fixed-dim":"#6bd8cb","surface-container-high":"#dce9ff","secondary-fixed-dim":"#c3c0ff","on-background":"#0b1c30","outline-variant":"#c6c6cd","on-secondary-fixed-variant":"#3323cc","on-error-container":"#93000a","on-error":"#ffffff","tertiary":"#000000","surface-container-low":"#eff4ff","surface-tint":"#565e74","secondary-container":"#645efb","outline":"#76777d","surface-variant":"#d3e4fe","on-primary-fixed-variant":"#3f465c","on-tertiary-container":"#0c9488","on-secondary":"#ffffff","on-tertiary-fixed-variant":"#005049","tertiary-container":"#00201d","primary-fixed-dim":"#bec6e0","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#131b2e","surface-dim":"#cbdbf5","inverse-surface":"#213145","surface-container-lowest":"#ffffff","on-surface-variant":"#45464d","surface-bright":"#f8f9ff","on-primary":"#ffffff"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{"space-lg":"1.5rem","margin-mobile":"1.25rem","margin-dense":"1.5rem","space-xxs":"0.125rem","gutter-dense":"0.75rem","space-sm":"0.5rem","margin":"3rem","space-3xl":"6rem","gutter":"1.5rem","space-md":"1rem","space-2xl":"4rem","gutter-mobile":"1rem","space-xs":"0.25rem","space-xl":"2.5rem"},fontFamily:{"label-md":["Inter"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Inter"],"body-lg":["Inter"],"headline-sm":["Plus Jakarta Sans"],"code-sm":["JetBrains Mono"],"code-inline":["JetBrains Mono"],"display-mobile":["Plus Jakarta Sans"],display:["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-sm":["Inter"],"body-md":["Inter"],"headline-lg-mobile":["Plus Jakarta Sans"]},fontSize:{"label-md":["0.875rem",{lineHeight:"1.25rem",letterSpacing:"-0.005em",fontWeight:"500"}],"headline-lg":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.025em",fontWeight:"600"}],"body-sm":["0.8125rem",{lineHeight:"1.25rem",letterSpacing:"0",fontWeight:"400"}],"body-lg":["1.125rem",{lineHeight:"1.75rem",letterSpacing:"-0.01em",fontWeight:"400"}],"headline-sm":["1.25rem",{lineHeight:"1.75rem",letterSpacing:"-0.015em",fontWeight:"600"}],"code-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.02em",fontWeight:"400"}],"code-inline":["0.8125rem",{lineHeight:"1.125rem",letterSpacing:"-0.01em",fontWeight:"500"}],"display-mobile":["2.25rem",{lineHeight:"2.75rem",letterSpacing:"-0.025em",fontWeight:"700"}],display:["3.75rem",{lineHeight:"4.25rem",letterSpacing:"-0.03em",fontWeight:"700"}],"headline-md":["1.75rem",{lineHeight:"2.25rem",letterSpacing:"-0.02em",fontWeight:"600"}],"label-sm":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.01em",fontWeight:"500"}],"body-md":["0.9375rem",{lineHeight:"1.5rem",letterSpacing:"-0.005em",fontWeight:"400"}],"headline-lg-mobile":["1.75rem",{lineHeight:"2.25rem",letterSpacing:"-0.02em",fontWeight:"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col flex-1 min-h-0"><div class="px-space-md py-space-md flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-headline-sm text-headline-sm"><span class="material-symbols-outlined text-[20px]">token</span></div><div><div class="font-headline-sm text-label-md text-on-surface font-bold leading-tight tracking-tight">ElarioLabs</div><div class="font-label-sm text-label-sm text-on-surface-variant leading-none">Studio System</div></div></div><span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">v2.4</span></div><nav class="flex-1 overflow-y-auto px-space-sm py-space-xs space-y-space-md" data-active-classes="bg-primary-container text-on-secondary-container font-medium rounded-lg"><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">Overview</div><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px]">grid_view</span>Dashboard</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="analytics" href="#"><span class="material-symbols-outlined text-[18px]">analytics</span>Analytics</a></div><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">Catalog &amp; Content</div><a aria-current="page" class="flex items-center gap-space-xs px-space-sm py-1.5 transition-colors bg-primary-container text-on-secondary-container font-medium rounded-lg" data-path="applications" href="#"><span class="material-symbols-outlined text-[18px]">apps</span>Applications</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="media-library" href="#"><span class="material-symbols-outlined text-[18px]">photo_library</span>Media Library</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="pages-sections" href="#"><span class="material-symbols-outlined text-[18px]">web</span>Pages &amp; Sections</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="homepage-builder" href="#"><span class="material-symbols-outlined text-[18px]">view_quilt</span>Homepage Builder</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="release-changelogs" href="#"><span class="material-symbols-outlined text-[18px]">history_edu</span>Release Changelogs</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="support-knowledgebase" href="#"><span class="material-symbols-outlined text-[18px]">help_outline</span>Support Knowledgebase</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="legal-compliance" href="#"><span class="material-symbols-outlined text-[18px]">gavel</span>Legal &amp; Compliance</a></div><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">Communications &amp; Users</div><a class="flex items-center justify-between px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="inquiries-messages" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px]">chat</span>Inquiries &amp; Messages</div><span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-semibold">3 new</span></a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="studio-team-roles" href="#"><span class="material-symbols-outlined text-[18px]">badge</span>Studio Team &amp; Roles</a></div><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">System Config</div><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="studio-settings" href="#"><span class="material-symbols-outlined text-[18px]">settings</span>Studio Settings</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="seo-metadata" href="#"><span class="material-symbols-outlined text-[18px]">find_in_page</span>SEO &amp; Metadata</a></div></nav></div><div class="p-space-sm bg-surface-container-lowest space-y-space-xs"><div class="p-space-xs rounded-lg bg-surface-container-low flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="leading-none"><div class="font-label-md text-label-md font-semibold text-on-surface">Julian Vance</div><div class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">Super Admin</div></div></div><button class="p-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors rounded" type="button"><span class="material-symbols-outlined text-[18px]">swap_horiz</span></button></div><a class="flex items-center justify-between px-space-xs py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors" href="#"><span>Exit to Public Studio</span><span class="material-symbols-outlined text-[16px]">north_east</span></a></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant"><span class="hover:text-on-surface cursor-pointer transition-colors">Admin</span><span class="text-outline text-code-sm">›</span><span class="font-medium text-on-surface">Overview</span></div><div class="relative flex items-center w-96"><span class="material-symbols-outlined absolute left-space-sm text-on-surface-variant text-[18px]">search</span><input class="w-full h-8 pl-9 pr-14 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-secondary shadow-[0_1px_8px_rgba(0,0,0,0.04)]" placeholder="Search apps, release tags, tickets, or media..." type="text"/><kbd class="absolute right-space-xs px-1.5 py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-on-surface-variant">⌘K</kbd></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs font-code-sm text-code-sm px-space-xs py-1 rounded-full bg-surface-container-low text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span>Production Live • macOS/iOS sync</span></div><div class="flex items-center gap-space-xs"><button class="relative p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><button class="h-8 px-space-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg font-label-sm text-label-sm flex items-center gap-1 transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">add</span><span>New App</span></button><button class="h-8 px-space-sm bg-primary hover:bg-primary-container text-on-primary rounded-lg font-label-md text-label-sm flex items-center gap-1 transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">rocket_launch</span><span>Dispatch Build</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface px-space-lg py-space-md min-h-screen"><div class="flex flex-col w-full pb-space-2xl">
+<!-- Architectural Ambient Glow -->
+<div class="relative w-full">
+<div class="absolute -top-10 right-20 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+<div class="absolute top-40 left-10 w-80 h-80 bg-surface-container-highest/40 rounded-full blur-2xl pointer-events-none -z-10"></div>
+<!-- 1. Editor Header Context Bar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md py-space-sm mb-space-md">
+<div class="flex items-center gap-space-md min-w-0">
+<!-- App Identity Squircle with Ambient Ring -->
+<div class="relative group shrink-0">
+<div class="w-14 h-14 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center shadow-md relative overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]">
+<div class="absolute inset-0 bg-gradient-to-tr from-secondary/30 via-transparent to-white/10 opacity-70"></div>
+<span class="material-symbols-outlined text-[32px] text-primary-fixed" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-surface flex items-center justify-center">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap">
+<h1 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight truncate">Focusly</h1>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface font-code-sm text-code-sm font-medium">v2.3.0 Stable</span>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-lowest text-on-tertiary-container shadow-sm font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-on-tertiary-container"></span>
+<span>Published • Publicly Visible</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-code-sm text-code-sm text-outline">com.elariolabs.focusly</span>
+<span class="text-outline text-code-sm">•</span>
+<span class="font-code-sm text-code-sm text-outline">Universal Binary (ARM64 + x86_64)</span>
+</div>
+</div>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center gap-space-xs self-start lg:self-center shrink-0">
+<button class="h-8 px-space-sm rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors shadow-sm flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span>Discard Changes</span>
+</button>
+<a class="h-8 px-space-sm rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-sm text-label-sm transition-colors flex items-center gap-1.5" href="#">
+<span>Preview Storefront</span>
+<span class="material-symbols-outlined text-[15px]">north_east</span>
+</a>
+<button class="h-8 px-space-md rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-sm shadow-sm transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+<span>Save &amp; Deploy Changes</span>
+</button>
+</div>
+</div>
+<!-- 2. Navigation Tabs Bar -->
+<div class="w-full bg-surface-container-lowest rounded-xl p-1 shadow-sm mb-space-lg overflow-x-auto">
+<div class="flex items-center gap-1 min-w-max font-label-md text-label-md">
+<button class="px-space-md py-2 rounded-lg bg-primary-container text-on-primary font-semibold flex items-center gap-2 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span>General Info</span>
+</button>
+<button class="px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">photo_library</span>
+<span>Media &amp; Screenshots</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.2 rounded-full bg-surface-container-high">8</span>
+</button>
+<button class="px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span>Platforms &amp; Builds</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</button>
+<button class="px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+<span>Legal &amp; Support</span>
+</button>
+<button class="px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">history_edu</span>
+<span>What's New / Changelog</span>
+</button>
+<button class="px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">search_check</span>
+<span>SEO &amp; Meta</span>
+</button>
+<button class="px-space-md py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">publish</span>
+<span>Publishing Settings</span>
+</button>
+</div>
+</div>
+<!-- 3. Tab Content - General Info & Platform Architecture (Two-Column Asymmetric Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+<!-- LEFT COLUMN: Primary Core Fields & Editorial Copy (7 cols) -->
+<div class="lg:col-span-7 space-y-space-lg">
+<!-- Metadata Overview Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between pb-space-xs">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Application Essentials</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Primary public identity, runtime classification, and ecosystem naming.</p>
+</div>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Core Spec</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1.5">App Display Name</label>
+<input class="w-full h-9 px-3 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary transition-colors" type="text" value="Focusly"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1.5">Bundle Identifier</label>
+<div class="relative flex items-center">
+<input class="w-full h-9 pl-3 pr-8 bg-surface-container-low rounded-lg font-code-inline text-code-inline text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary transition-colors" type="text" value="com.elariolabs.focusly"/>
+<span class="material-symbols-outlined absolute right-2 text-outline text-[16px]">lock</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1.5">Short Architectural Tagline</label>
+<input class="w-full h-9 px-3 bg-surface-container-low rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary transition-colors" type="text" value="Adaptive temporal pacing with micro-break rituals and neural interval audio cues"/>
+<div class="flex justify-between items-center mt-1 text-outline font-label-sm text-label-sm">
+<span>Succinct value proposition for desktop launchpad &amp; header overlays.</span>
+<span class="font-code-sm text-code-sm">74/120</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1.5">Primary Category</label>
+<div class="relative">
+<select class="w-full h-9 px-3 pr-8 appearance-none bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary cursor-pointer">
+<option selected="">Productivity &amp; Focus Tools</option>
+<option>Audio Synthesizers &amp; Soundscapes</option>
+<option>Developer Ergonomics</option>
+<option>Utilities &amp; System Monitoring</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2 text-outline pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1.5">Secondary Tag Classification</label>
+<div class="relative">
+<select class="w-full h-9 px-3 pr-8 appearance-none bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary cursor-pointer">
+<option selected="">Neuro-Acoustic Workflows</option>
+<option>Deep Work Session Timers</option>
+<option>Bio-Feedback Sync</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2 text-outline pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Markdown Rich Text Editor -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-sm">
+<div class="flex flex-wrap items-center justify-between gap-space-xs pb-space-xxs">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Architectural Description &amp; Bio</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Markdown formatted for the public showcase, technical docs, and package README.</p>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-low p-0.5 rounded-lg font-label-sm text-label-sm">
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-on-surface shadow-sm font-semibold flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[14px]">edit_note</span>
+<span>Editor</span>
+</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">visibility</span>
+<span>Live Preview</span>
+</button>
+</div>
+</div>
+<!-- Mini Format Toolbar -->
+<div class="flex items-center gap-1 p-1 bg-surface-container-low rounded-lg text-on-surface-variant">
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Bold" type="button"><span class="material-symbols-outlined text-[16px]">format_bold</span></button>
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Italic" type="button"><span class="material-symbols-outlined text-[16px]">format_italic</span></button>
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Inline Code" type="button"><span class="material-symbols-outlined text-[16px]">code</span></button>
+<div class="w-px h-4 bg-surface-container-high mx-1"></div>
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Bullet List" type="button"><span class="material-symbols-outlined text-[16px]">format_list_bulleted</span></button>
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Numbered List" type="button"><span class="material-symbols-outlined text-[16px]">format_list_numbered</span></button>
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Quote" type="button"><span class="material-symbols-outlined text-[16px]">format_quote</span></button>
+<div class="w-px h-4 bg-surface-container-high mx-1"></div>
+<button class="p-1 hover:bg-surface-container-high rounded text-on-surface" title="Link" type="button"><span class="material-symbols-outlined text-[16px]">link</span></button>
+<span class="ml-auto font-code-sm text-code-sm px-2 text-outline">Markdown Enabled</span>
+</div>
+<textarea class="w-full p-3 bg-surface-container-low rounded-lg font-code-inline text-code-inline text-on-surface focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-secondary leading-relaxed resize-y" rows="7">Focusly reconstructs the traditional Pomodoro cadence into non-linear, cognitively tuned sessions. 
+
+Using low-latency **CoreAudio binaural pulse generators**, the application synthesizes 40Hz gamma frequency backdrops during active sprint intervals, shifting autonomously into 10Hz alpha dampening during regenerative micro-breaks.
+
+### Core Tenets
+- **Deterministic Scheduling:** Strict state-machine architecture avoiding cloud clock drift.
+- **Micro-Break Visual Hygiene:** Automatic display brightness ramping to relieve retinal stress.
+- **Air-Gapped Telemetry:** Fully local SQLite journals with optional manual JSON export.</textarea>
+<div class="flex items-center justify-between pt-1 font-label-sm text-label-sm text-on-surface-variant">
+<span>Rendered dynamically on `/apps/focusly` using typography vellum layout.</span>
+<span class="font-code-sm text-code-sm">118 words • 840 characters</span>
+</div>
+</div>
+<!-- Key Highlights Modular Repeater -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Key Technical Highlights</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Feature chips rendered in storefront badges and press kit summaries.</p>
+</div>
+<button class="h-7 px-space-xs rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-sm text-label-sm flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Add Highlight</span>
+</button>
+</div>
+<div class="space-y-space-xs">
+<!-- Row 1 -->
+<div class="flex items-center gap-space-xs p-2 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-outline text-[18px] cursor-grab">drag_indicator</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<input class="flex-1 bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="Neural Interval Pacing"/>
+<span class="font-code-sm text-code-sm text-outline px-2">Tag: Core</span>
+<button class="p-1 rounded text-outline hover:text-error hover:bg-error-container/40 transition-colors opacity-70 group-hover:opacity-100" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center gap-space-xs p-2 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-outline text-[18px] cursor-grab">drag_indicator</span>
+<span class="w-2 h-2 rounded-full bg-on-tertiary-container"></span>
+<input class="flex-1 bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="CoreAudio Binaural Synthesizer"/>
+<span class="font-code-sm text-code-sm text-outline px-2">Tag: Audio</span>
+<button class="p-1 rounded text-outline hover:text-error hover:bg-error-container/40 transition-colors opacity-70 group-hover:opacity-100" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center gap-space-xs p-2 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-outline text-[18px] cursor-grab">drag_indicator</span>
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<input class="flex-1 bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none" type="text" value="Offline-First SQLite Storage"/>
+<span class="font-code-sm text-code-sm text-outline px-2">Tag: Privacy</span>
+<button class="p-1 rounded text-outline hover:text-error hover:bg-error-container/40 transition-colors opacity-70 group-hover:opacity-100" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Architecture Topology Visualization -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-code-sm text-code-sm text-outline uppercase tracking-wider font-semibold">Subsystem Topology</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mt-0.5">Local Audio &amp; Clock Engine</h3>
+</div>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container font-medium">Zero WebSockets</span>
+</div>
+<!-- Clean Inline SVG Vector Architecture Diagram -->
+<div class="p-space-md rounded-xl bg-surface-container-low">
+<svg class="w-full h-32" fill="none" viewbox="0 0 600 120" xmlns="http://www.w3.org/2000/svg">
+<!-- Node 1: Kernel Timer -->
+<rect class="fill-surface-container-lowest stroke-none shadow-sm" height="50" rx="8" width="130" x="20" y="35"></rect>
+<circle class="fill-secondary/15" cx="45" cy="60" r="12"></circle>
+<circle class="fill-secondary" cx="45" cy="60" r="4"></circle>
+<text class="fill-on-surface font-label-md text-[11px] font-semibold" x="68" y="55">Mach Kernel</text>
+<text class="fill-outline font-code-sm text-[9px]" x="68" y="70">Continuous Clock</text>
+<!-- Connector 1 -->
+<path d="M150 60 H210" stroke="#76777d" stroke-dasharray="3 3" stroke-width="1.5"></path>
+<polygon class="fill-outline" points="212,60 206,56 206,64"></polygon>
+<!-- Node 2: Interval Engine -->
+<rect class="fill-primary text-on-primary shadow-sm" height="70" rx="8" width="150" x="215" y="25"></rect>
+<text class="font-label-md text-[12px] font-bold" fill="#ffffff" x="235" y="52">Session FSM</text>
+<text class="font-code-sm text-[9px]" fill="#bec6e0" x="235" y="68">40Hz / 10Hz Switcher</text>
+<circle cx="340" cy="60" fill="#6bd8cb" r="5"></circle>
+<!-- Connector 2 -->
+<path d="M365 60 H425" stroke="#76777d" stroke-width="1.5"></path>
+<polygon class="fill-outline" points="427,60 421,56 421,64"></polygon>
+<!-- Node 3: CoreAudio Pipeline -->
+<rect class="fill-surface-container-lowest stroke-none shadow-sm" height="50" rx="8" width="150" x="430" y="35"></rect>
+<circle class="fill-tertiary-container" cx="455" cy="60" r="12"></circle>
+<circle class="fill-on-tertiary-container" cx="455" cy="60" r="5"></circle>
+<text class="fill-on-surface font-label-md text-[11px] font-semibold" x="478" y="55">AudioUnit V3</text>
+<text class="fill-outline font-code-sm text-[9px]" x="478" y="70">Stereo Binaural Bus</text>
+</svg>
+<div class="flex items-center justify-between pt-space-xs font-code-sm text-code-sm text-outline">
+<span>Synchronous zero-alloc audio loop</span>
+<span>Latency: &lt;1.8ms on Apple Silicon</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Architecture, Assets, Identity & Licensing (5 cols) -->
+<div class="lg:col-span-5 space-y-space-lg">
+<!-- App Icon Asset Hub -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Master App Icon</h3>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">1024x1024 PNG</span>
+</div>
+<!-- Dropzone and Preview Box -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col items-center justify-center text-center group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="relative mb-space-sm">
+<div class="w-24 h-24 rounded-3xl bg-primary-container flex items-center justify-center shadow-lg relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+<div class="absolute inset-0 bg-gradient-to-tr from-secondary/40 via-transparent to-white/10"></div>
+<!-- Precision Focus Dial Indicator -->
+<svg class="w-14 h-14 text-primary-fixed" fill="none" viewbox="0 0 100 100">
+<circle cx="50" cy="50" r="42" stroke="currentColor" stroke-dasharray="4 6" stroke-opacity="0.3" stroke-width="4"></circle>
+<circle cx="50" cy="50" r="32" stroke="currentColor" stroke-width="3"></circle>
+<path d="M50 18 V28" stroke="currentColor" stroke-linecap="round" stroke-width="4"></path>
+<path d="M82 50 H72" stroke="currentColor" stroke-linecap="round" stroke-width="4"></path>
+<path d="M50 82 V72" stroke="currentColor" stroke-linecap="round" stroke-width="4"></path>
+<path d="M18 50 H28" stroke="currentColor" stroke-linecap="round" stroke-width="4"></path>
+<circle cx="50" cy="50" fill="currentColor" r="8"></circle>
+<path d="M50 50 L64 36" stroke="#dae2fd" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+</div>
+<button class="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-surface-container-lowest text-on-surface shadow-md flex items-center justify-center hover:bg-primary hover:text-on-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">crop_original</span>
+</button>
+</div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">focusly_appicon_v2.3_master.png</div>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">Drag &amp; drop new master vector ICNS or layered SVG.</p>
+<div class="flex items-center gap-2 mt-3">
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium">Display P3</span>
+<span class="font-code-sm text-code-sm px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-medium">Alpha Mask OK</span>
+</div>
+</div>
+</div>
+<!-- Color Identity Palette -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Studio Color Tokens</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Dynamic tint variables injected into app shell and marketing banners.</p>
+</div>
+<div class="space-y-space-xs">
+<!-- Token 1 -->
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-[#0f172a] shadow-inner flex items-center justify-center text-white font-code-sm text-code-sm">P</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Primary Accent</div>
+<div class="font-code-sm text-code-sm text-outline">Deep Onyx Titanium</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-code-inline text-code-inline px-2 py-1 rounded bg-surface-container font-medium text-on-surface">#0F172A</span>
+<button class="p-1 text-outline hover:text-on-surface rounded" type="button"><span class="material-symbols-outlined text-[16px]">colorize</span></button>
+</div>
+</div>
+<!-- Token 2 -->
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-[#4b41e1] shadow-inner flex items-center justify-center text-white font-code-sm text-code-sm">S</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Secondary Frequency</div>
+<div class="font-code-sm text-code-sm text-outline">Binaural Electric Indigo</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-code-inline text-code-inline px-2 py-1 rounded bg-surface-container font-medium text-on-surface">#4B41E1</span>
+<button class="p-1 text-outline hover:text-on-surface rounded" type="button"><span class="material-symbols-outlined text-[16px]">colorize</span></button>
+</div>
+</div>
+<!-- Token 3 -->
+<div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-[#f8f9ff] shadow-inner flex items-center justify-center text-on-surface font-code-sm text-code-sm">T</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-semibold">Surface Tint Canvas</div>
+<div class="font-code-sm text-code-sm text-outline">Glacial Vellum</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-code-inline text-code-inline px-2 py-1 rounded bg-surface-container font-medium text-on-surface">#F8F9FF</span>
+<button class="p-1 text-outline hover:text-on-surface rounded" type="button"><span class="material-symbols-outlined text-[16px]">colorize</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- System Requirements & Target Targets -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Platform Matrix</h3>
+<span class="font-label-sm text-label-sm text-secondary font-medium">Apple Ecosystem</span>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-on-surface">desktop_mac</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">macOS Minimum</span>
+</div>
+<span class="font-code-inline text-code-inline px-2.5 py-1 rounded bg-surface-container font-semibold text-on-surface">13.0 Ventura+</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-on-surface">phone_iphone</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">iOS / iPadOS Minimum</span>
+</div>
+<span class="font-code-inline text-code-inline px-2.5 py-1 rounded bg-surface-container font-semibold text-on-surface">17.0+</span>
+</div>
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-on-surface">watch</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">watchOS Complication</span>
+</div>
+<span class="font-code-inline text-code-inline px-2.5 py-1 rounded bg-surface-container font-semibold text-on-surface">10.0+</span>
+</div>
+</div>
+<!-- Zero-Telemetry Architectural Compliance Callout -->
+<div class="p-3.5 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-start gap-3">
+<span class="material-symbols-outlined text-[22px] shrink-0 mt-0.5">verified_user</span>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md font-semibold text-on-tertiary">Zero-Telemetry Verification</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-tertiary text-tertiary-fixed font-bold">AIR-GAP ACTIVE</span>
+</div>
+<p class="font-body-sm text-body-sm text-tertiary-fixed-dim mt-1">Binary inspection confirmed: zero external beacons, zero trackers, and zero analytical socket listeners attached.</p>
+</div>
+</div>
+</div>
+<!-- Licensing & Storefront Monetization -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">License &amp; Pricing Model</h3>
+<span class="material-symbols-outlined text-[18px] text-outline">payments</span>
+</div>
+<div class="space-y-space-xs">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1">Commercial Structure</label>
+<div class="relative">
+<select class="w-full h-9 px-3 appearance-none bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary cursor-pointer">
+<option selected="">One-time Perpetual Studio License</option>
+<option>Annual Major-Version Upgrade Pass</option>
+<option>ElarioLabs All-Access Bundle</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-2 text-outline pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1">Default Price</label>
+<div class="relative flex items-center">
+<span class="absolute left-3 font-code-sm text-code-sm text-outline">$</span>
+<input class="w-full h-9 pl-7 pr-3 bg-surface-container-low rounded-lg font-code-inline text-code-inline text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary" type="text" value="39.00"/>
+</div>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-on-surface mb-1">Currency</label>
+<input class="w-full h-9 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-outline cursor-not-allowed" readonly="" type="text" value="USD ($)"/>
+</div>
+</div>
+<div class="pt-1">
+<label class="block font-label-sm text-label-sm text-on-surface mb-1">Mac App Store In-App Purchase Parity ID</label>
+<input class="w-full h-9 px-3 bg-surface-container-low rounded-lg font-code-sm text-code-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary" type="text" value="com.elariolabs.focusly.perpetual"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. Form Persistent Footer Bar -->
+<div class="sticky bottom-4 mt-space-xl z-30">
+<div class="bg-primary-container text-on-primary rounded-xl px-space-lg py-3 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-space-md backdrop-blur-md bg-primary-container/95">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-primary-container">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="text-white font-medium">All edits synced to staging cache</span>
+<span class="text-outline">•</span>
+<span>Last deployed build <strong class="text-white">v2.3.0 (r440)</strong> 2 hours ago by <strong class="text-white">Julian Vance</strong></span>
+</div>
+<div class="flex items-center gap-space-xs w-full sm:w-auto justify-end">
+<button class="h-8 px-3 rounded-lg text-inverse-primary hover:text-white hover:bg-white/10 font-label-sm text-label-sm transition-colors" type="button">
+            Reset To Live
+          </button>
+<button class="h-8 px-space-md rounded-lg bg-secondary text-on-secondary hover:bg-secondary-container font-label-md text-label-sm font-semibold transition-colors flex items-center gap-1.5 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Publish To Production</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>

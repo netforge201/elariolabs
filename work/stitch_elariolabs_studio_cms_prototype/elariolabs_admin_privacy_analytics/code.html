@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"secondary-fixed":"#e2dfff","on-tertiary":"#ffffff","on-secondary-fixed":"#0f0069","primary-fixed":"#dae2fd","inverse-primary":"#bec6e0","surface-container":"#e5eeff","error":"#ba1a1a","on-tertiary-fixed":"#00201d","on-secondary-container":"#fffbff","primary":"#000000","secondary":"#4b41e1","surface":"#f8f9ff","on-surface":"#0b1c30","surface-container-highest":"#d3e4fe","background":"#f8f9ff","error-container":"#ffdad6","primary-container":"#131b2e","tertiary-fixed":"#89f5e7","on-primary-container":"#7c839b","tertiary-fixed-dim":"#6bd8cb","surface-container-high":"#dce9ff","secondary-fixed-dim":"#c3c0ff","on-background":"#0b1c30","outline-variant":"#c6c6cd","on-secondary-fixed-variant":"#3323cc","on-error-container":"#93000a","on-error":"#ffffff","tertiary":"#000000","surface-container-low":"#eff4ff","surface-tint":"#565e74","secondary-container":"#645efb","outline":"#76777d","surface-variant":"#d3e4fe","on-primary-fixed-variant":"#3f465c","on-tertiary-container":"#0c9488","on-secondary":"#ffffff","on-tertiary-fixed-variant":"#005049","tertiary-container":"#00201d","primary-fixed-dim":"#bec6e0","inverse-on-surface":"#eaf1ff","on-primary-fixed":"#131b2e","surface-dim":"#cbdbf5","inverse-surface":"#213145","surface-container-lowest":"#ffffff","on-surface-variant":"#45464d","surface-bright":"#f8f9ff","on-primary":"#ffffff"},borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},spacing:{"space-lg":"1.5rem","margin-mobile":"1.25rem","margin-dense":"1.5rem","space-xxs":"0.125rem","gutter-dense":"0.75rem","space-sm":"0.5rem","margin":"3rem","space-3xl":"6rem","gutter":"1.5rem","space-md":"1rem","space-2xl":"4rem","gutter-mobile":"1rem","space-xs":"0.25rem","space-xl":"2.5rem"},fontFamily:{"label-md":["Inter"],"headline-lg":["Plus Jakarta Sans"],"body-sm":["Inter"],"body-lg":["Inter"],"headline-sm":["Plus Jakarta Sans"],"code-sm":["JetBrains Mono"],"code-inline":["JetBrains Mono"],"display-mobile":["Plus Jakarta Sans"],display:["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-sm":["Inter"],"body-md":["Inter"],"headline-lg-mobile":["Plus Jakarta Sans"]},fontSize:{"label-md":["0.875rem",{lineHeight:"1.25rem",letterSpacing:"-0.005em",fontWeight:"500"}],"headline-lg":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.025em",fontWeight:"600"}],"body-sm":["0.8125rem",{lineHeight:"1.25rem",letterSpacing:"0",fontWeight:"400"}],"body-lg":["1.125rem",{lineHeight:"1.75rem",letterSpacing:"-0.01em",fontWeight:"400"}],"headline-sm":["1.25rem",{lineHeight:"1.75rem",letterSpacing:"-0.015em",fontWeight:"600"}],"code-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.02em",fontWeight:"400"}],"code-inline":["0.8125rem",{lineHeight:"1.125rem",letterSpacing:"-0.01em",fontWeight:"500"}],"display-mobile":["2.25rem",{lineHeight:"2.75rem",letterSpacing:"-0.025em",fontWeight:"700"}],display:["3.75rem",{lineHeight:"4.25rem",letterSpacing:"-0.03em",fontWeight:"700"}],"headline-md":["1.75rem",{lineHeight:"2.25rem",letterSpacing:"-0.02em",fontWeight:"600"}],"label-sm":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.01em",fontWeight:"500"}],"body-md":["0.9375rem",{lineHeight:"1.5rem",letterSpacing:"-0.005em",fontWeight:"400"}],"headline-lg-mobile":["1.75rem",{lineHeight:"2.25rem",letterSpacing:"-0.02em",fontWeight:"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col flex-1 min-h-0"><div class="px-space-md py-space-md flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-headline-sm text-headline-sm"><span class="material-symbols-outlined text-[20px]">token</span></div><div><div class="font-headline-sm text-label-md text-on-surface font-bold leading-tight tracking-tight">ElarioLabs</div><div class="font-label-sm text-label-sm text-on-surface-variant leading-none">Studio System</div></div></div><span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant font-medium">v2.4</span></div><nav class="flex-1 overflow-y-auto px-space-sm py-space-xs space-y-space-md" data-active-classes="bg-primary-container text-on-secondary-container font-medium rounded-lg"><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">Overview</div><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="dashboard" href="#"><span class="material-symbols-outlined text-[18px]">grid_view</span>Dashboard</a><a aria-current="page" class="flex items-center gap-space-xs px-space-sm py-1.5 transition-colors bg-primary-container text-on-secondary-container font-medium rounded-lg" data-path="analytics" href="#"><span class="material-symbols-outlined text-[18px]">analytics</span>Analytics</a></div><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">Catalog &amp; Content</div><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="applications" href="#"><span class="material-symbols-outlined text-[18px]">apps</span>Applications</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="media-library" href="#"><span class="material-symbols-outlined text-[18px]">photo_library</span>Media Library</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="pages-sections" href="#"><span class="material-symbols-outlined text-[18px]">web</span>Pages &amp; Sections</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="homepage-builder" href="#"><span class="material-symbols-outlined text-[18px]">view_quilt</span>Homepage Builder</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="release-changelogs" href="#"><span class="material-symbols-outlined text-[18px]">history_edu</span>Release Changelogs</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="support-knowledgebase" href="#"><span class="material-symbols-outlined text-[18px]">help_outline</span>Support Knowledgebase</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="legal-compliance" href="#"><span class="material-symbols-outlined text-[18px]">gavel</span>Legal &amp; Compliance</a></div><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">Communications &amp; Users</div><a class="flex items-center justify-between px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="inquiries-messages" href="#"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[18px]">chat</span>Inquiries &amp; Messages</div><span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-semibold">3 new</span></a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="studio-team-roles" href="#"><span class="material-symbols-outlined text-[18px]">badge</span>Studio Team &amp; Roles</a></div><div class="space-y-space-xxs"><div class="px-space-xs font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold mb-space-xxs">System Config</div><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="studio-settings" href="#"><span class="material-symbols-outlined text-[18px]">settings</span>Studio Settings</a><a class="flex items-center gap-space-xs px-space-sm py-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-label-md text-label-md transition-colors" data-path="seo-metadata" href="#"><span class="material-symbols-outlined text-[18px]">find_in_page</span>SEO &amp; Metadata</a></div></nav></div><div class="p-space-sm bg-surface-container-lowest space-y-space-xs"><div class="p-space-xs rounded-lg bg-surface-container-low flex items-center justify-between"><div class="flex items-center gap-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="leading-none"><div class="font-label-md text-label-md font-semibold text-on-surface">Julian Vance</div><div class="font-label-sm text-label-sm text-secondary font-medium mt-0.5">Super Admin</div></div></div><button class="p-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors rounded" type="button"><span class="material-symbols-outlined text-[18px]">swap_horiz</span></button></div><a class="flex items-center justify-between px-space-xs py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors" href="#"><span>Exit to Public Studio</span><span class="material-symbols-outlined text-[16px]">north_east</span></a></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-xs font-label-sm text-label-sm text-on-surface-variant"><span class="hover:text-on-surface cursor-pointer transition-colors">Admin</span><span class="text-outline text-code-sm">›</span><span class="font-medium text-on-surface">Overview</span></div><div class="relative flex items-center w-96"><span class="material-symbols-outlined absolute left-space-sm text-on-surface-variant text-[18px]">search</span><input class="w-full h-8 pl-9 pr-14 bg-surface-container-lowest rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-secondary shadow-[0_1px_8px_rgba(0,0,0,0.04)]" placeholder="Search apps, release tags, tickets, or media..." type="text"/><kbd class="absolute right-space-xs px-1.5 py-0.5 rounded bg-surface-container-high font-code-sm text-code-sm text-on-surface-variant">⌘K</kbd></div></div><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs font-code-sm text-code-sm px-space-xs py-1 rounded-full bg-surface-container-low text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span>Production Live • macOS/iOS sync</span></div><div class="flex items-center gap-space-xs"><button class="relative p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><button class="h-8 px-space-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg font-label-sm text-label-sm flex items-center gap-1 transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">add</span><span>New App</span></button><button class="h-8 px-space-sm bg-primary hover:bg-primary-container text-on-primary rounded-lg font-label-md text-label-sm flex items-center gap-1 transition-colors" type="button"><span class="material-symbols-outlined text-[16px]">rocket_launch</span><span>Dispatch Build</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 bg-surface px-space-lg py-space-md min-h-screen"><div class="flex flex-col w-full gap-space-lg">
+<!-- Header Section -->
+<section class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
+<div class="space-y-space-xxs max-w-3xl">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 font-code-sm text-code-sm px-space-xs py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          Audit Signed: SHA256-ED25519
+        </span>
+<span class="font-code-sm text-code-sm text-outline">·</span>
+<span class="font-code-sm text-code-sm text-outline">Zero Client-Side Beacons</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface font-semibold tracking-tight">
+        Privacy-Preserving Studio Telemetry &amp; Insights
+      </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Aggregated metrics compiled exclusively from Apple StoreKit anonymized receipts and direct notarized DMG download server logs. Zero in-app beacons or user trackers.
+      </p>
+</div>
+<!-- Actions & Filter Controls -->
+<div class="flex flex-wrap items-center gap-space-xs self-start lg:self-end">
+<div class="flex items-center bg-surface-container-lowest rounded-lg shadow-sm px-space-xs py-1">
+<button class="flex items-center gap-1 px-space-xs py-1 rounded font-label-sm text-label-sm text-on-surface font-medium hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">calendar_today</span>
+<span>Last 30 Days (Oct 1 – Oct 31, 2025)</span>
+<span class="material-symbols-outlined text-[14px] text-outline">expand_more</span>
+</button>
+<span class="h-4 w-px bg-surface-container-high mx-1"></span>
+<button class="px-space-xs py-1 rounded font-code-sm text-code-sm text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1" id="compareToggle" type="button">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span>vs Prior 30d</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="h-8 px-space-xs bg-surface-container-lowest hover:bg-surface-container-high text-on-surface rounded-lg font-label-sm text-label-sm shadow-sm flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span>Raw CSV</span>
+</button>
+<button class="h-8 px-space-sm bg-primary hover:bg-primary-container text-on-primary rounded-lg font-label-md text-label-sm shadow-sm flex items-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed">verified_user</span>
+<span>Verify Zero-Tracking Audit</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Metric Cards Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter-dense">
+<!-- Total Universal Downloads -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold">Universal Ingestion</span>
+<span class="w-7 h-7 rounded-lg bg-surface-container-high flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">download_for_offline</span>
+</span>
+</div>
+<div class="mt-space-md">
+<div class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">42,910</div>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded-full bg-surface-container-high text-on-tertiary-container font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">trending_up</span>+8.2%
+          </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">vs previous 30-day window</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between font-code-sm text-code-sm text-outline">
+<span>DMG + PKG + StoreKit</span>
+<span class="text-on-surface-variant font-medium">1,430/day avg</span>
+</div>
+</div>
+<!-- Distribution Split Direct vs MAS -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold">Distribution Topology</span>
+<span class="w-7 h-7 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">alt_route</span>
+</span>
+</div>
+<div class="mt-space-md">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">68%</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-medium">Direct / 32% App Store</span>
+</div>
+<!-- Progress Split Bar -->
+<div class="w-full h-2 rounded-full bg-surface-container-high mt-space-xs overflow-hidden flex">
+<div class="bg-secondary h-full rounded-l-full" style="width: 68%;"></div>
+<div class="bg-tertiary-fixed-dim h-full" style="width: 32%;"></div>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between font-code-sm text-code-sm">
+<span class="text-secondary font-medium">29,178 Notarized DMG</span>
+<span class="text-on-surface-variant">13,732 Mac App Store</span>
+</div>
+</div>
+<!-- Cryptographic License Activations -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold">Offline License Checks</span>
+<span class="w-7 h-7 rounded-lg bg-surface-container-high text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">key</span>
+</span>
+</div>
+<div class="mt-space-md">
+<div class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">3,420</div>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container-high text-secondary font-medium">
+            Ed25519 Local
+          </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Zero phone-home calls</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between font-code-sm text-code-sm text-outline">
+<span>Hardware Nonce Signatures</span>
+<span class="text-on-surface-variant font-medium">100% Verified</span>
+</div>
+</div>
+<!-- Crash-Free Sessions (Opt-in Diagnostics) -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold">Crash-Free Integrity</span>
+<span class="w-7 h-7 rounded-lg bg-surface-container-high text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">shield_with_heart</span>
+</span>
+</div>
+<div class="mt-space-md">
+<div class="flex items-baseline gap-space-xs">
+<span class="font-headline-lg text-headline-lg text-on-surface font-semibold tracking-tight">99.94%</span>
+<span class="font-label-sm text-label-sm text-outline font-normal">Apple Diagnostics</span>
+</div>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">6 total symbolicated crash traces</span>
+</div>
+</div>
+<div class="mt-space-sm pt-space-xs flex items-center justify-between font-code-sm text-code-sm text-outline">
+<span>macOS 15 Sequoia Base</span>
+<span class="text-on-surface-variant font-medium">v2.4.1 Release</span>
+</div>
+</div>
+</section>
+<!-- Interactive Primary Visualization & Platform Distribution -->
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-gutter-dense">
+<!-- Daily Installs Timeline Visualizer (Takes 2 cols on xl) -->
+<div class="xl:col-span-2 p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs pb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Daily Installs &amp; License Generation</span>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">CDN Cache Log Ingestion</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Time-series distribution across OS environments (macOS, iOS, iPadOS)</p>
+</div>
+<!-- Series Legend -->
+<div class="flex items-center gap-space-sm font-code-sm text-code-sm">
+<div class="flex items-center gap-1">
+<span class="w-2.5 h-2.5 rounded-sm bg-secondary"></span>
+<span class="text-on-surface">macOS</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-2.5 h-2.5 rounded-sm bg-tertiary-fixed-dim"></span>
+<span class="text-on-surface">iOS</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-2.5 h-2.5 rounded-sm bg-outline-variant"></span>
+<span class="text-on-surface">iPadOS</span>
+</div>
+</div>
+</div>
+<!-- Pure Vector Interactive SVG Chart -->
+<div class="w-full relative mt-space-xs">
+<svg class="w-full h-56 overflow-visible select-none" viewbox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="macOSGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4b41e1" stop-opacity="0.22"></stop>
+<stop offset="100%" stop-color="#4b41e1" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="iosGrad" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#6bd8cb" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#6bd8cb" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Subtle Background Grid Guidelines -->
+<line stroke="#eff4ff" stroke-width="1" x1="30" x2="750" y1="20" y2="20"></line>
+<line stroke="#eff4ff" stroke-width="1" x1="30" x2="750" y1="70" y2="70"></line>
+<line stroke="#eff4ff" stroke-width="1" x1="30" x2="750" y1="120" y2="120"></line>
+<line stroke="#eff4ff" stroke-width="1" x1="30" x2="750" y1="170" y2="170"></line>
+<line stroke="#e2e8f0" stroke-width="1" x1="30" x2="750" y1="200" y2="200"></line>
+<!-- Y-Axis Values -->
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="start" x="5" y="24">2.2k</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="start" x="5" y="74">1.6k</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="start" x="5" y="124">1.0k</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="start" x="5" y="174">400</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="start" x="15" y="204">0</text>
+<!-- macOS Area Fill -->
+<polygon fill="url(#macOSGrad)" points="40,195 40,130 90,118 140,140 190,95 240,110 290,75 340,65 390,90 440,55 490,45 540,60 590,38 640,42 690,30 740,25 740,195"></polygon>
+<!-- iOS Area Fill -->
+<polygon fill="url(#iosGrad)" points="40,195 40,165 90,158 140,168 190,145 240,150 290,135 340,130 390,140 440,125 490,118 540,128 590,115 640,110 690,105 740,95 740,195"></polygon>
+<!-- iPadOS Line (Stroke only) -->
+<polyline fill="none" points="40,185 90,180 140,182 190,175 240,178 290,170 340,168 390,172 440,164 490,160 540,165 590,158 640,155 690,150 740,145" stroke="#c6c6cd" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></polyline>
+<!-- iOS Line (Stroke) -->
+<polyline fill="none" points="40,165 90,158 140,168 190,145 240,150 290,135 340,130 390,140 440,125 490,118 540,128 590,115 640,110 690,105 740,95" stroke="#6bd8cb" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"></polyline>
+<!-- macOS Line (Primary Accent Stroke) -->
+<polyline fill="none" points="40,130 90,118 140,140 190,95 240,110 290,75 340,65 390,90 440,55 490,45 540,60 590,38 640,42 690,30 740,25" stroke="#4b41e1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- Active Marker on Key Peak (Oct 28 dispatch) -->
+<line opacity="0.6" stroke="#4b41e1" stroke-dasharray="3 3" stroke-width="1.5" x1="690" x2="690" y1="20" y2="195"></line>
+<circle cx="690" cy="30" fill="#4b41e1" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="690" cy="105" fill="#6bd8cb" r="4" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="690" cy="150" fill="#c6c6cd" r="3.5" stroke="#ffffff" stroke-width="1.5"></circle>
+<!-- Date Points on X Axis -->
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="40" y="214">Oct 01</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="190" y="214">Oct 07</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="340" y="214">Oct 14</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="490" y="214">Oct 21</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="640" y="214">Oct 28</text>
+<text fill="#76777d" font-family="JetBrains Mono" font-size="9" text-anchor="middle" x="740" y="214">Oct 31</text>
+</svg>
+<!-- Tooltip Card positioned at peak event -->
+<div class="hidden md:flex absolute top-4 right-16 bg-primary-container text-on-primary rounded-lg p-space-xs shadow-md flex-col gap-0.5 border-none">
+<div class="font-code-sm text-code-sm text-tertiary-fixed font-semibold">Oct 28 Release (v2.4.0)</div>
+<div class="font-body-sm text-body-sm text-on-secondary-container">1,892 macOS DMG / 412 iOS StoreKit</div>
+<div class="font-label-sm text-label-sm text-on-primary-container">Cloudflare CDN edge cache validated</div>
+</div>
+</div>
+<!-- Quick Platform Ratio Footer -->
+<div class="mt-space-md pt-space-xs flex flex-wrap items-center justify-between gap-space-xs font-code-sm text-code-sm text-on-surface-variant">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>macOS Desktop Engine: <strong>72.4%</strong> (31,066)</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span>iOS Companion: <strong>21.2%</strong> (9,096)</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span>iPadOS Stage Manager: <strong>6.4%</strong> (2,748)</span>
+</div>
+</div>
+</div>
+<!-- Verification & Telemetry Ingestion Audit Inspector -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div class="space-y-space-xxs">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-outline font-semibold">Telemetry Pipeline</span>
+<span class="font-code-sm text-code-sm text-on-tertiary-container font-semibold">Zero-Leak Guard</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Edge Ingestion Stream</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Real-time validation of incoming anonymous notarized asset inquiries.</p>
+</div>
+<!-- Mini Live Ingestion Terminal Log -->
+<div class="bg-primary-container text-on-primary rounded-lg p-space-sm font-code-sm text-code-sm space-y-1.5 my-space-sm">
+<div class="flex items-center justify-between text-on-primary-container font-medium">
+<span>EDGE-POP-SIG</span>
+<span>TIME (UTC)</span>
+</div>
+<div class="flex items-center justify-between text-tertiary-fixed">
+<span class="truncate">FRA1-CDN · GET /focusly-2.4.dmg</span>
+<span>14:02:19</span>
+</div>
+<div class="flex items-center justify-between text-surface-container-highest">
+<span class="truncate">NRT2-CDN · GET /notebloom-v1.8.dmg</span>
+<span>14:02:04</span>
+</div>
+<div class="flex items-center justify-between text-secondary-fixed">
+<span class="truncate">IAD3-STOREKIT · RECEIPT_ANON</span>
+<span>14:01:48</span>
+</div>
+<div class="flex items-center justify-between text-tertiary-fixed">
+<span class="truncate">AMS1-CDN · ED25519_KEY_PUB</span>
+<span>14:01:12</span>
+</div>
+</div>
+<!-- Donut / Pipeline Distribution Stats -->
+<div class="space-y-space-xs">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Log Aggregation Latency</span>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">&lt; 140ms</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Anonymization Entropy</span>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">K-Anonymity (k=50)</span>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-on-surface-variant">Disk Retention Window</span>
+<span class="font-code-sm text-code-sm text-secondary font-semibold">24 hrs max (RAM purge)</span>
+</div>
+</div>
+<div class="pt-space-sm">
+<button class="w-full h-8 px-space-sm bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg font-label-sm text-label-sm flex items-center justify-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+<span>Inspect CDN Edge Manifest</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Breakdown Matrix: Application Distribution & Regional Edge CDN Nodes -->
+<section class="grid grid-cols-1 xl:grid-cols-3 gap-gutter-dense">
+<!-- Applications Download Table (Takes 2 cols) -->
+<div class="xl:col-span-2 p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between pb-space-xs">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Downloads by Application</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Volume, direct distribution channels, and license adoption velocity.</p>
+</div>
+<span class="font-code-sm text-code-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant">4 Active Suites</span>
+</div>
+<!-- Matrix Table -->
+<div class="overflow-x-auto mt-space-sm">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead>
+<tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase tracking-wider">
+<th class="py-2.5 px-space-sm rounded-l-lg font-medium">Application</th>
+<th class="py-2.5 px-space-sm font-medium">Downloads</th>
+<th class="py-2.5 px-space-sm font-medium">Direct DMG / MAS</th>
+<th class="py-2.5 px-space-sm font-medium">Velocity</th>
+<th class="py-2.5 px-space-sm rounded-r-lg font-medium text-right">Licenses</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Focusly Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-lg bg-primary-container text-on-primary flex items-center justify-center font-bold font-headline-sm text-label-sm">
+                      F
+                    </div>
+<div>
+<div class="font-label-md text-label-md font-semibold text-on-surface group-hover:text-secondary transition-colors">Focusly Studio</div>
+<div class="font-code-sm text-code-sm text-outline">v2.4.2 · macOS Universal</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm font-headline-sm text-label-md font-semibold text-on-surface">
+                  18,240
+                </td>
+<td class="py-3 px-space-sm">
+<div class="w-32 space-y-1">
+<div class="flex justify-between font-code-sm text-code-sm text-outline">
+<span class="text-secondary font-medium">74%</span>
+<span>26%</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 74%;"></div>
+<div class="bg-surface-container-highest h-full" style="width: 26%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm">
+<span class="inline-flex items-center gap-0.5 font-code-sm text-code-sm text-on-tertiary-container font-semibold">
+<span class="material-symbols-outlined text-[14px]">north_east</span>+14.6%
+                  </span>
+</td>
+<td class="py-3 px-space-sm text-right font-code-sm text-code-sm text-on-surface font-semibold">
+                  1,840 Act.
+                </td>
+</tr>
+<!-- Notebloom Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-bold font-headline-sm text-label-sm">
+                      N
+                    </div>
+<div>
+<div class="font-label-md text-label-md font-semibold text-on-surface group-hover:text-secondary transition-colors">Notebloom Engine</div>
+<div class="font-code-sm text-code-sm text-outline">v1.8.0 · macOS / iOS Sync</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm font-headline-sm text-label-md font-semibold text-on-surface">
+                  12,110
+                </td>
+<td class="py-3 px-space-sm">
+<div class="w-32 space-y-1">
+<div class="flex justify-between font-code-sm text-code-sm text-outline">
+<span class="text-secondary font-medium">62%</span>
+<span>38%</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 62%;"></div>
+<div class="bg-surface-container-highest h-full" style="width: 38%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm">
+<span class="inline-flex items-center gap-0.5 font-code-sm text-code-sm text-on-tertiary-container font-semibold">
+<span class="material-symbols-outlined text-[14px]">north_east</span>+9.2%
+                  </span>
+</td>
+<td class="py-3 px-space-sm text-right font-code-sm text-code-sm text-on-surface font-semibold">
+                  920 Act.
+                </td>
+</tr>
+<!-- PrismScript Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-lg bg-surface-container-high text-on-surface flex items-center justify-center font-bold font-headline-sm text-label-sm">
+                      P
+                    </div>
+<div>
+<div class="font-label-md text-label-md font-semibold text-on-surface group-hover:text-secondary transition-colors">PrismScript CLI</div>
+<div class="font-code-sm text-code-sm text-outline">v3.1.0 · Homebrew / PKG</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm font-headline-sm text-label-md font-semibold text-on-surface">
+                  7,830
+                </td>
+<td class="py-3 px-space-sm">
+<div class="w-32 space-y-1">
+<div class="flex justify-between font-code-sm text-code-sm text-outline">
+<span class="text-secondary font-medium">94%</span>
+<span>6%</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 94%;"></div>
+<div class="bg-surface-container-highest h-full" style="width: 6%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm">
+<span class="inline-flex items-center gap-0.5 font-code-sm text-code-sm text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-[14px]">trending_flat</span>+0.8%
+                  </span>
+</td>
+<td class="py-3 px-space-sm text-right font-code-sm text-code-sm text-on-surface font-semibold">
+                  480 Act.
+                </td>
+</tr>
+<!-- OrbitCalc Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-space-sm">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-lg bg-surface-container-highest text-on-surface flex items-center justify-center font-bold font-headline-sm text-label-sm">
+                      O
+                    </div>
+<div>
+<div class="font-label-md text-label-md font-semibold text-on-surface group-hover:text-secondary transition-colors">OrbitCalc Mac</div>
+<div class="font-code-sm text-code-sm text-outline">v1.2.4 · Mac App Store Exclusive</div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm font-headline-sm text-label-md font-semibold text-on-surface">
+                  4,730
+                </td>
+<td class="py-3 px-space-sm">
+<div class="w-32 space-y-1">
+<div class="flex justify-between font-code-sm text-code-sm text-outline">
+<span class="text-on-surface-variant font-medium">0%</span>
+<span class="text-secondary font-medium">100%</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden flex">
+<div class="bg-secondary h-full" style="width: 100%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-space-sm">
+<span class="inline-flex items-center gap-0.5 font-code-sm text-code-sm text-on-tertiary-container font-semibold">
+<span class="material-symbols-outlined text-[14px]">north_east</span>+3.4%
+                  </span>
+</td>
+<td class="py-3 px-space-sm text-right font-code-sm text-code-sm text-on-surface font-semibold">
+                  180 Act.
+                </td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Displaying 4 studio products tracked via signed hash digests</span>
+<a class="text-secondary font-medium hover:underline flex items-center gap-0.5" href="#">
+<span>Manage Artifact Repositories</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Geographic Privacy-Aggregated Regions -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Geographic Regions</h3>
+<span class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant">Edge CDN Only</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+          Derived strictly from CDN node edge routing. Zero IP retention or client geolocation queries.
+        </p>
+<!-- Regions Progress List -->
+<div class="space-y-space-md mt-space-md">
+<!-- DACH -->
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-semibold text-on-surface">DACH (Frankfurt / Zurich / Vienna)</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">38.4% (16,477)</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 38.4%;"></div>
+</div>
+</div>
+<!-- North America -->
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-semibold text-on-surface">North America (US-East &amp; West)</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">31.2% (13,387)</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 31.2%;"></div>
+</div>
+</div>
+<!-- Japan & East Asia -->
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-semibold text-on-surface">Japan &amp; East Asia (Tokyo / Osaka)</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">18.6% (7,981)</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden">
+<div class="bg-tertiary-fixed-dim h-full rounded-full" style="width: 18.6%;"></div>
+</div>
+</div>
+<!-- Nordic -->
+<div class="space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-semibold text-on-surface">Nordic (Stockholm / Helsinki)</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface font-semibold">11.8% (5,065)</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-high overflow-hidden">
+<div class="bg-outline h-full rounded-full" style="width: 11.8%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-space-md pt-space-xs font-code-sm text-code-sm text-outline flex items-center justify-between">
+<span>K-Anonymity Cluster Masking</span>
+<span class="text-on-surface-variant font-medium">RFC-8890 Compliant</span>
+</div>
+</div>
+</section>
+<!-- Architecture Compliance Callout Banner -->
+<section class="rounded-xl bg-surface-container-lowest shadow-sm p-space-lg relative overflow-hidden">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg">
+<!-- Icon + Narrative -->
+<div class="flex items-start gap-space-md max-w-4xl">
+<div class="w-12 h-12 rounded-xl bg-primary-container text-tertiary-fixed flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">lock_clock</span>
+</div>
+<div class="space-y-space-xxs">
+<div class="flex items-center gap-space-xs">
+<span class="font-code-sm text-code-sm uppercase tracking-wider text-secondary font-semibold">Privacy-First Architecture Proof</span>
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">No Third-Party Analytics SDKs</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">
+            Cryptographic Guarantee: Analytics Derived Without Tracking
+          </h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            ElarioLabs applications do not load Google Analytics, Segment, Amplitude, or Sentry client SDKs. Download counts are computed via ephemeral web server access logs scrubbed of IP addresses every 60 seconds. License activations execute entirely offline using localized public-key asymmetric verification (<code class="font-code-inline text-code-inline px-1 py-0.5 rounded bg-surface-container-high text-on-surface">Ed25519</code>) embedded into notarized binary payloads.
+          </p>
+</div>
+</div>
+<!-- Action & Audit Certificate -->
+<div class="flex flex-col sm:flex-row lg:flex-col gap-space-xs flex-shrink-0">
+<button class="h-9 px-space-md bg-primary hover:bg-primary-container text-on-primary rounded-lg font-label-md text-label-sm shadow-sm flex items-center justify-center gap-2 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed">policy</span>
+<span>View Cryptographic Manifest</span>
+</button>
+<div class="flex items-center justify-center gap-1 font-code-sm text-code-sm text-outline">
+<span class="material-symbols-outlined text-[14px]">fingerprint</span>
+<span>PGP: 4A8B 91F2 C04E 8E91</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Simple micro-interaction for date comparison toggle
+  const compareToggle = document.getElementById('compareToggle');
+  if (compareToggle) {
+    let active = false;
+    compareToggle.addEventListener('click', () => {
+      active = !active;
+      if (active) {
+        compareToggle.classList.remove('text-on-surface-variant');
+        compareToggle.classList.add('bg-surface-container-high', 'text-on-surface', 'font-semibold');
+      } else {
+        compareToggle.classList.remove('bg-surface-container-high', 'text-on-surface', 'font-semibold');
+        compareToggle.classList.add('text-on-surface-variant');
+      }
+    });
+  }
+</script></main></div></body></html>
