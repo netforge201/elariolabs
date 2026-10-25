@@ -9,7 +9,10 @@ export interface MediaStorage {
 }
 
 export function mediaStorage():MediaStorage{
- const driver=process.env.STORAGE_DRIVER??'local';
+ const configuredDriver=process.env.STORAGE_DRIVER;
+ const driver=process.env.NODE_ENV==='production'&&configuredDriver==='local'&&process.env.IMGBB_API_KEY
+  ?'imgbb'
+  :configuredDriver??(process.env.NODE_ENV==='production'&&process.env.IMGBB_API_KEY?'imgbb':'local');
  if(driver==='local'){
   if(process.env.NODE_ENV==='production'&&process.env.ALLOW_LOCAL_STORAGE_IN_PRODUCTION!=='true')throw new Error('Production requires S3-compatible media storage.');
   const root=path.resolve(process.env.MEDIA_LOCAL_DIR??'./var/media');
