@@ -41,6 +41,7 @@ async function main() {
     for (const file of files) {
       const done = await client.query('SELECT 1 FROM _elario_migrations WHERE name=$1', [file]);
       if (done.rowCount) continue;
+      console.log(`Starting migration: ${file}`);
       const sql = await readFile(path.join(folder, file), 'utf8');
       await client.query('BEGIN');
       try {
@@ -60,6 +61,31 @@ async function main() {
 }
 
 main().catch(error => {
-  console.error(error);
+  const e = error as {
+    message?: string;
+    code?: string;
+    detail?: string;
+    constraint?: string;
+    table?: string;
+    column?: string;
+    file?: string;
+    line?: string;
+    routine?: string;
+    stack?: string;
+  };
+
+  console.error('STARTUP FAILURE:', JSON.stringify({
+    message: e.message,
+    code: e.code,
+    detail: e.detail,
+    constraint: e.constraint,
+    table: e.table,
+    column: e.column,
+    file: e.file,
+    line: e.line,
+    routine: e.routine,
+    stack: e.stack
+  }, null, 2));
+
   process.exitCode = 1;
 });
