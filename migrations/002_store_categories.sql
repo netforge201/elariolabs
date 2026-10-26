@@ -1,4 +1,6 @@
 ALTER TABLE categories ALTER COLUMN id SET DEFAULT gen_random_uuid();
+ALTER TABLE categories ALTER COLUMN id SET DEFAULT gen_random_uuid();
+ALTER TABLE categories ALTER COLUMN updated_at SET DEFAULT now();
 INSERT INTO categories(name, slug, sort_order) VALUES
   ('Art & Design', 'art-and-design', 0),
   ('Auto and Vehicles', 'auto-and-vehicles', 1),
