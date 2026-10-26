@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ApplicationsAdmin() {
   const user = await currentAdmin();
-  if (!user) redirect('/admin/login');
+  if (!user) redirect('/admin/login'); if (user.mustChangePassword) redirect('/admin/change-password');
   if (!await requirePermission('applications.view')) redirect('/admin?forbidden=1');
   const apps = await db.application.findMany({
     include: { category: true, platforms: { include: { platform: true } } },
