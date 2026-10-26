@@ -19,6 +19,25 @@ async function main() {
     await client.query('CREATE TABLE IF NOT EXISTS _elario_migrations (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())');
     const folder = path.resolve('migrations');
     const files = (await readdir(folder)).filter(file => file.endsWith('.sql')).sort();
+
+    // Recover safely when the database schema already exists but the migration
+    // ledger was lost/reset (otherwise 001_initial.sql tries to recreate enums).
+    const initial = await client.query(
+      `SELECT
+         to_regclass('public.roles') IS NOT NULL AS has_roles,
+         to_regclass('public.applications') IS NOT NULL AS has_applications,
+         EXISTS (SELECT 1 FROM pg_type WHERE typname = 'AppContentState') AS has_app_content_state`
+    );
+    const state = initial.rows[0];
+    if (state.has_roles && state.has_applications && state.has_app_content_state) {
+      await client.query(
+        `INSERT INTO _elario_migrations(name)
+         VALUES ('001_initial.sql')
+         ON CONFLICT (name) DO NOTHING`
+      );
+      console.log('Detected existing ElarioLabs schema; marked 001_initial.sql as applied.');
+    }
+
     for (const file of files) {
       const done = await client.query('SELECT 1 FROM _elario_migrations WHERE name=$1', [file]);
       if (done.rowCount) continue;
