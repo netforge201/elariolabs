@@ -1,1 +1,14 @@
-import type {MetadataRoute} from 'next';export default function robots():MetadataRoute.Robots{const base=process.env.APP_URL??'http://localhost:3000';return{rules:{userAgent:'*',allow:'/',disallow:'/admin/'},sitemap:`${base}/sitemap.xml`}}
+import type {MetadataRoute} from 'next';
+
+const siteUrl = 'https://elariolabs.com';
+
+export default function robots():MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      allow: '/',
+      disallow: ['/admin', '/api/admin'],
+    },
+    sitemap: `${siteUrl.replace(/\/+$/, '')}/sitemap.xml`,
+  };
+}

@@ -1,8 +1,62 @@
+import type {Metadata} from 'next';
 import {notFound} from 'next/navigation';
 import {db} from '@/lib/db';
 import {getNav,getSetting} from '@/lib/settings';
 import {getSocialLinks} from '@/lib/social';
 import {PublicFrame} from '../../components';
+
+
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
+  const {slug}=await params;
+  const app=await db.application.findFirst({
+    where:{slug,contentState:'PUBLISHED'},
+    select:{
+      name:true,
+      slug:true,
+      tagline:true,
+      shortDescription:true,
+      seoTitle:true,
+      seoDescription:true,
+      coverUrl:true,
+      media:{
+        where:{role:'COVER'},
+        take:1,
+        include:{asset:true}
+      }
+    }
+  });
+
+  if(!app) return {title:'Application not found',robots:{index:false,follow:false}};
+
+  const title=app.seoTitle?.trim()||`${app.name} — Official App`;
+  const description=(app.seoDescription?.trim()||app.shortDescription?.trim()||app.tagline?.trim()||`Discover ${app.name}, an application by ElarioLabs.`).slice(0,320);
+  const cover=app.media[0]?.asset;
+  const image=cover
+    ? (cover.storageKey.startsWith('http')?cover.storageKey:`/media/${cover.storageKey}`)
+    : app.coverUrl||undefined;
+  const canonical=`/apps/${app.slug}`;
+
+  return {
+    title,
+    description,
+    alternates:{canonical},
+    openGraph:{
+      type:'website',
+      siteName:'ElarioLabs',
+      title,
+      description,
+      url:canonical,
+      images:image?[{url:image,alt:cover?.altText||`${app.name} application preview`}]:[]
+    },
+    twitter:{
+      card:image?'summary_large_image':'summary',
+      title,
+      description,
+      ...(image?{images:[image]}:{})
+    },
+    robots:{index:true,follow:true}
+  };
+}
 
 export const dynamic='force-dynamic';
 const imageUrl=(key:string)=>key.startsWith('http')?key:`/media/${key}`;
