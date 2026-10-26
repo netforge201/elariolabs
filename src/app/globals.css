@@ -30,3 +30,47 @@
 
 /* Featured application badge */
 .featured-badge{display:inline-flex;align-items:center;padding:.28rem .65rem;border-radius:999px;background:#eeedff;color:#4338ca;border:1px solid #d9d6ff;font:500 .68rem var(--font-mono);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+
+/* Applications catalogue — sidebar filters and top search */
+.apps-catalog{padding-bottom:3rem}
+.apps-heading{padding:4rem 0 2rem}
+.apps-heading h1{margin:.65rem 0}
+.apps-heading p{color:var(--muted);font-size:1.05rem;margin:0}
+.apps-search{display:flex;gap:.7rem;align-items:center;padding:1rem;background:#fff;border:1px solid var(--line);border-radius:12px;margin:0 0 1.25rem}
+.apps-search-field{display:flex;align-items:center;gap:.7rem;flex:1;min-width:0;padding:0 .9rem;border:1px solid var(--line);border-radius:8px;background:#fafbff}
+.apps-search-field>span{font-size:1.5rem;color:var(--muted)}
+.apps-search-field input{width:100%;min-width:0;padding:.75rem 0;border:0;outline:none;background:transparent;color:var(--ink)}
+.apps-search-field:focus-within{border-color:var(--indigo);box-shadow:0 0 0 3px #4b41e11a}
+.apps-search .btn-primary,.apps-apply{border-radius:8px;min-height:44px;padding:.7rem 1.15rem}
+.apps-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:1.5rem;align-items:start}
+.apps-filter-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1.1rem;position:sticky;top:1rem}
+.apps-filter-heading{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding-bottom:.85rem;border-bottom:1px solid #e9ebf2}
+.apps-filter-heading h2{font-size:1.1rem;letter-spacing:-.03em;margin:0}
+.apps-filter-heading>a,.apps-reset-mobile{font-size:.75rem;color:var(--indigo);font-weight:600}
+.apps-filter-form{display:grid;gap:1.15rem;padding-top:1rem}
+.apps-filter-group{display:grid;gap:.45rem;min-width:0;border:0;padding:0;margin:0}
+.apps-filter-group>span,.apps-filter-group>legend{font-size:.8rem;font-weight:600;color:#344054}
+.apps-filter-group select{width:100%;min-width:0;padding:.65rem .55rem;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);font-size:.8rem}
+.apps-status-group{gap:.65rem}
+.apps-status-group>label{display:flex;align-items:center;gap:.55rem;font-size:.82rem;color:#344054;cursor:pointer}
+.apps-status-group input{width:15px;height:15px;accent-color:var(--indigo);margin:0}
+.apps-apply{width:100%;margin-top:.2rem}
+.apps-reset-mobile{display:none;text-align:center}
+.apps-results{min-width:0}
+.apps-results-heading{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin:.25rem 0 1rem}
+.apps-results-heading h2{font-size:1.55rem;margin:.35rem 0 0}
+.apps-result-count{flex:0 0 auto;font-size:.78rem;color:var(--muted);background:#fff;border:1px solid var(--line);padding:.45rem .7rem;border-radius:999px}
+.apps-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.apps-product-card{min-width:0;padding:1.1rem;border-radius:10px;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.apps-product-card:hover{transform:translateY(-2px);border-color:#bfc5d8;box-shadow:0 10px 28px #1820340b}
+.apps-product-card .product-cover{width:calc(100% + 2.2rem);margin:-1.1rem -1.1rem .85rem}
+.apps-card-meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.apps-card-meta .mono{font-size:.65rem}
+.apps-card-title{font-size:1.25rem;margin:.8rem 0 .4rem;overflow-wrap:anywhere}
+.apps-product-card>p{font-size:.88rem;color:var(--muted);margin:.25rem 0 1.1rem}
+.apps-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding-top:.8rem;border-top:1px solid #edf0f5}
+.apps-card-bottom .mono{font-size:.63rem}
+.apps-card-bottom>span:last-child{color:var(--indigo)}
+@media(min-width:1100px){.apps-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.apps-heading{padding:3rem 0 1.5rem}.apps-layout{grid-template-columns:1fr;gap:1rem}.apps-filter-panel{position:static}.apps-filter-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}.apps-status-group{grid-column:1/-1}.apps-apply{align-self:end}.apps-results-heading h2{font-size:1.3rem}}
+@media(max-width:520px){.apps-search{padding:.65rem;gap:.5rem}.apps-search .btn-primary{padding:.65rem .8rem}.apps-filter-form{grid-template-columns:1fr}.apps-status-group{grid-column:auto}.apps-card-grid{grid-template-columns:1fr}.apps-results-heading{align-items:flex-start;flex-direction:column;gap:.6rem}}
