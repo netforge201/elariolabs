@@ -1,8 +1,45 @@
+import type {Metadata} from 'next';
 import {notFound} from 'next/navigation';
 import {db} from '@/lib/db';
 import {getNav,getSetting} from '@/lib/settings';
 import {getSocialLinks} from '@/lib/social';
 import {PublicFrame,SocialLinks} from '../components';
+
+
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
+  const {slug}=await params;
+
+  if(!['about','contact'].includes(slug)){
+    return {title:'Page not found',robots:{index:false,follow:false}};
+  }
+
+  const page=slug==='about'?null:await db.page.findUnique({where:{slug}});
+  if(page&&!page.published){
+    return {title:'Page not found',robots:{index:false,follow:false}};
+  }
+
+  const title=slug==='about'
+    ? 'About ElarioLabs | Independent Software Studio'
+    : page?.seoTitle?.trim()||'Contact ElarioLabs | Get in Touch';
+
+  const description=slug==='about'
+    ? 'Learn about ElarioLabs, an independent software studio building thoughtful digital products and practical mobile applications.'
+    : page?.seoDescription?.trim()||'Contact ElarioLabs with questions about our applications, product support, or the studio. We would be glad to hear from you.';
+
+  return {
+    title,
+    description,
+    alternates:{canonical:`/${slug}`},
+    openGraph:{
+      type:'website',
+      siteName:'ElarioLabs',
+      title,
+      description,
+      url:`/${slug}`,
+    },
+    twitter:{card:'summary',title,description},
+  };
+}
 
 export const dynamic='force-dynamic';
 

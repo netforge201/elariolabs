@@ -1,4 +1,23 @@
+import type {Metadata} from 'next';
 import {getSocialLinks} from '@/lib/social';import Link from 'next/link';import { db } from '@/lib/db';import {getNav,getSetting} from '@/lib/settings';import {PublicFrame} from '../components';
+export const metadata:Metadata = {
+  title: {absolute:'Mobile Apps & Software Products | ElarioLabs'},
+  description:'Explore applications developed by ElarioLabs. Discover product details, features, supported platforms, pricing information, and official download links.',
+  alternates:{canonical:'/apps'},
+  openGraph:{
+    type:'website',
+    siteName:'ElarioLabs',
+    title:'Mobile Apps & Software Products | ElarioLabs',
+    description:'Explore ElarioLabs applications, features, supported platforms, and official download links.',
+    url:'/apps',
+  },
+  twitter:{
+    card:'summary',
+    title:'Mobile Apps & Software Products | ElarioLabs',
+    description:'Explore ElarioLabs applications, features, and official download links.',
+  },
+};
+
 export const dynamic='force-dynamic';
 export default async function Apps({searchParams}:{searchParams:Promise<Record<string,string|undefined>>}){const q=await searchParams;const statuses=Array.isArray(q.status)?q.status:[q.status].filter((x):x is string=>typeof x==='string');const all=await db.application.count({where:{contentState:'PUBLISHED'}});const [nav,copyright,logoUrl,socialLinks,contactEmail,contactPhone]=await Promise.all([getNav(),getSetting('copyright','© ElarioLabs'),getSetting<string>('brand.logoUrl',''),getSocialLinks(),getSetting<string>('contact.email',''),getSetting<string>('contact.phone','')]);let where:any={contentState:'PUBLISHED'};if(statuses.length){const validStatuses=statuses.map(status=>status.toUpperCase()).filter(status=>['AVAILABLE','COMING_SOON','DISCONTINUED'].includes(status));if(validStatuses.length)where.availability={in:validStatuses};else where.availability={not:'DISCONTINUED'};}else where.availability={not:'DISCONTINUED'};if(q.q)where.OR=[{name:{contains:q.q,mode:'insensitive'}},{shortDescription:{contains:q.q,mode:'insensitive'}}];if(q.category)where.category={slug:q.category};if(q.platform)where.platforms={some:{platform:{slug:q.platform}}};const orderBy=q.sort==='az'?[{name:'asc'}]:q.sort==='za'?[{name:'desc'}]:q.sort==='recent'?[{updatedAt:'desc'}]:[{displayOrder:'asc'},{name:'asc'}];const apps=all?await db.application.findMany({where,include:{category:true,platforms:{include:{platform:true}},media:{where:{role:{in:['ICON','COVER']}},include:{asset:true},orderBy:{sortOrder:'asc'}}},orderBy:orderBy as any}):[];if(!q.sort||q.sort==='featured')apps.sort((a,b)=>Number(b.featured)-Number(a.featured)||a.displayOrder-b.displayOrder||a.name.localeCompare(b.name));const [categories,platforms]=all?await Promise.all([db.category.findMany({orderBy:{sortOrder:'asc'}}),db.platform.findMany({orderBy:{sortOrder:'asc'}})]):[[],[]];return <PublicFrame items={nav.filter((n:any)=>n.group==='header'&&n.href!=='/support')} copyright={copyright} logoUrl={logoUrl} socialLinks={socialLinks} contactEmail={contactEmail} contactPhone={contactPhone}>
 <div className="shell apps-catalog">
