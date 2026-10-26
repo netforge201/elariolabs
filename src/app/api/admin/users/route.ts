@@ -1,1 +1,18 @@
-import {NextResponse} from 'next/server';import {z} from 'zod';import bcrypt from 'bcryptjs';import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';import {db} from '@/lib/db';const schema=z.object({name:z.string().min(1).max(120),email:z.string().email().max(254),password:z.string().min(14).max(200),roleId:z.string().uuid()});export async function POST(req:Request){if(!await sameOrigin(req))return new Response('Forbidden',{status:403});const actor=await currentAdmin();if(!actor||actor.role.name!=='Super Admin')return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);const parsed=schema.safeParse(Object.fromEntries(await req.formData()));if(parsed.success)await db.adminUser.create({data:{name:parsed.data.name,email:parsed.data.email.toLowerCase(),passwordHash:await bcrypt.hash(parsed.data.password,12),roleId:parsed.data.roleId}});return NextResponse.redirect(new URL('/admin/studio-team-roles',publicBase(req)),303)}
+import {NextResponse} from 'next/server';
+import {z} from 'zod';
+import bcrypt from 'bcryptjs';
+import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';
+import {requirePermission} from '@/lib/permissions';
+import {db} from '@/lib/db';
+
+const schema=z.object({name:z.string().min(1).max(120),email:z.string().email().max(254),password:z.string().min(14).max(200),roleId:z.string().uuid()});
+
+export async function POST(req:Request){
+  if(!await sameOrigin(req))return new Response('Forbidden',{status:403});
+  const actor=await currentAdmin();
+  if(!actor)return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);
+  if(!await requirePermission('users.manage'))return new Response('Forbidden',{status:403});
+  const parsed=schema.safeParse(Object.fromEntries(await req.formData()));
+  if(parsed.success)await db.adminUser.create({data:{name:parsed.data.name,email:parsed.data.email.toLowerCase(),passwordHash:await bcrypt.hash(parsed.data.password,12),roleId:parsed.data.roleId}});
+  return NextResponse.redirect(new URL('/admin/studio-team-roles',publicBase(req)),303)
+}

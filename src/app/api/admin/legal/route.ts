@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {z} from 'zod';
 import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';
+import {requirePermission} from '@/lib/permissions';
 import {db} from '@/lib/db';
 
 const schema=z.object({
@@ -16,6 +17,7 @@ export async function POST(req:Request){
   if(!await sameOrigin(req))return new Response('Forbidden',{status:403});
   const user=await currentAdmin();
   if(!user)return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);
+  if(!await requirePermission('legal.manage'))return new Response('Forbidden',{status:403});
   const form=await req.formData();
   const parsed=schema.safeParse(Object.fromEntries(form));
   if(!parsed.success)return NextResponse.redirect(new URL('/admin/legal-compliance?error=invalid',publicBase(req)),303);

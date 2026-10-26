@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
 import { currentAdmin, publicBase, sameOrigin } from '@/lib/auth';
+import { requirePermission } from '@/lib/permissions';
 import { db } from '@/lib/db';
 import { mediaStorage } from '@/lib/storage';
 
@@ -17,6 +18,7 @@ export async function POST(req: Request) {
   try {
     const user = await currentAdmin();
     if (!user) return NextResponse.redirect(new URL('/admin/login', publicBase(req)), 303);
+    if (!await requirePermission('settings.manage')) return new Response('Forbidden', { status: 403 });
 
     const form = await req.formData();
     const file = form.get('file');

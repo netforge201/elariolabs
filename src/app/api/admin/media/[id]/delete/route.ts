@@ -1,3 +1,31 @@
-import {NextResponse} from 'next/server';import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';import {db} from '@/lib/db';import {mediaStorage} from '@/lib/storage';
+import {NextResponse} from 'next/server';
+import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';
+import {requirePermission} from '@/lib/permissions';
+import {db} from '@/lib/db';
+import {mediaStorage} from '@/lib/storage';
+
 export const runtime='nodejs';
-export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){if(!await sameOrigin(req))return new Response('Forbidden',{status:403});const user=await currentAdmin();if(!user)return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);const {id}=await params;const asset=await db.mediaAsset.findUnique({where:{id},include:{links:true}});if(!asset)return NextResponse.redirect(new URL('/admin/media-library?error=missing',publicBase(req)),303);const apps=await db.application.findMany({where:{OR:[{iconUrl:{contains:asset.storageKey}},{coverUrl:{contains:asset.storageKey}}]},select:{id:true}});const logo=await db.siteSetting.findUnique({where:{key:'brand.logoUrl'},select:{value:true}});const used=asset.links.length>0||apps.length>0||String(logo?.value||'').includes(asset.storageKey);if(used)return NextResponse.redirect(new URL('/admin/media-library?error=used',publicBase(req)),303);await mediaStorage().remove(asset.storageKey,asset.deleteUrl);await db.mediaAsset.delete({where:{id}});await db.auditLog.create({data:{actorId:user.id,action:'delete',entity:'media_asset',entityId:id,summary:{filename:asset.originalFilename}}});return NextResponse.redirect(new URL('/admin/media-library?deleted=1',publicBase(req)),303)}
+
+export async function POST(req:Request,{params}:{params:Promise<{id:string}>}){
+  if(!await sameOrigin(req))return new Response('Forbidden',{status:403});
+  const user=await currentAdmin();
+  if(!user)return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);
+  if(!await requirePermission('media.manage'))return new Response('Forbidden',{status:403});
+
+  const {id}=await params;
+  const asset=await db.mediaAsset.findUnique({where:{id},include:{links:true}});
+  if(!asset)return NextResponse.redirect(new URL('/admin/media-library?error=missing',publicBase(req)),303);
+
+  const apps=await db.application.findMany({
+    where:{OR:[{iconUrl:{contains:asset.storageKey}},{coverUrl:{contains:asset.storageKey}}]},
+    select:{id:true}
+  });
+  const logo=await db.siteSetting.findUnique({where:{key:'brand.logoUrl'},select:{value:true}});
+  const used=asset.links.length>0||apps.length>0||String(logo?.value||'').includes(asset.storageKey);
+  if(used)return NextResponse.redirect(new URL('/admin/media-library?error=used',publicBase(req)),303);
+
+  await mediaStorage().remove(asset.storageKey,asset.deleteUrl);
+  await db.mediaAsset.delete({where:{id}});
+  await db.auditLog.create({data:{actorId:user.id,action:'delete',entity:'media_asset',entityId:id,summary:{filename:asset.originalFilename}}});
+  return NextResponse.redirect(new URL('/admin/media-library?deleted=1',publicBase(req)),303);
+}

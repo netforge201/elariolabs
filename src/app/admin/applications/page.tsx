@@ -2,17 +2,21 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { currentAdmin } from '@/lib/auth';
+import { requirePermission } from '@/lib/permissions';
 import { AdminShell } from '../../components';
+import { getAdminNavigation } from '@/lib/admin-navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ApplicationsAdmin() {
-  if (!await currentAdmin()) redirect('/admin/login');
+  const user = await currentAdmin();
+  if (!user) redirect('/admin/login');
+  if (!await requirePermission('applications.view')) redirect('/admin?forbidden=1');
   const apps = await db.application.findMany({
     include: { category: true, platforms: { include: { platform: true } } },
     orderBy: [{ updatedAt: 'desc' }],
   });
-  return <AdminShell active="Applications">
+  const allowedLinks=await getAdminNavigation();return <AdminShell active="Applications" allowedLinks={allowedLinks}>
     <div className="admin-title">
       <div><div className="eyebrow">Catalog & content</div><h1 style={{fontSize:'2rem'}}>Applications</h1><p>Manage application information and publishing.</p></div>
       <Link className="btn btn-primary" href="/admin/applications/new">Add application</Link>

@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server';
 import {randomUUID} from 'node:crypto';
 import {basename,extname} from 'node:path';
 import {currentAdmin,sameOrigin,publicBase} from '@/lib/auth';
+import {requirePermission} from '@/lib/permissions';
 import {db} from '@/lib/db';
 import {mediaStorage} from '@/lib/storage';
 
@@ -12,6 +13,7 @@ export async function POST(req:Request){
  if(!await sameOrigin(req))return new Response('Forbidden',{status:403});
  const user=await currentAdmin();
  if(!user)return NextResponse.redirect(new URL('/admin/login',publicBase(req)),303);
+ if(!await requirePermission('media.manage'))return new Response('Forbidden',{status:403});
  const form=await req.formData();
  const file=form.get('file');
  const altText=String(form.get('altText')||'').slice(0,300);
