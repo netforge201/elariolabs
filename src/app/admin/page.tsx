@@ -1,7 +1,7 @@
 import Link from 'next/link';import {redirect} from 'next/navigation';import {db} from '@/lib/db';import {currentAdmin} from '@/lib/auth';import {AdminShell} from '../components';export const dynamic='force-dynamic';
 import {requirePermission} from '@/lib/permissions';
 import { getAdminNavigation } from '@/lib/admin-navigation';
-export default async function Dashboard(){const user=await currentAdmin();if(!user)redirect('/admin/login');
+export default async function Dashboard(){const user=await currentAdmin();if(!user)redirect('/admin/login');if(user.mustChangePassword)redirect('/admin/change-password');
 const canViewApps=await requirePermission('applications.view');
 const canManageApps=await requirePermission('applications.manage');
 const canViewMessages=await requirePermission('inquiries.manage');

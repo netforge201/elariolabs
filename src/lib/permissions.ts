@@ -19,7 +19,7 @@ export async function hasPermission(
 ): Promise<boolean> {
   const admin = await currentAdmin();
 
-  if (!admin) return false;
+  if (!admin || admin.mustChangePassword) return false;
 
   // Super Admin always has full access.
   if (admin.role.name === 'Super Admin') return true;
