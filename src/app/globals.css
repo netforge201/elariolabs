@@ -311,3 +311,713 @@
 .legal-document-date { color: var(--muted); }
 .legal-document-link { margin-top: auto; padding-top: 1rem; color: var(--indigo); font-weight: 600; }
 .legal-document-card:hover { border-color: var(--indigo); }
+
+
+
+/* ELARIOLABS GRADIENT DESIGN V1 */
+
+/* Public website palette — admin remains unchanged */
+body:has(.topbar) {
+  --surface: #f8f9ff;
+  --paper: #ffffff;
+  --ink: #151b35;
+  --muted: #646b85;
+  --line: #e6e8f4;
+  --indigo: #426bff;
+  --teal: #20bfa9;
+  --wash: #edf2ff;
+  background:
+    radial-gradient(ellipse at 8% 5%, #e7edff 0, transparent 34rem),
+    radial-gradient(ellipse at 94% 25%, #f9e8ff 0, transparent 30rem),
+    var(--surface);
+  color: var(--ink);
+}
+
+body:has(.topbar) h1,
+body:has(.topbar) h2,
+body:has(.topbar) h3 {
+  letter-spacing: -0.045em;
+}
+
+body:has(.topbar) a {
+  transition: color .2s ease, background .2s ease,
+    border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+body:has(.topbar) .shell {
+  width: min(1240px, calc(100% - 3rem));
+}
+
+/* Navigation */
+body:has(.topbar) .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 76px;
+  background: rgb(255 255 255 / 82%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgb(222 226 245 / 80%);
+}
+
+body:has(.topbar) .nav {
+  gap: 1.5rem;
+}
+
+body:has(.topbar) .navlinks {
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+body:has(.topbar) .navlinks a {
+  color: #535c79;
+  font-size: .88rem;
+  font-weight: 550;
+}
+
+body:has(.topbar) .navlinks a:hover,
+body:has(.topbar) .footerlinks a:hover {
+  color: var(--indigo);
+}
+
+body:has(.topbar) .brand-symbol {
+  background: linear-gradient(135deg, #4778ff, #956bff 65%, #e7a5f6);
+  border-radius: 13px;
+  box-shadow: 0 5px 16px #6579ef30;
+}
+
+body:has(.topbar) .brand-symbol path {
+  stroke: white;
+}
+
+body:has(.topbar) .brand-symbol circle {
+  fill: #ffe1a7;
+}
+
+body:has(.topbar) .brand-name-main {
+  color: #1b2140;
+}
+
+body:has(.topbar) .mobile-toggle {
+  border-radius: 14px;
+}
+
+/* Buttons */
+body:has(.topbar) .btn,
+body:has(.topbar) button:not(.side-link) {
+  min-height: 44px;
+  padding: .72rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid #dfe4f6;
+  font-weight: 650;
+  transition: transform .2s ease, box-shadow .2s ease,
+    background .2s ease;
+}
+
+body:has(.topbar) .btn:hover,
+body:has(.topbar) button:not(.side-link):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px #344c9818;
+}
+
+body:has(.topbar) .btn-primary,
+body:has(.topbar) .btn-accent {
+  color: white;
+  border-color: transparent;
+  background: linear-gradient(115deg, #3477ff, #6559f5 75%, #8e65f6);
+  box-shadow: 0 7px 18px #5269f52b;
+}
+
+body:has(.topbar) .btn-primary:hover,
+body:has(.topbar) .btn-accent:hover {
+  background: linear-gradient(115deg, #2867ed, #5748e9);
+  box-shadow: 0 10px 26px #5269f540;
+}
+
+/* General headings and page introductions */
+body:has(.topbar) .hero {
+  max-width: 100%;
+  padding: clamp(4rem, 8vw, 7rem) 0 clamp(3rem, 6vw, 5rem);
+}
+
+body:has(.topbar) .eyebrow {
+  color: #5969d8;
+  font-size: .7rem;
+  letter-spacing: .12em;
+}
+
+body:has(.topbar) .hero h1 {
+  max-width: 850px;
+  font-size: clamp(2.8rem, 6.2vw, 5.4rem);
+  line-height: 1.01;
+  letter-spacing: -.065em;
+}
+
+body:has(.topbar) .hero p {
+  color: #606983;
+  max-width: 650px;
+  font-size: clamp(1.05rem, 1.7vw, 1.22rem);
+  line-height: 1.8;
+}
+
+body:has(.topbar) .actions {
+  gap: .85rem;
+  margin-top: 1.8rem;
+}
+
+/* Homepage: gradient hero */
+body:has(.topbar) .home-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 2rem;
+  max-width: none;
+  margin-top: 1.8rem;
+  padding: clamp(2.4rem, 6vw, 5.2rem);
+  border: 1px solid rgb(255 255 255 / 90%);
+  border-radius: 34px;
+  background:
+    radial-gradient(ellipse at 78% 18%, #ffffffc9 0, transparent 31%),
+    radial-gradient(ellipse at 92% 86%, #f0caffb8 0, transparent 38%),
+    linear-gradient(125deg, #e2efff 0%, #f0eaff 47%, #fce9f7 100%);
+  box-shadow: 0 22px 70px #586acb12;
+}
+
+body:has(.topbar) .home-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 340px;
+  height: 340px;
+  top: -190px;
+  right: 8%;
+  border-radius: 50%;
+  background: #ffffff9c;
+  filter: blur(5px);
+}
+
+body:has(.topbar) .home-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+}
+
+body:has(.topbar) .home-hero-copy h1 {
+  max-width: 700px;
+  margin: 1.1rem 0 1.35rem;
+  font-size: clamp(3rem, 6.4vw, 5.4rem);
+  line-height: .99;
+  letter-spacing: -.07em;
+}
+
+body:has(.topbar) .home-hero-copy > p {
+  max-width: 570px;
+  color: #56617e;
+  font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+  line-height: 1.8;
+}
+
+body:has(.topbar) .home-hero-art {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+body:has(.topbar) .home-hero-art img {
+  width: 100%;
+  max-height: 440px;
+  object-fit: contain;
+  border-radius: 24px;
+  filter: drop-shadow(0 20px 28px #5149a51c);
+}
+
+/* If no hero artwork is configured, keep the hero balanced */
+body:has(.topbar) .home-hero:not(:has(.home-hero-art)) .home-hero-copy {
+  max-width: 750px;
+}
+
+body:has(.topbar) .home-hero:not(:has(.home-hero-art)) .home-hero-copy h1 {
+  max-width: 700px;
+}
+
+body:has(.topbar) .home-hero:not(:has(.home-hero-art))::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: clamp(180px, 28vw, 350px);
+  aspect-ratio: 1;
+  right: -3%;
+  top: 8%;
+  border-radius: 36% 64% 60% 40% / 43% 42% 58% 57%;
+  background: linear-gradient(140deg, #ffffffa8, #a8c5ff99 40%, #e7b7f5a8 75%, #ffcfe4a8);
+  filter: blur(1px);
+  transform: rotate(-12deg);
+}
+
+/* Sections and product cards */
+body:has(.topbar) .section {
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0;
+  border-top-color: #e5e8f4;
+}
+
+body:has(.topbar) .section h2 {
+  letter-spacing: -.055em;
+}
+
+body:has(.topbar) .cards {
+  gap: 1.25rem;
+}
+
+body:has(.topbar) .card {
+  min-width: 0;
+  overflow: hidden;
+  padding: 1.4rem;
+  border: 1px solid #e8eaf5;
+  border-radius: 22px;
+  background: rgb(255 255 255 / 90%);
+  box-shadow: 0 8px 30px #263d8010;
+}
+
+body:has(.topbar) .product-card {
+  display: block;
+  transition: transform .25s ease, box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+body:has(.topbar) .product-card:hover {
+  transform: translateY(-5px);
+  border-color: #cbd5ff;
+  box-shadow: 0 18px 42px #5368bb1d;
+}
+
+body:has(.topbar) .product-cover {
+  display: block;
+  width: calc(100% + 2.8rem);
+  max-width: none;
+  height: auto;
+  max-height: 260px;
+  aspect-ratio: 1.65 / 1;
+  object-fit: cover;
+  margin: -1.4rem -1.4rem 1.3rem;
+  border-radius: 21px 21px 0 0;
+  background: linear-gradient(135deg, #edf3ff, #f8eaff);
+}
+
+body:has(.topbar) .product-card h3 {
+  margin: .65rem 0;
+  font-size: 1.3rem;
+}
+
+body:has(.topbar) .product-card p {
+  color: #626a84;
+  line-height: 1.75;
+}
+
+body:has(.topbar) .empty {
+  border: 1px dashed #cdd5f4;
+  border-radius: 24px;
+  background: #ffffffb8;
+}
+
+/* Application catalogue */
+body:has(.topbar) .apps-catalog {
+  padding-bottom: 3rem;
+}
+
+body:has(.topbar) .apps-heading {
+  padding-top: 4.5rem;
+}
+
+body:has(.topbar) .apps-heading h1,
+body:has(.topbar) .apps-results-heading h2 {
+  letter-spacing: -.06em;
+}
+
+body:has(.topbar) .apps-layout {
+  grid-template-columns: 245px minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+body:has(.topbar) .apps-filter-panel {
+  padding: 1.25rem;
+  border: 1px solid #e7e9f5;
+  border-radius: 22px;
+  background: #ffffffc9;
+  box-shadow: 0 8px 28px #263d8009;
+}
+
+body:has(.topbar) .apps-search-field input,
+body:has(.topbar) .apps-filter-group select,
+body:has(.topbar) .field input,
+body:has(.topbar) .field textarea,
+body:has(.topbar) .field select {
+  border: 1px solid #dfe4f4;
+  border-radius: 13px;
+  background: #fff;
+}
+
+body:has(.topbar) .apps-search-field input:focus,
+body:has(.topbar) .field input:focus,
+body:has(.topbar) .field textarea:focus {
+  border-color: #8098ff;
+  outline: 3px solid #6682ff1c;
+}
+
+body:has(.topbar) .apps-card-grid {
+  gap: 1.2rem;
+}
+
+body:has(.topbar) .apps-product-card {
+  border-radius: 22px;
+}
+
+body:has(.topbar) .featured-badge {
+  border-radius: 999px;
+  background: #e9eaff;
+  color: #5147d8;
+  padding: .35rem .7rem;
+}
+
+body:has(.topbar) .apps-card-bottom {
+  border-top: 1px solid #edf0f8;
+  padding-top: .9rem;
+}
+
+/* Individual app pages */
+body:has(.topbar) .app-page {
+  padding-bottom: 3rem;
+}
+
+body:has(.topbar) .app-breadcrumb {
+  padding: 1.4rem 0;
+}
+
+body:has(.topbar) .app-hero {
+  padding: 2.5rem 0 3.5rem;
+  border-bottom-color: #e5e8f4;
+}
+
+body:has(.topbar) .app-title-lockup h1 {
+  font-size: clamp(2.5rem, 5.5vw, 4.6rem);
+}
+
+body:has(.topbar) .app-icon {
+  border-radius: 21px;
+  box-shadow: 0 10px 25px #4d5c9a20;
+}
+
+body:has(.topbar) .app-cover-frame {
+  padding: .65rem;
+  border: 1px solid #e4e7f5;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff, #f0edff);
+  box-shadow: 0 20px 55px #5363ad19;
+}
+
+body:has(.topbar) .app-cover-frame img {
+  border-radius: 17px;
+}
+
+body:has(.topbar) .app-facts {
+  border-bottom-color: #e5e8f4;
+}
+
+body:has(.topbar) .app-pill {
+  border-color: #dce2f6;
+  border-radius: 999px;
+  background: #fff;
+}
+
+body:has(.topbar) .app-section {
+  border-bottom-color: #e5e8f4;
+}
+
+body:has(.topbar) .app-feature {
+  border: 1px solid #e6e9f6;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fff, #fafaff);
+  box-shadow: 0 7px 24px #263d8009;
+}
+
+body:has(.topbar) .app-feature-number {
+  color: #625af0;
+}
+
+body:has(.topbar) .app-screenshots figure {
+  border: 1px solid #e4e7f5;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 10px 30px #263d800c;
+}
+
+body:has(.topbar) .app-screenshots img {
+  border-radius: 15px;
+}
+
+body:has(.topbar) .app-bottom-panel {
+  position: relative;
+  overflow: hidden;
+  border: 0;
+  border-radius: 28px;
+  background:
+    radial-gradient(ellipse at 90% 0%, #8478ff80, transparent 38%),
+    linear-gradient(120deg, #263f91, #5149c8 60%, #8d63d9);
+  box-shadow: 0 20px 50px #4543a329;
+}
+
+body:has(.topbar) .app-bottom-panel .eyebrow,
+body:has(.topbar) .app-bottom-panel p {
+  color: #eeedff;
+}
+
+/* About page */
+body:has(.topbar) .about-lead {
+  border-bottom-color: #e5e8f4;
+}
+
+body:has(.topbar) .about-grid article {
+  border: 1px solid #e7e9f5;
+  border-radius: 22px;
+  background: #ffffffd9;
+  box-shadow: 0 8px 28px #263d8009;
+}
+
+body:has(.topbar) .about-index {
+  color: #625af0;
+}
+
+/* Contact page */
+body:has(.topbar) .contact-intro h1 span {
+  background: linear-gradient(100deg, #397cff, #7860f1 60%, #b66de0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+body:has(.topbar) .contact-aside {
+  border: 1px solid #e4e7f6;
+  border-radius: 25px;
+  background:
+    radial-gradient(ellipse at 100% 0%, #d8dfff, transparent 48%),
+    linear-gradient(145deg, #f2f5ff, #f8edff);
+}
+
+body:has(.topbar) .contact-form {
+  border: 1px solid #e6e9f5;
+  border-radius: 25px;
+  background: #ffffffeb;
+  box-shadow: 0 12px 36px #344a8710;
+}
+
+body:has(.topbar) .contact-aside-orbit {
+  background: linear-gradient(135deg, #417aff, #8c62f0);
+  box-shadow: 0 10px 28px #6d66ed35;
+}
+
+body:has(.topbar) .contact-success {
+  border-radius: 18px;
+}
+
+/* Legal documents and general content pages */
+body:has(.topbar) .content-copy {
+  color: #414965;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+body:has(.topbar) .hero:has(.content-copy) {
+  max-width: 920px;
+}
+
+body:has(.topbar) .app-legal-links a {
+  color: #5964c9;
+}
+
+/* Footer */
+body:has(.topbar) .footer {
+  margin-top: 4rem;
+  padding: 3.2rem 0;
+  border-top: 1px solid #e3e7f4;
+  background: linear-gradient(180deg, #f9faff00, #edf0ff85);
+}
+
+body:has(.topbar) .footerrow {
+  align-items: center;
+  gap: 1.5rem;
+}
+
+body:has(.topbar) .footerlinks {
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+body:has(.topbar) .footerlinks a,
+body:has(.topbar) .footer-contacts a {
+  color: #616a84;
+  font-size: .85rem;
+}
+
+body:has(.topbar) .social-links a {
+  border-color: #dce2f4;
+  background: #ffffffb8;
+}
+
+body:has(.topbar) .social-links a:hover {
+  border-color: #9eabff;
+  background: #fff;
+}
+
+/* Motion and accessibility */
+@media (prefers-reduced-motion: reduce) {
+  body:has(.topbar) *,
+  body:has(.topbar) *::before,
+  body:has(.topbar) *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Responsive layout */
+@media (min-width: 900px) {
+  body:has(.topbar) .home-hero-with-image {
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, .85fr);
+  }
+}
+
+@media (max-width: 900px) {
+  body:has(.topbar) .apps-layout {
+    grid-template-columns: 1fr;
+  }
+
+  body:has(.topbar) .app-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 280px);
+    gap: 1.5rem;
+  }
+
+  body:has(.topbar) .app-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:has(.topbar) .app-screenshots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  body:has(.topbar) .shell {
+    width: calc(100% - 2rem);
+  }
+
+  body:has(.topbar) .topbar {
+    height: 66px;
+  }
+
+  body:has(.topbar) .navlinks {
+    top: 66px;
+    padding: 1.1rem;
+    border-radius: 0 0 20px 20px;
+    background: #fffffffa;
+    box-shadow: 0 14px 25px #263d8010;
+  }
+
+  body:has(.topbar) .home-hero {
+    margin-top: 1rem;
+    padding: 2rem 1.4rem;
+    border-radius: 25px;
+    gap: 1.5rem;
+  }
+
+  body:has(.topbar) .home-hero-copy h1 {
+    font-size: clamp(2.7rem, 12vw, 4rem);
+  }
+
+  body:has(.topbar) .home-hero:not(:has(.home-hero-art))::after {
+    width: 180px;
+    right: -65px;
+    top: auto;
+    bottom: -65px;
+    opacity: .65;
+  }
+
+  body:has(.topbar) .home-hero:not(:has(.home-hero-art)) .home-hero-copy {
+    max-width: 100%;
+  }
+
+  body:has(.topbar) .home-hero:not(:has(.home-hero-art)) .home-hero-copy h1 {
+    max-width: 100%;
+  }
+
+  body:has(.topbar) .hero {
+    padding: 4rem 0 3rem;
+  }
+
+  body:has(.topbar) .hero h1 {
+    font-size: clamp(2.7rem, 11vw, 4rem);
+  }
+
+  body:has(.topbar) .cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  body:has(.topbar) .card {
+    border-radius: 19px;
+  }
+
+  body:has(.topbar) .product-cover {
+    max-height: 240px;
+  }
+
+  body:has(.topbar) .app-hero {
+    grid-template-columns: 1fr;
+    padding-top: 1.5rem;
+  }
+
+  body:has(.topbar) .app-cover-frame {
+    max-width: 440px;
+  }
+
+  body:has(.topbar) .app-description {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  body:has(.topbar) .app-feature-grid,
+  body:has(.topbar) .app-screenshots {
+    grid-template-columns: 1fr;
+  }
+
+  body:has(.topbar) .app-screenshots img {
+    height: auto;
+    max-height: 480px;
+    object-fit: contain;
+  }
+
+  body:has(.topbar) .app-bottom-panel {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.6rem;
+    border-radius: 23px;
+  }
+
+  body:has(.topbar) .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body:has(.topbar) .contact-form,
+  body:has(.topbar) .contact-aside {
+    border-radius: 20px;
+  }
+
+  body:has(.topbar) .footerrow {
+    align-items: flex-start;
+  }
+
+  body:has(.topbar) .footerlinks {
+    gap: .9rem 1.1rem;
+  }
+}
+
