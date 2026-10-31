@@ -18,18 +18,18 @@ model Role {
 }
 
 model AdminUser {
-  id           String         @id @default(uuid()) @db.Uuid
-  email        String         @unique
-  passwordHash String         @map("password_hash")
-  name         String
-  roleId       String         @map("role_id") @db.Uuid
-  active       Boolean        @default(true)
-  mustChangePassword Boolean @default(false) @map("must_change_password")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  sessions     AdminSession[]
-  role         Role           @relation(fields: [roleId], references: [id])
-  assets       MediaAsset[]
+  id                 String         @id @default(uuid()) @db.Uuid
+  email              String         @unique
+  passwordHash       String         @map("password_hash")
+  name               String
+  roleId             String         @map("role_id") @db.Uuid
+  active             Boolean        @default(true)
+  mustChangePassword Boolean        @default(false) @map("must_change_password")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  sessions           AdminSession[]
+  role               Role           @relation(fields: [roleId], references: [id])
+  assets             MediaAsset[]
 
   @@map("admin_users")
 }
@@ -321,11 +321,26 @@ model NavigationItem {
 
 model AnalyticsEvent {
   id        String   @id @default(uuid()) @db.Uuid
-  event     String
+  event     String   @default("page_view")
   path      String
+  visitorId String?  @map("visitor_id")
+  sessionId String?  @map("session_id")
+  referrer  String?
+  source    String?
+  medium    String?
+  campaign  String?
+  country   String?
+  device    String?
+  browser   String?
+  os        String?
   createdAt DateTime @default(now()) @map("created_at")
 
   @@index([createdAt, event])
+  @@index([visitorId, createdAt])
+  @@index([sessionId, createdAt])
+  @@index([source, createdAt])
+  @@index([country, createdAt])
+  @@index([path, createdAt])
   @@map("analytics_events")
 }
 
