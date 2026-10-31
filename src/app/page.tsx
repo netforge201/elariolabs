@@ -3,25 +3,37 @@ import {getSocialLinks} from '@/lib/social';import Link from 'next/link';
 import { db } from '@/lib/db';
 import { getNav,getSetting } from '@/lib/settings';
 import { PublicFrame } from './components';
-export const metadata:Metadata = {
-  title: {absolute:'ElarioLabs — Thoughtfully Designed Software & Apps'},
-  description:'Discover mobile apps and digital products created by ElarioLabs, an independent software studio building practical, thoughtfully designed software.',
-  alternates:{canonical:'/'},
-  openGraph:{
-    type:'website',
-    siteName:'ElarioLabs',
-    title:'ElarioLabs — Thoughtfully Designed Software & Apps',
-    description:'Discover mobile apps and digital products created by ElarioLabs.',
-    url:'/',
-  },
-  twitter:{
-    card:'summary',
-    title:'ElarioLabs — Thoughtfully Designed Software & Apps',
-    description:'Discover mobile apps and digital products created by ElarioLabs.',
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const title = await getSetting<string>(
+    'seo.title',
+    'ElarioLabs — Independent Software Studio'
+  );
 
-export const dynamic='force-dynamic';
+  const description = await getSetting<string>(
+    'seo.description',
+    'Discover thoughtfully designed software and mobile applications by ElarioLabs.'
+  );
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: '/' },
+    openGraph: {
+      type: 'website',
+      siteName: 'ElarioLabs',
+      title,
+      description,
+      url: '/',
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
+}
+
+export const dynamic = 'force-dynamic';
 export default async function Home(){const [nav,apps,page,tagline,copyright,logoUrl,heroImageUrl,socialLinks,supportEmail,contactPhone]=await Promise.all([getNav(),db.application.findMany({where:{contentState:'PUBLISHED',featured:true},orderBy:{displayOrder:'asc'},take:3,include:{category:true,media:{where:{role:'COVER'},include:{asset:true},take:1}}}),db.page.findUnique({where:{slug:'home'}}),getSetting('home.tagline','Independent software, thoughtfully made.'),getSetting('copyright','© ElarioLabs'),getSetting<string>('brand.logoUrl',''),getSetting<string>('home.heroImageUrl',''),getSocialLinks(),getSetting<string>('contact.email',''),getSetting<string>('contact.phone','')]);const data=(page?.content??{}) as {heroTitle?:string;heroBody?:string;introTitle?:string;introBody?:string};return <PublicFrame items={nav.filter((n:any)=>n.group==='header'&&n.href!=='/support')} copyright={copyright} logoUrl={logoUrl} socialLinks={socialLinks} contactEmail={supportEmail} contactPhone={contactPhone}>
 <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({
   "@context":"https://schema.org",
