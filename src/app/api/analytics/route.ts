@@ -40,6 +40,15 @@ function getOS(ua: string) {
 }
 
 export async function POST(req: Request) {
+  console.log('[ANALYTICS HEADERS]', {
+    forwardedFor: req.headers.get('x-forwarded-for'),
+    realIp: req.headers.get('x-real-ip'),
+    cfConnectingIp: req.headers.get('cf-connecting-ip'),
+    vercelForwardedFor: req.headers.get('x-vercel-forwarded-for'),
+    cfIpCountry: req.headers.get('cf-ipcountry'),
+    vercelCountry: req.headers.get('x-vercel-ip-country'),
+  });
+
   if (process.env.ANALYTICS_ENABLED === 'false') {
     return new NextResponse(null, { status: 204 });
   }
