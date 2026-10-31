@@ -16,7 +16,7 @@ export default async function ChangePasswordPage({
   if (!user.mustChangePassword && !query.changed) redirect('/admin');
 
   return (
-    <main className="shell" style={{ maxWidth: 460, paddingTop: '10vh' }}>
+    <main className="admin-auth">
       <a className="wordmark" href="/">ElarioLabs.</a>
       <section className="card" style={{ marginTop: '2rem' }}>
         <span className="eyebrow">Account security</span>
