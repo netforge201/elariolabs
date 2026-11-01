@@ -9,6 +9,7 @@ const navigation = [
   { label: 'Legal & Compliance', href: '/admin/legal-compliance', permission: 'legal.manage' },
   { label: 'Inquiries & Messages', href: '/admin/inquiries-messages', permission: 'inquiries.manage' },
   { label: 'Studio Team & Roles', href: '/admin/studio-team-roles', permission: 'users.manage' },
+  { label: 'Invitations', href: '/admin/invitations', permission: 'invitations.manage' },
   { label: 'Studio Settings', href: '/admin/studio-settings', permission: 'settings.manage' },
   { label: 'SEO & Metadata', href: '/admin/seo-metadata', permission: 'settings.manage' },
 ] as const;

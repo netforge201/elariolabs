@@ -12,7 +12,8 @@ export type Permission =
   | 'releases.manage'
   | 'legal.manage'
   | 'analytics.view'
-  | 'users.manage';
+  | 'users.manage'
+  | 'invitations.manage';
 
 export async function hasPermission(
   permission: Permission,
