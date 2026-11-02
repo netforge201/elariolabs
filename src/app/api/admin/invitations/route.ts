@@ -13,6 +13,7 @@ const createSchema = z.object({
 
 const updateSchema = z.object({
   id: z.string().uuid(),
+  email: z.string().trim().email().max(254),
   active: z.enum(['true', 'false']),
   password: z.string().max(200).optional(),
   accessExpiresAt: z.string().optional(),
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
   if (action === 'update') {
     const parsed = updateSchema.safeParse({
       id: form.get('id'),
+      email: form.get('email'),
       active: form.get('active'),
       password: String(form.get('password') || ''),
       accessExpiresAt: String(form.get('accessExpiresAt') || ''),
@@ -112,11 +114,15 @@ export async function POST(req: Request) {
       return redirectToAdmin(req, 'error=invalid');
     }
 
+    const normalizedEmail = parsed.data.email.toLowerCase();
+
     const data: {
+      email: string;
       active: boolean;
       accessExpiresAt: Date | null;
       passwordHash?: string;
     } = {
+      email: normalizedEmail,
       active: parsed.data.active === 'true',
       accessExpiresAt: expiresAt,
     };
@@ -125,13 +131,18 @@ export async function POST(req: Request) {
       data.passwordHash = await bcrypt.hash(parsed.data.password, 12);
     }
 
-    await db.$transaction(async (tx) => {
+    try {
+      await db.$transaction(async (tx) => {
       await tx.invitationAccount.update({
         where: { id: account.id },
         data,
       });
 
-      if (!data.active || data.passwordHash) {
+      if (
+        !data.active ||
+        data.passwordHash ||
+        normalizedEmail !== account.email.toLowerCase()
+      ) {
         await tx.invitationSession.deleteMany({
           where: { accountId: account.id },
         });
@@ -139,7 +150,58 @@ export async function POST(req: Request) {
     });
 
     return redirectToAdmin(req, 'updated=1');
+    } catch (error) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'P2002'
+      ) {
+        return redirectToAdmin(req, 'error=duplicate');
+      }
+      throw error;
+    }
   }
 
   return redirectToAdmin(req, 'error=invalid');
+}
+
+
+export async function DELETE(req: Request) {
+  if (!(await sameOrigin(req))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const actor = await currentAdmin();
+
+  if (!actor || actor.role.name !== 'Super Admin' || actor.mustChangePassword) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  let body: { id?: unknown };
+
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
+
+  if (typeof body.id !== 'string' || !z.string().uuid().safeParse(body.id).success) {
+    return NextResponse.json({ error: 'Invalid account ID' }, { status: 400 });
+  }
+
+  const account = await db.invitationAccount.findUnique({
+    where: { id: body.id },
+    select: { id: true, email: true },
+  });
+
+  if (!account) {
+    return NextResponse.json({ error: 'Account not found' }, { status: 404 });
+  }
+
+  await db.invitationAccount.delete({
+    where: { id: account.id },
+  });
+
+  return NextResponse.json({ success: true });
 }

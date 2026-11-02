@@ -2,6 +2,7 @@ import {redirect,notFound} from 'next/navigation';import {currentAdmin} from '@/
 import { getAdminNavigation } from '@/lib/admin-navigation';
 import UserDeleteButton from '../UserDeleteButton';
 import UserPasswordResetButton from '../UserPasswordResetButton';
+import InvitationDeleteButton from '../InvitationDeleteButton';
 export const dynamic='force-dynamic';
 const titles:Record<string,string>={'media-library':'Media Library','legal-compliance':'Legal & Compliance','inquiries-messages':'Inquiries & Messages','studio-team-roles':'Studio Team & Roles','studio-settings':'Studio Settings','seo-metadata':'SEO & Metadata','invitations':'Invitations'};
 export default async function AdminSection({params,searchParams}:{params:Promise<{section:string}>;searchParams:Promise<Record<string,string|undefined>>}){const user=await currentAdmin();if(!user)redirect('/admin/login');if(user.mustChangePassword)redirect('/admin/change-password');const {section}=await params;const title=titles[section];if(!title)notFound();if(['pages','homepage-builder','release-changelogs','support-knowledgebase'].includes(section))notFound();
@@ -114,7 +115,8 @@ return <>
 <div className="admin-title"><div><div className="eyebrow">Product management</div><h1 style={{fontSize:'2rem'}}>Invitations</h1><p>Create and manage customer accounts for Invitations.</p></div></div>
 {extra.created&&<p className="notice" role="status">Customer account created.</p>}
 {extra.updated&&<p className="notice" role="status">Customer account updated.</p>}
-{extra.error==='duplicate'&&<p className="error" role="alert">An account with this email already exists.</p>}
+{extra.error==='duplicate'&&<p className="error" role="alert">An account with this email already exists. Choose another address.</p>}
+{extra.deleted&&<p className="notice" role="status">Customer account deleted.</p>}
 {extra.error==='invalid'&&<p className="error" role="alert">Check the account details. Passwords must contain at least 12 characters and dates must be valid.</p>}
 {extra.error==='missing'&&<p className="error" role="alert">Customer account not found.</p>}
 <section className="card">
@@ -137,10 +139,12 @@ return <>
 <td>{a.accessExpiresAt?a.accessExpiresAt.toLocaleDateString():'Unlimited'}</td>
 <td><form action="/api/admin/invitations" method="post" className="ticket-status" style={{display:'grid',gap:'.5rem',minWidth:220}}>
 <input type="hidden" name="action" value="update"/><input type="hidden" name="id" value={a.id}/>
+<label className="field">Email<input type="email" name="email" defaultValue={a.email} required maxLength={254}/></label>
 <label className="field">Status<select name="active" defaultValue={String(a.active)}><option value="true">Active</option><option value="false">Blocked</option></select></label>
 <label className="field">Access expiry<input type="date" name="accessExpiresAt" defaultValue={a.accessExpiresAt?a.accessExpiresAt.toISOString().slice(0,10):''}/></label>
 <label className="field">New password<input type="password" name="password" minLength={12} maxLength={200} placeholder="Leave empty to keep current"/></label>
 <button className="btn">Save changes</button>
+<InvitationDeleteButton accountId={a.id} email={a.email}/>
 </form></td>
 </tr>)}
 </tbody></table></div>}
