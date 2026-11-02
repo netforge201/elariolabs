@@ -1,6 +1,7 @@
 'use client';
 
-import type { SeatingGuest, SeatingObject, SeatingPlanV2 } from '@/lib/seating-types';
+
+import Link from "next/link"; import type { SeatingGuest, SeatingObject, SeatingPlanV2 } from '@/lib/seating-types';
 
 type Locale = 'az' | 'ru' | 'en';
 
@@ -153,7 +154,7 @@ export default function SeatingPrintReport({ locale, couple, guests, plan }: Pro
   return (
     <div className="seating-report">
       <div className="seating-report-actions no-print">
-        <a href="/dashboard/seating">{words.back}</a>
+        <Link href="/dashboard/seating">{words.back}</Link>
         <button type="button" onClick={() => window.print()}>
           {words.print}
         </button>
