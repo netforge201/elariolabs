@@ -12,6 +12,16 @@ import {
   type SeatingObjectType,
   type SeatingPlanV2,
 } from '@/lib/seating-types';
+import {
+  RoundTableIcon,
+  RectTableIcon,
+  OvalTableIcon,
+  SparklesIcon,
+  UndoIcon,
+  RedoIcon,
+  DuplicateIcon,
+  MinusIcon,
+} from './icons';
 
 type Locale = 'az' | 'ru' | 'en';
 type Props = {
@@ -831,22 +841,22 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
       <div className="sp-workspace">
         <aside className="sp-tools">
           <span className="sp-panel-label">OBJECTS</span>
-          <button onClick={() => addObject('round-table')}>◯ {t.addRound}</button>
-          <button onClick={() => addObject('rect-table')}>▭ {t.addRect}</button>
-          <button onClick={() => addObject('oval-table')}>⬭ {t.addOval}</button>
+          <button onClick={() => addObject('round-table')} className="flex items-center gap-1.5"><RoundTableIcon className="w-4 h-4 inline-block" /> {t.addRound}</button>
+          <button onClick={() => addObject('rect-table')} className="flex items-center gap-1.5"><RectTableIcon className="w-4 h-4 inline-block" /> {t.addRect}</button>
+          <button onClick={() => addObject('oval-table')} className="flex items-center gap-1.5"><OvalTableIcon className="w-4 h-4 inline-block" /> {t.addOval}</button>
           <div className="sp-tool-divider" />
           {(['wall', 'column', 'door', 'window', 'stage', 'dancefloor', 'bar', 'buffet', 'entrance'] as SeatingObjectType[]).map(type => (
             <button key={type} onClick={() => addObject(type)}>{objectLabel(type, t)}</button>
           ))}
           <div className="sp-tool-divider" />
-          <button className="sp-auto-trigger" onClick={openAutoSeating} disabled={!guests.length || !plan.objects.some(isTable)}>
-            ✦ {locale === 'ru' ? 'Умная рассадка' : locale === 'az' ? 'Ağıllı yerləşdirmə' : 'Smart Seating'}
+          <button className="sp-auto-trigger flex items-center justify-center gap-1.5" onClick={openAutoSeating} disabled={!guests.length || !plan.objects.some(isTable)}>
+            <SparklesIcon className="w-4 h-4 inline-block text-amber-300" /> {locale === 'ru' ? 'Умная рассадка' : locale === 'az' ? 'Ağıllı yerləşdirmə' : 'Smart Seating'}
           </button>
           <div className="sp-tool-divider" />
-          <button onClick={undo} disabled={!past.length}>↶ {t.undo}</button>
-          <button onClick={redo} disabled={!future.length}>↷ {t.redo}</button>
+          <button onClick={undo} disabled={!past.length} className="flex items-center gap-1.5"><UndoIcon className="w-3.5 h-3.5 inline-block" /> {t.undo}</button>
+          <button onClick={redo} disabled={!future.length} className="flex items-center gap-1.5"><RedoIcon className="w-3.5 h-3.5 inline-block" /> {t.redo}</button>
           <div className="sp-tool-divider" />
-          <button onClick={duplicateSelected} disabled={!selectedIds.length && !selectedId}>⧉ Duplicate</button>
+          <button onClick={duplicateSelected} disabled={!selectedIds.length && !selectedId} className="flex items-center gap-1.5"><DuplicateIcon className="w-3.5 h-3.5 inline-block" /> Duplicate</button>
           <button onClick={() => alignSelected('left')} disabled={selectedIds.length < 2}>Align left</button>
           <button onClick={() => alignSelected('top')} disabled={selectedIds.length < 2}>Align top</button>
           <button onClick={() => alignSelected('center-x')} disabled={selectedIds.length < 2}>Center horizontally</button>
@@ -866,7 +876,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                   {selectedIds.length || (selectedId ? 1 : 0)} selected
                 </span>
               )}
-              <button onClick={() => zoomFromCenter(1 / 1.2)} title="Zoom out">−</button>
+              <button onClick={() => zoomFromCenter(1 / 1.2)} title="Zoom out" className="inline-flex items-center justify-center"><MinusIcon className="w-3 h-3" /></button>
               <strong>{Math.round(zoom * 100)}%</strong>
               <button onClick={() => zoomFromCenter(1.2)} title="Zoom in">+</button>
               <button onClick={fitCanvas}>{t.fit}</button>

@@ -2,6 +2,14 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import LanguageSwitcher from './language-switcher';
 import type { DashboardLocale } from '@/lib/dashboard-locale';
+import {
+  OverviewNavIcon,
+  StudioNavIcon,
+  GuestsNavIcon,
+  SeatingNavIcon,
+  CompatibilityNavIcon,
+  LogoutNavIcon,
+} from './icons';
 
 type Section = 'overview' | 'studio' | 'guests' | 'seating' | 'compatibility';
 
@@ -23,6 +31,14 @@ const translations = {
   },
 };
 
+const navIcons = {
+  overview: OverviewNavIcon,
+  studio: StudioNavIcon,
+  guests: GuestsNavIcon,
+  seating: SeatingNavIcon,
+  compatibility: CompatibilityNavIcon,
+} as const;
+
 export default function DashboardShell({
   children, active, accountName, accountEmail, locale,
 }: {
@@ -34,11 +50,11 @@ export default function DashboardShell({
 }) {
   const t = translations[locale];
   const items = [
-    { id: 'overview', href: '/dashboard', label: t.overview, icon: '◫', number: '01' },
-    { id: 'studio', href: '/dashboard/studio', label: t.studio, icon: '✳', number: '02' },
-    { id: 'guests', href: '/dashboard/guests', label: t.guests, icon: '♧', number: '03' },
-    { id: 'seating', href: '/dashboard/seating', label: t.seating, icon: '⌘', number: '04' },
-    { id: 'compatibility', href: '/dashboard/compatibility', label: t.compatibility, icon: '⇄', number: '05' },
+    { id: 'overview', href: '/dashboard', label: t.overview, number: '01' },
+    { id: 'studio', href: '/dashboard/studio', label: t.studio, number: '02' },
+    { id: 'guests', href: '/dashboard/guests', label: t.guests, number: '03' },
+    { id: 'seating', href: '/dashboard/seating', label: t.seating, number: '04' },
+    { id: 'compatibility', href: '/dashboard/compatibility', label: t.compatibility, number: '05' },
   ] as const;
 
   return (
@@ -51,15 +67,18 @@ export default function DashboardShell({
 
         <div className="elario-nav-label">{t.workspace}</div>
         <nav className="elario-navigation">
-          {items.map(item => (
-            <Link key={item.id} href={item.href}
-              aria-current={active === item.id ? 'page' : undefined}
-              className={`elario-nav-item ${active === item.id ? 'active' : ''}`}>
-              <span className="elario-nav-icon">{item.icon}</span>
-              <span>{item.label}</span>
-              <small>{item.number}</small>
-            </Link>
-          ))}
+          {items.map(item => {
+            const Icon = navIcons[item.id];
+            return (
+              <Link key={item.id} href={item.href}
+                aria-current={active === item.id ? 'page' : undefined}
+                className={`elario-nav-item ${active === item.id ? 'active' : ''}`}>
+                <span className="elario-nav-icon"><Icon className="w-4 h-4" /></span>
+                <span>{item.label}</span>
+                <small>{item.number}</small>
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="elario-sidebar-bottom">
@@ -72,7 +91,7 @@ export default function DashboardShell({
             </div>
           </div>
           <form action="/api/logout" method="post">
-            <button className="elario-logout">{t.logout} <span>↗</span></button>
+            <button className="elario-logout">{t.logout} <LogoutNavIcon className="w-3.5 h-3.5 inline-block" /></button>
           </form>
         </div>
       </aside>

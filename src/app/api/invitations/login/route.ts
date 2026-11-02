@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
+import { publicBase } from '@/lib/auth';
 import {
   createInvitationSession,
   invitationCookieName,
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
     password: formData.get('password'),
   });
 
-  const loginUrl = new URL('/login?error=1', req.url);
+  const base = publicBase(req);
+  const loginUrl = new URL('/login?error=1', base);
 
   if (!parsed.success) {
     return NextResponse.redirect(loginUrl, 303);
@@ -62,7 +64,7 @@ export async function POST(req: Request) {
 
   const { token, expiresAt } = await createInvitationSession(account.id);
 
-  const response = NextResponse.redirect(new URL('/dashboard', req.url), 303);
+  const response = NextResponse.redirect(new URL('/dashboard', base), 303);
 
   response.cookies.set(invitationCookieName(), token, {
     httpOnly: true,

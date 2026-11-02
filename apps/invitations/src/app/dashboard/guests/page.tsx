@@ -4,6 +4,7 @@ import { currentInvitationAccount } from '@/lib/auth';
 import { db } from '@/lib/db';
 import DashboardShell from '@/app/components/dashboard-shell';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
+import { ArrowUpRightIcon, CrestStarIcon, GuestsNavIcon } from '@/app/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,7 +70,7 @@ export default async function GuestsPage() {
           <h1>{t.title}</h1>
           <p>{t.description}</p>
         </div>
-        <Link href="/dashboard/studio" className="elario-button-dark">{t.manage} <span>↗</span></Link>
+        <Link href="/dashboard/studio" className="elario-button-dark">{t.manage} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
       </div>
 
       <section className="guests-summary">
@@ -79,17 +80,17 @@ export default async function GuestsPage() {
 
       {!wedding ? (
         <div className="guests-empty">
-          <span className="guests-empty-symbol">✳</span>
+          <span className="guests-empty-symbol"><CrestStarIcon className="w-8 h-8 text-amber-500/60 inline-block" /></span>
           <h2>{t.first}</h2>
           <p>{t.firstText}</p>
-          <Link href="/dashboard/studio" className="elario-button-dark">{t.goStudio} ↗</Link>
+          <Link href="/dashboard/studio" className="elario-button-dark">{t.goStudio} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
         </div>
       ) : guests.length === 0 ? (
         <div className="guests-empty">
-          <span className="guests-empty-symbol">♧</span>
+          <span className="guests-empty-symbol"><GuestsNavIcon className="w-8 h-8 text-amber-500/60 inline-block" /></span>
           <h2>{t.empty}</h2>
           <p>{t.emptyText}</p>
-          <Link href="/dashboard/studio" className="elario-button-dark">{t.create} ↗</Link>
+          <Link href="/dashboard/studio" className="elario-button-dark">{t.create} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
         </div>
       ) : (
         <section className="guests-table-card">
@@ -105,7 +106,7 @@ export default async function GuestsPage() {
                 <strong>{guest.name}</strong>
               </div>
               <span className="guest-link-text">/guest/{guest.slug}</span>
-              <a href={`/guest/${guest.slug}`} target="_blank" rel="noreferrer" className="guest-open-link">{t.open} ↗</a>
+              <a href={`/guest/${guest.slug}`} target="_blank" rel="noreferrer" className="guest-open-link">{t.open} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></a>
             </div>
           ))}
         </section>

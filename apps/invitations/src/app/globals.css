@@ -544,11 +544,14 @@ button, input { font: inherit; }
 }
 .theme-soft .invitation-frame::before,
 .theme-soft .invitation-frame::after {
-  content: "❀";
+  content: "";
   position: absolute;
-  color: #d7a1b0;
+  width: 120px;
+  height: 120px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7a1b0' stroke-width='1.5'%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23d7a1b0' fill-opacity='0.3'/%3E%3Cpath d='M12 4.5a3 3 0 013 3c0 2-3 4.5-3 4.5s-3-2.5-3-4.5a3 3 0 013-3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3Cpath d='M19.5 12a3 3 0 01-3 3c-2 0-4.5-3-4.5-3s2.5-3 4.5-3a3 3 0 013 3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3Cpath d='M12 19.5a3 3 0 01-3-3c0-2 3-4.5 3-4.5s3 2.5 3 4.5a3 3 0 01-3 3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3Cpath d='M4.5 12a3 3 0 013-3c2 0 4.5 3 4.5 3s-2.5 3-4.5 3a3 3 0 01-3-3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
   opacity: .38;
-  font-size: clamp(80px, 15vw, 170px);
   animation: elario-float 8s ease-in-out infinite;
 }
 .theme-soft .invitation-frame::before { top: 7%; left: 4%; }
@@ -572,21 +575,31 @@ button, input { font: inherit; }
   outline-offset: -17px;
 }
 .theme-national .invitation-frame::before {
-  content: "❖  ✧  ❖  ✧  ❖";
+  content: "";
   position: absolute;
   top: 30px;
-  color: #a34f3d;
-  font-size: 19px;
-  letter-spacing: .45em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 20' fill='%23a34f3d'%3E%3Crect x='10' y='5' width='10' height='10' transform='rotate(45 15 10)'/%3E%3Crect x='45' y='6' width='8' height='8' transform='rotate(45 49 10)'/%3E%3Crect x='75' y='4' width='12' height='12' transform='rotate(45 81 10)'/%3E%3Crect x='110' y='6' width='8' height='8' transform='rotate(45 114 10)'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: .7;
 }
 .theme-national .invitation-frame::after {
-  content: "❖  ✧  ❖  ✧  ❖";
+  content: "";
   position: absolute;
   bottom: 30px;
-  color: #a34f3d;
-  font-size: 19px;
-  letter-spacing: .45em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 20' fill='%23a34f3d'%3E%3Crect x='10' y='5' width='10' height='10' transform='rotate(45 15 10)'/%3E%3Crect x='45' y='6' width='8' height='8' transform='rotate(45 49 10)'/%3E%3Crect x='75' y='4' width='12' height='12' transform='rotate(45 81 10)'/%3E%3Crect x='110' y='6' width='8' height='8' transform='rotate(45 114 10)'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: .7;
 }
 .theme-national h1 { font-family: Georgia, serif; }
@@ -635,10 +648,13 @@ button, input { font: inherit; }
 }
 .theme-botanical .invitation-frame::before,
 .theme-botanical .invitation-frame::after {
-  content: "❧";
+  content: "";
   position: absolute;
-  color: #829a78;
-  font-size: clamp(100px, 18vw, 200px);
+  width: 140px;
+  height: 140px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23829a78' fill-opacity='0.4'%3E%3Cpath d='M4 20c4-6 10-10 16-16-1 7-5 13-11 16-2 1-3.5 1-5 0z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
   opacity: .25;
   pointer-events: none;
 }
@@ -663,12 +679,17 @@ button, input { font: inherit; }
   box-shadow: 0 30px 120px #0008, inset 0 0 90px #d5b77c0a;
 }
 .theme-romantic .invitation-frame::before {
-  content: "✧     ·       ✦       ·      ✧";
+  content: "";
   position: absolute;
   top: 8%;
-  color: #d5b77c;
-  font-size: 22px;
-  letter-spacing: .7em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 24px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 24' fill='%23d5b77c'%3E%3Ccircle cx='20' cy='12' r='2'/%3E%3Cpath d='M70 2c0 5 4 10 10 10-6 0-10 5-10 10 0-5-4-10-10-10 6 0 10-5 10-10z'/%3E%3Ccircle cx='120' cy='12' r='2'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   opacity: .6;
   animation: elario-twinkle 4s ease-in-out infinite alternate;
 }
@@ -696,11 +717,17 @@ button, input { font: inherit; }
   box-shadow: 0 30px 90px #5d47221c;
 }
 .theme-classic .invitation-frame::before {
-  content: "❦";
+  content: "";
   position: absolute;
   top: 25px;
-  color: #a68a57;
-  font-size: 38px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a68a57'%3E%3Cpath d='M12 3c-1.5 4-4 6-4 9 0 2.5 2 4.5 4 4.5s4-2 4-4.5c0-3-2.5-5-4-9z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .theme-classic h1 {
   font-family: "Palatino Linotype", Georgia, serif;
@@ -793,10 +820,13 @@ button, input { font: inherit; }
   border-radius: 150px 150px 16px 16px !important;
 }
 .preview-soft-colorful::before {
-  content: "❀";
+  content: "";
   position: absolute;
-  color: #d7a1b0;
-  font-size: 100px;
+  width: 80px;
+  height: 80px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7a1b0' stroke-width='1.5'%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%23d7a1b0' fill-opacity='0.3'/%3E%3Cpath d='M12 4.5a3 3 0 013 3c0 2-3 4.5-3 4.5s-3-2.5-3-4.5a3 3 0 013-3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3Cpath d='M19.5 12a3 3 0 01-3 3c-2 0-4.5-3-4.5-3s2.5-3 4.5-3a3 3 0 013 3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3Cpath d='M12 19.5a3 3 0 01-3-3c0-2 3-4.5 3-4.5s3 2.5 3 4.5a3 3 0 01-3 3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3Cpath d='M4.5 12a3 3 0 013-3c2 0 4.5 3 4.5 3s-2.5 3-4.5 3a3 3 0 01-3-3z' fill='%23d7a1b0' fill-opacity='0.15'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
   opacity: .25;
 }
 .preview-azeri {
@@ -3677,7 +3707,11 @@ button, a {
 }
 
 .seat-separator {
-  font-size: 14px;
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
   opacity: 0.6;
 }
 
@@ -3780,104 +3814,91 @@ button, a {
   font-style: italic;
 }
 
-/* Add to Calendar Action */
+/* Add to Calendar Action Box - fully inline, never hidden or cut off */
 .invitation-calendar-action {
   display: flex;
   justify-content: center;
-  margin-top: 36px;
+  margin-top: 40px;
   position: relative;
+  z-index: 10;
 }
 
-.calendar-dropdown-wrapper {
-  position: relative;
-  display: inline-block;
+.calendar-action-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--paper) 70%, white 30%);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  max-width: 100%;
 }
 
-.calendar-btn {
+.calendar-action-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+
+.calendar-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.calendar-action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 13px 28px;
+  gap: 8px;
+  padding: 10px 20px;
   border-radius: 9999px;
-  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  background: color-mix(in srgb, var(--paper) 70%, white 30%);
-  color: var(--ink);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: .15em;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.04);
-}
-
-.calendar-btn:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  background: white;
-}
-
-.calendar-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--accent);
-}
-
-.calendar-chevron {
-  font-size: 12px;
-  color: var(--accent);
-  transition: transform 0.25s ease;
-}
-
-.calendar-btn[aria-expanded="true"] .calendar-chevron {
-  transform: rotate(180deg);
-}
-
-.calendar-menu {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 210px;
-  background: color-mix(in srgb, var(--paper) 90%, white 10%);
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
-  border-radius: 16px;
-  padding: 8px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(14px);
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  animation: calendar-menu-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes calendar-menu-pop {
-  from { opacity: 0; transform: translate(-50%, -8px) scale(0.95); }
-  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
-}
-
-.calendar-menu-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  border-radius: 10px;
-  background: transparent;
-  border: 0;
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-  width: 100%;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
-.calendar-menu-item:hover {
-  background: color-mix(in srgb, var(--accent) 15%, transparent);
-  color: var(--accent);
+.calendar-action-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--accent) 8%, white);
+}
+
+.calendar-action-btn .arrow-icon {
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.calendar-action-btn:hover .arrow-icon {
+  transform: translate(2px, -2px);
+  opacity: 1;
+}
+
+.calendar-action-btn.apple-btn:hover .arrow-icon {
+  transform: translateY(2px);
+}
+
+.detail-table-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Theme overrides for Midnight & Royal templates */
@@ -3887,17 +3908,20 @@ button, a {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(213, 184, 121, 0.3);
 }
 .layout-midnight .table-badge-table-name { color: #fff8eb; }
-.layout-midnight .calendar-btn {
-  background: #1c1f2e;
+.layout-midnight .calendar-action-box {
+  background: rgba(22, 25, 38, 0.85);
+  border-color: rgba(213, 184, 121, 0.35);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+.layout-midnight .calendar-action-btn {
+  background: #1e2233;
   color: #fff8eb;
+  border-color: rgba(213, 184, 121, 0.4);
+}
+.layout-midnight .calendar-action-btn:hover {
+  background: #252a3f;
   border-color: #d5b879;
 }
-.layout-midnight .calendar-menu {
-  background: #181a27;
-  border-color: rgba(213, 184, 121, 0.4);
-  color: #fff;
-}
-.layout-midnight .calendar-menu-item { color: #f5eee2; }
 
 .layout-royal .invitation-table-badge {
   border: 3px double #a1844e;

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { publicBase } from '@/lib/auth';
 import {
   deleteInvitationSession,
   invitationCookieName,
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
 
   await deleteInvitationSession();
 
-  const response = NextResponse.redirect(new URL('/login', req.url), 303);
+  const response = NextResponse.redirect(new URL('/login', publicBase(req)), 303);
 
   response.cookies.set(invitationCookieName(), '', {
     httpOnly: true,

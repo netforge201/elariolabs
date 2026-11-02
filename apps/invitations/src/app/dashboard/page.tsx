@@ -4,6 +4,7 @@ import { currentInvitationAccount } from '@/lib/auth';
 import { db } from '@/lib/db';
 import DashboardShell from '@/app/components/dashboard-shell';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
+import { ArrowUpRightIcon, CrestStarIcon, StudioNavIcon, GuestsNavIcon } from '@/app/components/icons';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,7 +95,7 @@ export default async function DashboardPage() {
           <p>{t.description}</p>
         </div>
         <div className="overview-date-mark">
-          <span>EST.</span><strong>2026</strong><i>✳</i>
+          <span>EST.</span><strong>2026</strong><i><CrestStarIcon className="w-3.5 h-3.5 inline-block text-amber-500/80" /></i>
         </div>
       </div>
 
@@ -106,22 +107,22 @@ export default async function DashboardPage() {
               <h2>{wedding.partnerOne}<br /><i>&</i> {wedding.partnerTwo}</h2>
               <p>{date}{wedding.eventTime ? ` · ${wedding.eventTime}` : ''}</p>
               <div className="overview-hero-actions">
-                <Link href="/dashboard/studio" className="elario-button-light">{t.edit} <span>↗</span></Link>
-                {published && <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer" className="elario-button-ghost">{t.open} ↗</a>}
+                <Link href="/dashboard/studio" className="elario-button-light">{t.edit} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
+                {published && <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer" className="elario-button-ghost">{t.open} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></a>}
               </div>
             </>
           ) : (
             <>
               <h2>{t.empty}</h2>
               <p>{t.emptyText}</p>
-              <Link href="/dashboard/studio" className="elario-button-light">{t.create} <span>↗</span></Link>
+              <Link href="/dashboard/studio" className="elario-button-light">{t.create} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
             </>
           )}
         </div>
         <div className="overview-hero-art" aria-hidden="true">
           <div className="overview-art-ring ring-one" />
           <div className="overview-art-ring ring-two" />
-          <div className="overview-art-flower">✳</div>
+          <div className="overview-art-flower"><CrestStarIcon className="w-6 h-6 text-amber-500/60" /></div>
           <span>THE BEGINNING OF FOREVER</span>
         </div>
       </section>
@@ -135,7 +136,7 @@ export default async function DashboardPage() {
         <article className="overview-stat">
           <span>{t.guests}</span>
           <strong>{guestCount.toString().padStart(2, '0')}</strong>
-          <Link href="/dashboard/guests">{t.manage} ↗</Link>
+          <Link href="/dashboard/guests">{t.manage} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
         </article>
         <article className="overview-stat">
           <span>{t.account}</span>
@@ -157,8 +158,8 @@ export default async function DashboardPage() {
         </div>
         <div className="overview-quick-card">
           <span className="elario-eyebrow">{t.quick}</span>
-          <Link href="/dashboard/studio"><span className="quick-icon">✳</span><span>{t.edit}</span><b>↗</b></Link>
-          <Link href="/dashboard/guests"><span className="quick-icon">♧</span><span>{t.guestAction}</span><b>↗</b></Link>
+          <Link href="/dashboard/studio"><span className="quick-icon"><StudioNavIcon className="w-4 h-4" /></span><span>{t.edit}</span><b><ArrowUpRightIcon className="w-3.5 h-3.5" /></b></Link>
+          <Link href="/dashboard/guests"><span className="quick-icon"><GuestsNavIcon className="w-4 h-4" /></span><span>{t.guestAction}</span><b><ArrowUpRightIcon className="w-3.5 h-3.5" /></b></Link>
         </div>
       </section>
     </DashboardShell>

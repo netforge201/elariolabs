@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import {
+  ArrowLeftIcon,
+  ArrowUpRightIcon,
+  CheckIcon,
+  DesktopIcon,
+  MobileIcon,
+  TemplateOrnament,
+} from './icons';
 
 type Wedding = {
   id: string;
@@ -42,13 +50,13 @@ type FormState = {
 };
 
 const templates = [
-  { id: 'elegant', name: 'Editorial Luxury', desc: 'Fashion editorial, oversized typography', symbol: '✦' },
-  { id: 'soft-colorful', name: 'Bloom Romance', desc: 'Pastel florals and delicate motion', symbol: '❀' },
-  { id: 'azeri', name: 'Azerbaijani Heritage', desc: 'Shebeke geometry and oriental luxury', symbol: '❋' },
-  { id: 'minimal', name: 'Pure Minimal', desc: 'Architectural whitespace and typography', symbol: '—' },
-  { id: 'botanical', name: 'Secret Garden', desc: 'Botanical atmosphere and organic forms', symbol: '❧' },
-  { id: 'romantic', name: 'Midnight', desc: 'Dark cinematic mood and starlight', symbol: '✧' },
-  { id: 'classic', name: 'Royal Affair', desc: 'Regal frames and timeless ornament', symbol: '❖' },
+  { id: 'elegant', name: 'Editorial Luxury', desc: 'Fashion editorial, oversized typography' },
+  { id: 'soft-colorful', name: 'Bloom Romance', desc: 'Pastel florals and delicate motion' },
+  { id: 'azeri', name: 'Azerbaijani Heritage', desc: 'Shebeke geometry and oriental luxury' },
+  { id: 'minimal', name: 'Pure Minimal', desc: 'Architectural whitespace and typography' },
+  { id: 'botanical', name: 'Secret Garden', desc: 'Botanical atmosphere and organic forms' },
+  { id: 'romantic', name: 'Midnight', desc: 'Dark cinematic mood and starlight' },
+  { id: 'classic', name: 'Royal Affair', desc: 'Regal frames and timeless ornament' },
 ];
 
 const dict = {
@@ -138,7 +146,7 @@ function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }
   return (
     <div className={`preview-device ${mode === 'mobile' ? 'preview-mobile' : ''}`}>
       <div className={`invitation-canvas ${theme}`}>
-        <div className="preview-top-ornament">{form.template === 'azeri' ? '❋ ❖ ❋' : form.template === 'botanical' ? '❧' : form.template === 'minimal' ? '—' : '✦'}</div>
+        <div className="preview-top-ornament"><TemplateOrnament template={form.template} className="w-5 h-5 mx-auto text-amber-500/80" /></div>
         <div className="preview-content">
           <p className="preview-kicker">{t.intro}</p>
           <h1 className="preview-names">
@@ -422,7 +430,7 @@ export default function WeddingEditor({
   async function copyLink() {
     if (!wedding) return;
     await navigator.clipboard.writeText(`${window.location.origin}/${wedding.slug}`);
-    setMessage(t.link + ' ✓');
+    setMessage(language === 'ru' ? 'Ссылка скопирована' : language === 'az' ? 'Keçid kopyalandı' : 'Link copied');
   }
 
   const input = 'builder-input';
@@ -434,7 +442,7 @@ export default function WeddingEditor({
   return (
     <main className="builder-shell">
       <div className="builder-toolbar">
-        <div><Link href="/dashboard">← {t.back}</Link><span>/</span><strong>{t.dashboard}</strong></div>
+        <div><Link href="/dashboard" className="inline-flex items-center gap-1.5"><ArrowLeftIcon className="w-3.5 h-3.5 inline-block" /> {t.back}</Link><span>/</span><strong>{t.dashboard}</strong></div>
         <div className="builder-actions">
           <span className={`builder-save-indicator ${saving ? 'is-saving' : hasChanges ? 'is-dirty' : 'is-saved'}`}>
             <i />
@@ -502,9 +510,9 @@ export default function WeddingEditor({
                 <h2>{t.design}</h2><p className="builder-hint">{t.designHint}</p>
                 <div className="builder-template-grid">
                   {templates.map((item, i) => <button type="button" key={item.id} onClick={() => update('template', item.id)} className={`builder-template ${form.template === item.id ? 'selected' : ''}`}>
-                    <div className={`template-art template-art-${item.id}`}><span>{item.symbol}</span><b>{form.partnerOne || 'Alex'} & {form.partnerTwo || 'Sam'}</b><i>{i === 2 ? 'AZERBAIJAN' : 'WEDDING INVITATION'}</i></div>
+                    <div className={`template-art template-art-${item.id}`}><span><TemplateOrnament template={item.id} className="w-5 h-5 text-amber-500/80" /></span><b>{form.partnerOne || 'Alex'} & {form.partnerTwo || 'Sam'}</b><i>{i === 2 ? 'AZERBAIJAN' : 'WEDDING INVITATION'}</i></div>
                     <div className="template-meta"><strong>{item.name}</strong><small>{item.desc}</small></div>
-                    {form.template === item.id && <span className="template-check">✓</span>}
+                    {form.template === item.id && <span className="template-check"><CheckIcon className="w-3.5 h-3.5" /></span>}
                   </button>)}
                 </div>
               </div>
@@ -522,8 +530,8 @@ export default function WeddingEditor({
           <div className="preview-toolbar">
             <div><span className="preview-live-dot"/><strong>{t.preview}</strong></div>
             <div className="preview-switch">
-              <button type="button" className={mode === 'desktop' ? 'active' : ''} onClick={() => setMode('desktop')}>▣ {t.desktop}</button>
-              <button type="button" className={mode === 'mobile' ? 'active' : ''} onClick={() => setMode('mobile')}>▯ {t.mobile}</button>
+              <button type="button" className={mode === 'desktop' ? 'active' : ''} onClick={() => setMode('desktop')}><DesktopIcon className="w-4 h-4 inline-block" /> {t.desktop}</button>
+              <button type="button" className={mode === 'mobile' ? 'active' : ''} onClick={() => setMode('mobile')}><MobileIcon className="w-4 h-4 inline-block" /> {t.mobile}</button>
             </div>
           </div>
           <div className="preview-stage">
@@ -532,7 +540,7 @@ export default function WeddingEditor({
           {wedding && <div className="builder-public-link">
             <div><small>{t.link}</small><strong>{origin ? `${origin}/${wedding.slug}` : `/${wedding.slug}`}</strong></div>
             <button type="button" onClick={copyLink}>{t.copy}</button>
-            {wedding.isPublished && <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer">{t.open} ↗</a>}
+            {wedding.isPublished && <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer">{t.open} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></a>}
           </div>}
           {wedding && <section className="builder-guests">
             <div className="builder-guests-heading">

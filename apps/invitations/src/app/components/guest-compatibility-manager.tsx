@@ -330,7 +330,7 @@ export default function CompatibilityManager({
   function relationLabel(relation: Relation) {
     if (relation === 'required') return '++';
     if (relation === 'preferred') return '+';
-    if (relation === 'excluded') return '−';
+    if (relation === 'excluded') return '-';
     return '·';
   }
 
@@ -379,7 +379,7 @@ export default function CompatibilityManager({
       <div className="gc-legend">
         <span><b className="gc-symbol gc-required">++</b>{t.required}</span>
         <span><b className="gc-symbol gc-preferred">+</b>{t.preferred}</span>
-        <span><b className="gc-symbol gc-excluded">−</b>{t.excluded}</span>
+        <span><b className="gc-symbol gc-excluded">-</b>{t.excluded}</span>
         <span><b className="gc-symbol gc-none">·</b>{t.none}</span>
       </div>
 

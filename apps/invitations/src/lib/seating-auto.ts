@@ -524,7 +524,7 @@ function generateProposal(
         areAdjacent(seatA.index, seatB.index, seatA.capacity) &&
         hasRelation(plan, a.id, b.id, 'excludedNeighbors')
       ) {
-        warnings.push(`Не выполнено −: ${a.name} / ${b.name}`);
+        warnings.push(`Не выполнено -: ${a.name} / ${b.name}`);
       }
 
       const sideA = getProfile(plan, a.id).side;

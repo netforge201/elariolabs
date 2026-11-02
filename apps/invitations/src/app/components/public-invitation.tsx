@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import Countdown from './countdown';
 import Reveal from './reveal';
+import {
+  CalendarIcon,
+  GoogleCalendarIcon,
+  AppleIcon,
+  MapPinIcon,
+  CopyIcon,
+  CheckIcon,
+  TablePlateIcon,
+  CrestStarIcon,
+  ArrowUpRightIcon,
+  DownloadIcon,
+  TemplateOrnament,
+} from './icons';
 
 export type Locale = 'az' | 'ru' | 'en';
 
@@ -24,7 +37,6 @@ const words = {
     intro: 'Ailələrimizin iştirakı ilə',
     invitation: 'Sizi toy mərasimimizə dəvət edirik',
     personalInvitation: 'ŞƏXSİ DƏVƏTNAMƏ',
-    guestHonor: 'Hörmətli qonağımız',
     date: 'Toy tarixi',
     time: 'Başlama vaxtı',
     venue: 'Mərasim məkanı',
@@ -48,7 +60,6 @@ const words = {
     intro: 'Вместе с нашими семьями',
     invitation: 'Приглашаем вас разделить наш особенный день',
     personalInvitation: 'ПЕРСОНАЛЬНОЕ ПРИГЛАШЕНИЕ',
-    guestHonor: 'Дорогой гость',
     date: 'Дата свадьбы',
     time: 'Начало торжества',
     venue: 'Место проведения',
@@ -72,7 +83,6 @@ const words = {
     intro: 'Together with our families',
     invitation: 'We invite you to celebrate our special day',
     personalInvitation: 'PERSONAL INVITATION',
-    guestHonor: 'Honored Guest',
     date: 'Wedding date',
     time: 'Ceremony begins',
     venue: 'The celebration',
@@ -104,16 +114,6 @@ const templates: Record<string, string> = {
   classic: 'theme-classic layout-royal',
 };
 
-const ornaments: Record<string, string> = {
-  elegant: '✳',
-  'soft-colorful': '❀',
-  azeri: '✥',
-  minimal: '+',
-  botanical: '❧',
-  romantic: '✧',
-  classic: '❦',
-};
-
 function formatTableLabel(tableName: string, locale: Locale): string {
   const trimmed = tableName.trim();
   if (/^\d+$/.test(trimmed)) {
@@ -136,7 +136,6 @@ export default function PublicInvitation({
   seatNumber?: number | null;
 }) {
   const [copied, setCopied] = useState(false);
-  const [showCalendarMenu, setShowCalendarMenu] = useState(false);
 
   const locale: Locale = ['az', 'ru', 'en'].includes(wedding.locale)
     ? (wedding.locale as Locale)
@@ -144,7 +143,6 @@ export default function PublicInvitation({
 
   const t = words[locale];
   const template = templates[wedding.template] || templates.elegant;
-  const ornament = ornaments[wedding.template] || '✳';
   const date = new Date(wedding.eventDate);
 
   const formattedDate = new Intl.DateTimeFormat(
@@ -233,12 +231,11 @@ export default function PublicInvitation({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    setShowCalendarMenu(false);
   }
 
   return (
     <main className={`public-invitation ${template}`}>
-      {/* Dynamic atmospheric ambient glow and particles */}
+      {/* Ambient background particles */}
       <div className="design-atmosphere" aria-hidden="true">
         <span className="atmosphere-orb orb-one" />
         <span className="atmosphere-orb orb-two" />
@@ -257,18 +254,24 @@ export default function PublicInvitation({
         {/* Topline header */}
         <div className="invitation-topline">
           <span>{guestName ? t.personalInvitation : t.intro}</span>
-          <span className="topline-symbol">{ornament}</span>
+          <span className="topline-symbol">
+            <TemplateOrnament template={wedding.template} className="w-4 h-4 inline-block" />
+          </span>
         </div>
 
         {/* Hero Section */}
         <section className="invitation-hero">
           <div className="hero-decoration" aria-hidden="true">
-            <span className="hero-decoration-left">{ornament}</span>
-            <span className="hero-decoration-right">{ornament}</span>
+            <span className="hero-decoration-left">
+              <TemplateOrnament template={wedding.template} className="w-16 h-16" />
+            </span>
+            <span className="hero-decoration-right">
+              <TemplateOrnament template={wedding.template} className="w-16 h-16" />
+            </span>
           </div>
 
           <Reveal className="hero-content">
-            {/* Personal Guest Greeting if personal invitation */}
+            {/* Guest Salutation */}
             {guestName ? (
               <div className="hero-guest-salutation">
                 <span className="guest-eyebrow">{t.personalInvitation}</span>
@@ -286,10 +289,12 @@ export default function PublicInvitation({
               <span>{wedding.partnerTwo}</span>
             </h1>
 
-            {/* Decorative Divider */}
+            {/* Decorative Divider with SVG ornament */}
             <div className="hero-divider" aria-hidden="true">
               <span />
-              <i>{ornament}</i>
+              <i>
+                <TemplateOrnament template={wedding.template} className="w-5 h-5 inline-block" />
+              </i>
               <span />
             </div>
 
@@ -298,25 +303,25 @@ export default function PublicInvitation({
               <p className="hero-welcome">{wedding.welcomeText}</p>
             )}
 
-            {/* Formatted Date */}
+            {/* Event Date */}
             <p className="hero-date">{formattedDate}</p>
 
-            {/* VIP Assigned Table Card (Prominent on personal invitations) */}
+            {/* VIP Table Badge */}
             {formattedTable && (
               <div className="invitation-table-badge" role="region" aria-label="Assigned Seating">
                 <div className="table-badge-shimmer" aria-hidden="true" />
                 <div className="table-badge-header">
-                  <span className="table-badge-crest" aria-hidden="true">✦</span>
+                  <CrestStarIcon className="w-3.5 h-3.5 text-accent" />
                   <span className="table-badge-label">{t.tableReserved}</span>
-                  <span className="table-badge-crest" aria-hidden="true">✦</span>
+                  <CrestStarIcon className="w-3.5 h-3.5 text-accent" />
                 </div>
                 <div className="table-badge-body">
                   <span className="table-badge-table-name">{formattedTable}</span>
                   {seatNumber && (
                     <span className="table-badge-seat-number">
-                      <span className="seat-separator">•</span>
+                      <span className="seat-separator" aria-hidden="true" />
                       {t.seat} № {seatNumber}
-                      <span className="seat-separator">•</span>
+                      <span className="seat-separator" aria-hidden="true" />
                     </span>
                   )}
                 </div>
@@ -338,7 +343,9 @@ export default function PublicInvitation({
         <Reveal className="invitation-details">
           <div className="section-heading">
             <span>{t.together}</span>
-            <i aria-hidden="true">{ornament}</i>
+            <i aria-hidden="true">
+              <TemplateOrnament template={wedding.template} className="w-4 h-4 inline-block" />
+            </i>
           </div>
 
           <div className={`details-grid ${formattedTable ? 'has-table-card' : ''}`}>
@@ -374,8 +381,9 @@ export default function PublicInvitation({
                     rel="noreferrer"
                     className="venue-map-link"
                   >
+                    <MapPinIcon className="w-3.5 h-3.5 inline-block" />
                     <span>{t.map}</span>
-                    <span aria-hidden="true">↗</span>
+                    <ArrowUpRightIcon className="w-3 h-3 inline-block" />
                   </a>
                   <button
                     type="button"
@@ -383,18 +391,31 @@ export default function PublicInvitation({
                     className="venue-copy-btn"
                     title={t.copyAddress}
                   >
-                    {copied ? t.copied : t.copyAddress}
+                    {copied ? (
+                      <>
+                        <CheckIcon className="w-3.5 h-3.5 inline-block" />
+                        <span>{t.copied}</span>
+                      </>
+                    ) : (
+                      <>
+                        <CopyIcon className="w-3.5 h-3.5 inline-block" />
+                        <span>{t.copyAddress}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* 04 Table Card in details grid if assigned */}
+            {/* 04 Table Card in details grid */}
             {formattedTable && (
               <div className="detail-card detail-table-assigned">
                 <span className="detail-index">04</span>
                 <span className="detail-label">{t.table}</span>
-                <strong className="detail-table-title">{formattedTable}</strong>
+                <div className="detail-table-title-row">
+                  <TablePlateIcon className="w-5 h-5 text-accent inline-block" />
+                  <strong className="detail-table-title">{formattedTable}</strong>
+                </div>
                 {seatNumber && (
                   <span className="detail-seat-info">
                     {t.seat} № {seatNumber}
@@ -405,54 +426,34 @@ export default function PublicInvitation({
             )}
           </div>
 
-          {/* Quick Actions: Add to Calendar */}
+          {/* Add to Calendar: Fixed inline action box, NEVER gets cut off or hidden */}
           <div className="invitation-calendar-action">
-            <div className="calendar-dropdown-wrapper">
-              <button
-                type="button"
-                onClick={() => setShowCalendarMenu(!showCalendarMenu)}
-                className="calendar-btn"
-                aria-expanded={showCalendarMenu}
-              >
-                <svg
-                  className="calendar-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  aria-hidden="true"
+            <div className="calendar-action-box">
+              <div className="calendar-action-header">
+                <CalendarIcon className="w-4 h-4 text-accent inline-block" />
+                <span className="calendar-action-label">{t.addToCalendar}</span>
+              </div>
+              <div className="calendar-action-buttons">
+                <a
+                  href={getGoogleCalendarUrl()}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="calendar-action-btn google-btn"
                 >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-                <span>{t.addToCalendar}</span>
-                <span className="calendar-chevron" aria-hidden="true">▾</span>
-              </button>
-
-              {showCalendarMenu && (
-                <div className="calendar-menu">
-                  <a
-                    href={getGoogleCalendarUrl()}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="calendar-menu-item"
-                    onClick={() => setShowCalendarMenu(false)}
-                  >
-                    <span>{t.googleCalendar}</span>
-                    <span aria-hidden="true">↗</span>
-                  </a>
-                  <button
-                    type="button"
-                    onClick={downloadIcs}
-                    className="calendar-menu-item"
-                  >
-                    <span>{t.appleCalendar}</span>
-                    <span aria-hidden="true">↓</span>
-                  </button>
-                </div>
-              )}
+                  <GoogleCalendarIcon className="w-4 h-4 inline-block" />
+                  <span>{t.googleCalendar}</span>
+                  <ArrowUpRightIcon className="w-3 h-3 inline-block arrow-icon" />
+                </a>
+                <button
+                  type="button"
+                  onClick={downloadIcs}
+                  className="calendar-action-btn apple-btn"
+                >
+                  <AppleIcon className="w-4 h-4 inline-block" />
+                  <span>{t.appleCalendar}</span>
+                  <DownloadIcon className="w-3 h-3 inline-block arrow-icon" />
+                </button>
+              </div>
             </div>
           </div>
         </Reveal>
@@ -461,7 +462,9 @@ export default function PublicInvitation({
         <Reveal className="invitation-countdown">
           <div className="countdown-heading">
             <span>{t.countdown}</span>
-            <i aria-hidden="true">✧</i>
+            <i aria-hidden="true">
+              <CrestStarIcon className="w-3.5 h-3.5 inline-block text-accent" />
+            </i>
           </div>
           <Countdown date={wedding.eventDate} locale={locale} />
         </Reveal>
@@ -471,16 +474,16 @@ export default function PublicInvitation({
           <Reveal className="invitation-story">
             <span className="story-overline">{t.ourStory}</span>
             <div className="story-decoration" aria-hidden="true">
-              {ornament}
+              <TemplateOrnament template={wedding.template} className="w-6 h-6 inline-block" />
             </div>
             <p>{wedding.story}</p>
           </Reveal>
         )}
 
-        {/* Elegant Footer */}
+        {/* Footer */}
         <Reveal className="invitation-footer">
           <div className="footer-ornament" aria-hidden="true">
-            {ornament}
+            <TemplateOrnament template={wedding.template} className="w-6 h-6 inline-block" />
           </div>
           <p>{t.footer}</p>
           <span>{t.celebration}</span>
