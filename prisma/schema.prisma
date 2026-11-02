@@ -415,6 +415,7 @@ model InvitationAccount {
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
   sessions        InvitationSession[]
+  wedding         InvitationWedding?
 
   @@index([active, accessExpiresAt])
   @@map("invitation_accounts")
@@ -430,4 +431,45 @@ model InvitationSession {
 
   @@index([expiresAt])
   @@map("invitation_sessions")
+}
+
+model InvitationWedding {
+  id           String            @id @default(uuid()) @db.Uuid
+  accountId    String            @unique @map("account_id") @db.Uuid
+  slug         String            @unique
+  partnerOne   String            @default("") @map("partner_one")
+  partnerTwo   String            @default("") @map("partner_two")
+  eventDate    DateTime?         @map("event_date") @db.Date
+  eventTime    String?           @map("event_time")
+  timezone     String            @default("Asia/Baku")
+  venueName    String?           @map("venue_name")
+  venueAddress String?           @map("venue_address")
+  welcomeText  String?           @map("welcome_text")
+  story        String?
+  locale       String            @default("az")
+  template     String            @default("elegant")
+  theme        Json?
+  isPublished  Boolean           @default(false) @map("is_published")
+  publishedAt  DateTime?         @map("published_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  account      InvitationAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  guests       InvitationGuest[]
+
+  @@index([isPublished])
+  @@map("invitation_weddings")
+}
+
+
+model InvitationGuest {
+  id        String            @id @default(uuid()) @db.Uuid
+  weddingId String            @map("wedding_id") @db.Uuid
+  name      String
+  slug      String            @unique
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  wedding   InvitationWedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@index([weddingId])
+  @@map("invitation_guests")
 }

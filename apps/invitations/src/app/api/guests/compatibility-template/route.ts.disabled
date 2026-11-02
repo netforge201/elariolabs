@@ -1,0 +1,128 @@
+import { NextResponse } from 'next/server';
+import { currentInvitationAccount } from '@/lib/auth';
+import * as XLSX from 'xlsx';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const GUEST_LIMIT = 100;
+
+export async function GET() {
+  const account = await currentInvitationAccount();
+  if (!account) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const matrixEndColumn = GUEST_LIMIT + 1;
+  const groupColumn = GUEST_LIMIT + 2;
+  const columnName = (column: number) => {
+    let name = '';
+    while (column > 0) {
+      const remainder = (column - 1) % 26;
+      name = String.fromCharCode(65 + remainder) + name;
+      column = Math.floor((column - 1) / 26);
+    }
+    return name;
+  };
+
+  const rows: (string | { t: string; f: string; v: string })[][] = [];
+  const header: (string | { t: string; f: string; v: string })[] = [
+    'Имя и фамилия',
+  ];
+
+  for (let i = 0; i < GUEST_LIMIT; i++) {
+    const col = columnName(i + 2);
+    header.push({
+      t: 's',
+      f: `IF($A${i + 2}="","",$A${i + 2})`,
+      v: '',
+    });
+  }
+  header.push('Группа гостя');
+  rows.push(header);
+
+  for (let row = 0; row < GUEST_LIMIT; row++) {
+    const values: string[] = [''];
+    for (let col = 0; col < GUEST_LIMIT; col++) {
+      values.push('');
+    }
+    values.push('');
+    rows.push(values);
+  }
+
+  const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+  worksheet['!ref'] = `A1:${columnName(groupColumn)}${GUEST_LIMIT + 1}`;
+  worksheet['!cols'] = [
+    { wch: 25 },
+    ...Array.from({ length: GUEST_LIMIT }, () => ({ wch: 11 })),
+    { wch: 22 },
+  ];
+  worksheet['!rows'] = [
+    { hpt: 32 },
+    ...Array.from({ length: GUEST_LIMIT }, () => ({ hpt: 22 })),
+  ];
+  worksheet['!freeze'] = { xSplit: 1, ySplit: 1, topLeftCell: 'B2', activePane: 'bottomRight', state: 'frozen' };
+
+  // Dropdown values for compatibility cells.
+  (worksheet as XLSX.WorkSheet & { '!dataValidation'?: unknown })['!dataValidation'] = {
+    type: 'list',
+    allowBlank: true,
+    formula1: '"++,+,-"',
+    sqref: `B2:${columnName(matrixEndColumn)}${GUEST_LIMIT + 1}`,
+  };
+
+  for (let col = 0; col <= groupColumn; col++) {
+    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+    const cell = worksheet[cellAddress];
+    if (cell) {
+      cell.s = {
+        fill: { fgColor: { rgb: col === 0 || col === groupColumn ? 'E9E1E5' : '674F5C' } },
+        font: { bold: true, color: { rgb: col === 0 || col === groupColumn ? '453640' : 'FFFFFF' } },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+        border: {
+          top: { style: 'thin', color: { rgb: 'D8CDD2' } },
+          bottom: { style: 'thin', color: { rgb: 'D8CDD2' } },
+          left: { style: 'thin', color: { rgb: 'D8CDD2' } },
+          right: { style: 'thin', color: { rgb: 'D8CDD2' } },
+        },
+      };
+    }
+  }
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Совместимость гостей');
+
+  const instructions = [
+    ['ИНСТРУКЦИЯ'],
+    ['1. Введите имя и фамилию гостя в первый столбец. Фамилия необязательна.'],
+    ['2. Имя автоматически появится в заголовке соответствующего столбца.'],
+    ['3. На пересечении двух гостей укажите ++, + или -.'],
+    ['++ — обязательно посадить вместе.'],
+    ['+ — предпочтительно посадить вместе.'],
+    ['- — не сажать вместе.'],
+    ['Пустая ячейка — предпочтение не указано.'],
+    ['4. В последнем столбце укажите группу гостя.'],
+    ['5. Заполняйте обе ячейки для пары гостей одинаково: матрица симметрична.'],
+    ['6. Не заполняйте диагональ (пересечение гостя с самим собой).'],
+    ['Шаблон рассчитан на 100 гостей. Не переименовывайте листы и заголовки.'],
+  ];
+  const instructionsSheet = XLSX.utils.aoa_to_sheet(instructions);
+  instructionsSheet['!cols'] = [{ wch: 105 }];
+  XLSX.utils.book_append_sheet(workbook, instructionsSheet, 'Инструкция');
+
+  const output = XLSX.write(workbook, {
+    type: 'buffer',
+    bookType: 'xlsx',
+    cellStyles: true,
+  });
+
+  return new NextResponse(output, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="guest-compatibility-template.xlsx"',
+      'Cache-Control': 'no-store',
+    },
+  });
+}
