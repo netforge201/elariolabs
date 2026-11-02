@@ -75,17 +75,32 @@ export default async function GuestInvitationPage({ params }: Props) {
     assignment => assignment.guestId === guest.id
   );
 
-  const guestTable = guestAssignment
-    ? seatingPlan.objects.find(object =>
-        ['round-table', 'rect-table', 'oval-table'].includes(object.type) &&
-        guestAssignment.seatId.startsWith(`${object.id}-seat-`)
-      )
-    : null;
+  let tableName: string | null = null;
+  let seatNumber: number | null = null;
+
+  if (guestAssignment) {
+    const match = guestAssignment.seatId.match(/^(.*)-seat-(\d+)$/);
+    const tableId = match ? match[1] : null;
+    const table = tableId
+      ? seatingPlan.objects.find(obj => obj.id === tableId)
+      : seatingPlan.objects.find(obj =>
+          ['round-table', 'rect-table', 'oval-table'].includes(obj.type) &&
+          guestAssignment.seatId.startsWith(`${obj.id}-seat-`)
+        );
+
+    if (table) {
+      tableName = table.name;
+      if (match) {
+        seatNumber = Number(match[2]) + 1;
+      }
+    }
+  }
 
   return (
     <PublicInvitation
       guestName={guest.name}
-      tableName={guestTable?.name ?? null}
+      tableName={tableName}
+      seatNumber={seatNumber}
       wedding={{
         partnerOne: wedding.partnerOne,
         partnerTwo: wedding.partnerTwo,
