@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { currentInvitationAccount } from '@/lib/auth';
+import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -52,17 +52,7 @@ const planSchema = z.object({
   }),
 });
 
-function sameOrigin(request: NextRequest) {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
-  if (!origin || !host) return false;
-  try {
-    const parsed = new URL(origin);
-    return parsed.host === host && ['http:', 'https:'].includes(parsed.protocol);
-  } catch {
-    return false;
-  }
-}
+
 
 async function getWedding(accountId: string) {
   return db.invitationWedding.findUnique({

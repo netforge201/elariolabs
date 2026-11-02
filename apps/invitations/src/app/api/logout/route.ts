@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deleteInvitationSession, invitationCookieName } from '@/lib/auth';
-
-function sameOrigin(req: NextRequest) {
-  const origin = req.headers.get('origin');
-  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
-  if (!origin || !host) return false;
-  try {
-    return new URL(origin).host === host;
-  } catch {
-    return false;
-  }
-}
+import { deleteInvitationSession, invitationCookieName, publicBase, sameOrigin } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
+  const base = publicBase(req);
+
   if (!sameOrigin(req)) {
-    return NextResponse.redirect(new URL('/dashboard', req.url), 303);
+    return NextResponse.redirect(new URL('/dashboard', base), 303);
   }
 
   await deleteInvitationSession();
-  const response = NextResponse.redirect(new URL('/login', req.url), 303);
+  const response = NextResponse.redirect(new URL('/login', base), 303);
 
   response.cookies.set({
     name: invitationCookieName(),

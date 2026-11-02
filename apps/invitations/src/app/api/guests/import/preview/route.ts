@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { currentInvitationAccount } from '@/lib/auth';
+import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import * as XLSX from 'xlsx';
 import mammoth from 'mammoth';
 
@@ -7,20 +7,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-function sameOrigin(request: NextRequest) {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
-
-  if (!origin || !host) return false;
-
-  try {
-    const parsed = new URL(origin);
-    return parsed.host === host && ['http:', 'https:'].includes(parsed.protocol);
-  } catch {
-    return false;
-  }
-}
 
 function cleanName(value: string) {
   return value

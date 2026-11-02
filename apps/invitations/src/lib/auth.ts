@@ -68,3 +68,71 @@ export async function deleteInvitationSession() {
 export function invitationCookieName() {
   return COOKIE_NAME;
 }
+
+export function publicBase(req: Request): string {
+  const origin = req.headers.get('origin');
+  if (origin) {
+    try {
+      const u = new URL(origin);
+      if (['http:', 'https:'].includes(u.protocol)) {
+        return u.origin;
+      }
+    } catch {}
+  }
+
+  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (appUrl) {
+    try {
+      const u = new URL(appUrl);
+      if (['http:', 'https:'].includes(u.protocol)) {
+        return u.origin;
+      }
+    } catch {}
+  }
+
+  const proto = req.headers.get('x-forwarded-proto') || (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+  const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+  const rawHost = forwardedHost || req.headers.get('host') || 'invitation.elariolabs.com';
+  const isLocal = rawHost.startsWith('localhost') || rawHost.startsWith('127.0.0.1');
+  const host = isLocal ? rawHost : rawHost.replace(/:\d+$/, '');
+
+  return `${proto}://${host}`;
+}
+
+export function sameOrigin(req: Request): boolean {
+  const origin = req.headers.get('origin');
+  if (!origin) return false;
+
+  try {
+    const originUrl = new URL(origin);
+    if (!['http:', 'https:'].includes(originUrl.protocol)) return false;
+
+    const originHostname = originUrl.hostname.toLowerCase();
+    const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim();
+    const rawHost = (forwardedHost || req.headers.get('host') || '').toLowerCase();
+    const requestHostname = rawHost.replace(/:\d+$/, '');
+
+    if (requestHostname && originHostname === requestHostname) {
+      return true;
+    }
+
+    const baseHostname = new URL(publicBase(req)).hostname.toLowerCase();
+    if (originHostname === baseHostname) {
+      return true;
+    }
+
+    const allowedHostnames = new Set([
+      'invitation.elariolabs.com',
+      'invitations.elariolabs.com',
+      'elariolabs.com',
+      'www.elariolabs.com',
+      'localhost',
+      '127.0.0.1',
+    ]);
+
+    return allowedHostnames.has(originHostname);
+  } catch {
+    return false;
+  }
+}
+

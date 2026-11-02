@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
-import { currentInvitationAccount } from '@/lib/auth';
+import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -22,17 +22,7 @@ const weddingSchema = z.object({
 
 const updateSchema = weddingSchema.partial().strict();
 
-function sameOrigin(request: NextRequest) {
-  const origin = request.headers.get('origin');
-  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
-  if (!origin || !host) return false;
-  try {
-    const parsed = new URL(origin);
-    return parsed.host === host && ['http:', 'https:'].includes(parsed.protocol);
-  } catch {
-    return false;
-  }
-}
+
 
 function slugify(value: string) {
   return value

@@ -2,27 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { createInvitationSession, invitationCookieName } from '@/lib/auth';
+import { createInvitationSession, invitationCookieName, publicBase, sameOrigin } from '@/lib/auth';
 
 const schema = z.object({
   email: z.string().email().max(254),
   password: z.string().min(1).max(200),
 });
 
-function sameOrigin(req: NextRequest) {
-  const origin = req.headers.get('origin');
-  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
-  if (!origin || !host) return false;
-  try {
-    return new URL(origin).host === host;
-  } catch {
-    return false;
-  }
-}
-
 export async function POST(req: NextRequest) {
+  const base = publicBase(req);
+
   if (!sameOrigin(req)) {
-    return NextResponse.redirect(new URL('/login?error=invalid_request', req.url), 303);
+    return NextResponse.redirect(new URL('/login?error=invalid_request', base), 303);
   }
 
   const form = await req.formData();
@@ -32,7 +23,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (!parsed.success) {
-    return NextResponse.redirect(new URL('/login?error=invalid_credentials', req.url), 303);
+    return NextResponse.redirect(new URL('/login?error=invalid_credentials', base), 303);
   }
 
   const account = await db.invitationAccount.findUnique({
@@ -44,16 +35,16 @@ export async function POST(req: NextRequest) {
     !account.active ||
     (account.accessExpiresAt && account.accessExpiresAt <= new Date())
   ) {
-    return NextResponse.redirect(new URL('/login?error=invalid_credentials', req.url), 303);
+    return NextResponse.redirect(new URL('/login?error=invalid_credentials', base), 303);
   }
 
   const valid = await bcrypt.compare(parsed.data.password, account.passwordHash);
   if (!valid) {
-    return NextResponse.redirect(new URL('/login?error=invalid_credentials', req.url), 303);
+    return NextResponse.redirect(new URL('/login?error=invalid_credentials', base), 303);
   }
 
   const session = await createInvitationSession(account.id);
-  const response = NextResponse.redirect(new URL('/dashboard', req.url), 303);
+  const response = NextResponse.redirect(new URL('/dashboard', base), 303);
 
   response.cookies.set({
     name: invitationCookieName(),
@@ -67,3 +58,4 @@ export async function POST(req: NextRequest) {
 
   return response;
 }
+
