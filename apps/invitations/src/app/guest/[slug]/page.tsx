@@ -99,9 +99,11 @@ export default async function GuestInvitationPage({ params }: Props) {
   return (
     <PublicInvitation
       guestName={guest.name}
+      guestSlug={guest.slug}
       tableName={tableName}
       seatNumber={seatNumber}
       wedding={{
+        slug: wedding.slug,
         partnerOne: wedding.partnerOne,
         partnerTwo: wedding.partnerTwo,
         eventDate: wedding.eventDate!.toISOString(),
@@ -112,6 +114,7 @@ export default async function GuestInvitationPage({ params }: Props) {
         story: wedding.story,
         locale: wedding.locale,
         template: wedding.template,
+        coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
       }}
     />
   );

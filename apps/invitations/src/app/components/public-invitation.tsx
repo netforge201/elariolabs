@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Countdown from './countdown';
 import Reveal from './reveal';
 import {
@@ -12,14 +12,19 @@ import {
   CheckIcon,
   TablePlateIcon,
   CrestStarIcon,
-  ArrowUpRightIcon,
-  DownloadIcon,
-  TemplateOrnament,
+  ClockIcon,
+  HeartOutlineIcon,
+  HeartFilledIcon,
+  PlayIcon,
+  CloseIcon,
+  FloralCorner,
+  BotanicalLineArt,
 } from './icons';
 
 export type Locale = 'az' | 'ru' | 'en';
 
 export type Wedding = {
+  slug?: string;
   partnerOne: string;
   partnerTwo: string;
   eventDate: string;
@@ -30,12 +35,14 @@ export type Wedding = {
   story: string | null;
   locale: string;
   template: string;
+  coverImage?: string | null;
 };
 
 const words = {
   az: {
     intro: 'Ailələrimizin iştirakı ilə',
     invitation: 'Sizi toy mərasimimizə dəvət edirik',
+    weddingInvitation: 'TOY DƏVƏTNAMƏSİ',
     personalInvitation: 'ŞƏXSİ DƏVƏTNAMƏ',
     date: 'Toy tarixi',
     time: 'Başlama vaxtı',
@@ -55,10 +62,29 @@ const words = {
     appleCalendar: 'Apple / iCal',
     copyAddress: 'Ünvanı kopyala',
     copied: 'Ünvan kopyalandı!',
+    and: 'və',
+    confirmAttendance: 'Təsdiq et',
+    rsvpButtonText: 'İştirakı təsdiq et',
+    rsvpTitle: 'İştirak təsdiqi',
+    rsvpSubtitle: 'Zəhmət olmasa, iştirakınız barədə bizə əvvəlcədən bildirin',
+    willAttend: 'Məmnuniyyətlə iştirak edəcəyəm',
+    willNotAttend: 'Təəssüf ki, iştirak edə bilməyəcəyəm',
+    guestsCount: 'Qonaq sayı',
+    yourName: 'Adınız və Soyadınız',
+    wishes: 'Gənclərə xoş arzularınız',
+    sendRsvp: 'Təsdiqlə və Göndər',
+    sending: 'Göndərilir...',
+    rsvpSuccess: 'Təşəkkür edirik! Cavabınız qeydə alındı',
+    rsvpSuccessSub: 'Sizi şad günümüzdə görməyi səbirsizliklə gözləyirik!',
+    close: 'Bağla',
+    musicOn: 'Musiqi',
+    musicOff: 'Musiqini dayandır',
+    welcomeDefault: 'Sizi həyatımızın ən xoşbəxt gününü bizimlə bölüşməyə dəvət edirik!',
   },
   ru: {
     intro: 'Вместе с нашими семьями',
     invitation: 'Приглашаем вас разделить наш особенный день',
+    weddingInvitation: 'ПРИГЛАШЕНИЕ НА СВАДЬБУ',
     personalInvitation: 'ПЕРСОНАЛЬНОЕ ПРИГЛАШЕНИЕ',
     date: 'Дата свадьбы',
     time: 'Начало торжества',
@@ -78,10 +104,29 @@ const words = {
     appleCalendar: 'Apple / iCal',
     copyAddress: 'Скопировать адрес',
     copied: 'Адрес скопирован!',
+    and: 'и',
+    confirmAttendance: 'Подтвердить участие',
+    rsvpButtonText: 'Подтвердить участие',
+    rsvpTitle: 'Подтверждение участия',
+    rsvpSubtitle: 'С радостью ждём вас! Пожалуйста, подтвердите своё присутствие',
+    willAttend: 'С радостью буду',
+    willNotAttend: 'К сожалению, не смогу',
+    guestsCount: 'Количество персон',
+    yourName: 'Ваше имя и фамилия',
+    wishes: 'Пожелания молодожёнам',
+    sendRsvp: 'Подтвердить присутствие',
+    sending: 'Отправка...',
+    rsvpSuccess: 'Спасибо! Ваш ответ принят',
+    rsvpSuccessSub: 'С нетерпением ждём встречи с вами на нашем празднике!',
+    close: 'Закрыть',
+    musicOn: 'Музыка',
+    musicOff: 'Выключить музыку',
+    welcomeDefault: 'С радостью приглашаем вас разделить с нами особенный день — нашу свадьбу!',
   },
   en: {
     intro: 'Together with our families',
     invitation: 'We invite you to celebrate our special day',
+    weddingInvitation: 'WEDDING INVITATION',
     personalInvitation: 'PERSONAL INVITATION',
     date: 'Wedding date',
     time: 'Ceremony begins',
@@ -101,18 +146,32 @@ const words = {
     appleCalendar: 'Apple / iCal',
     copyAddress: 'Copy address',
     copied: 'Address copied!',
+    and: '&',
+    confirmAttendance: 'Confirm attendance',
+    rsvpButtonText: 'Confirm attendance',
+    rsvpTitle: 'RSVP Confirmation',
+    rsvpSubtitle: 'We would love to know if you can make it to our special day',
+    willAttend: 'Joyfully accept',
+    willNotAttend: 'Regretfully decline',
+    guestsCount: 'Number of guests',
+    yourName: 'Your name',
+    wishes: 'Wishes for the newlyweds',
+    sendRsvp: 'Submit RSVP',
+    sending: 'Sending...',
+    rsvpSuccess: 'Thank you! Your RSVP is confirmed',
+    rsvpSuccessSub: 'We cannot wait to celebrate this special day with you!',
+    close: 'Close',
+    musicOn: 'Music',
+    musicOff: 'Pause music',
+    welcomeDefault: 'We joyfully invite you to share our special day with us — our wedding celebration!',
   },
 };
 
-const templates: Record<string, string> = {
-  elegant: 'theme-elegant layout-editorial',
-  'soft-colorful': 'theme-soft layout-bloom',
-  azeri: 'theme-national layout-heritage',
-  minimal: 'theme-minimal layout-minimal',
-  botanical: 'theme-botanical layout-garden',
-  romantic: 'theme-romantic layout-midnight',
-  classic: 'theme-classic layout-royal',
-};
+function resolveTemplate(template: string): 'classic' | 'modern' | 'minimal' {
+  if (template === 'modern' || template === 'elegant') return 'modern';
+  if (template === 'minimal') return 'minimal';
+  return 'classic';
+}
 
 function formatTableLabel(tableName: string, locale: Locale): string {
   const trimmed = tableName.trim();
@@ -124,25 +183,141 @@ function formatTableLabel(tableName: string, locale: Locale): string {
   return trimmed;
 }
 
+function getInitialLetter(name: string): string {
+  return name.trim().charAt(0).toUpperCase() || 'A';
+}
+
+// Falling rose petals animation for Template 1 (Cream)
+function PetalsShower() {
+  const petals = useMemo(() => {
+    return Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      left: `${(i * 5.6 + Math.sin(i * 1.7) * 4) % 100}%`,
+      delay: `${(i * 0.75) % 8}s`,
+      duration: `${7 + (i % 5) * 1.4}s`,
+      size: 14 + (i % 4) * 5,
+      rotation: (i * 47) % 360,
+      opacity: 0.35 + (i % 4) * 0.15,
+    }));
+  }, []);
+
+  return (
+    <div className="petals-container" aria-hidden="true">
+      {petals.map(p => (
+        <span
+          key={p.id}
+          className="falling-petal"
+          style={{
+            left: p.left,
+            animationDelay: p.delay,
+            animationDuration: p.duration,
+            width: `${p.size}px`,
+            height: `${p.size * 1.3}px`,
+            opacity: p.opacity,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Golden stardust bokeh particles for Template 2 (Photo)
+function StardustParticles() {
+  const particles = useMemo(() => {
+    return Array.from({ length: 24 }, (_, i) => ({
+      id: i,
+      left: `${(i * 4.3 + Math.cos(i * 2.1) * 6) % 100}%`,
+      delay: `${(i * 0.45) % 6}s`,
+      duration: `${5 + (i % 5) * 1.2}s`,
+      size: 2 + (i % 3) * 2.5,
+      opacity: 0.3 + (i % 4) * 0.18,
+    }));
+  }, []);
+
+  return (
+    <div className="stardust-container" aria-hidden="true">
+      {particles.map(p => (
+        <span
+          key={p.id}
+          className="stardust-particle"
+          style={{
+            left: p.left,
+            animationDelay: p.delay,
+            animationDuration: p.duration,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            opacity: p.opacity,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Soft organic dust for Template 3 (Linear)
+function OrganicDust() {
+  const specks = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      left: `${(i * 8.3) % 100}%`,
+      delay: `${(i * 0.8) % 7}s`,
+      duration: `${8 + (i % 4) * 2}s`,
+      size: 2 + (i % 2) * 1.5,
+    }));
+  }, []);
+
+  return (
+    <div className="organic-dust-container" aria-hidden="true">
+      {specks.map(s => (
+        <span
+          key={s.id}
+          className="dust-speck"
+          style={{
+            left: s.left,
+            animationDelay: s.delay,
+            animationDuration: s.duration,
+            width: `${s.size}px`,
+            height: `${s.size}px`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function PublicInvitation({
   wedding,
   guestName,
+  guestSlug,
   tableName,
   seatNumber,
 }: {
   wedding: Wedding;
   guestName?: string;
+  guestSlug?: string;
   tableName?: string | null;
   seatNumber?: number | null;
 }) {
   const [copied, setCopied] = useState(false);
+  const [showRsvp, setShowRsvp] = useState(false);
+  const [rsvpAttending, setRsvpAttending] = useState(true);
+  const [rsvpGuestsCount, setRsvpGuestsCount] = useState(1);
+  const [rsvpGuestName, setRsvpGuestName] = useState(guestName || '');
+  const [rsvpMessage, setRsvpMessage] = useState('');
+  const [rsvpSending, setRsvpSending] = useState(false);
+  const [rsvpDone, setRsvpDone] = useState(false);
+
+  // Audio ambient player
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const oscillatorIntervalRef = useRef<number | null>(null);
 
   const locale: Locale = ['az', 'ru', 'en'].includes(wedding.locale)
     ? (wedding.locale as Locale)
     : 'az';
 
   const t = words[locale];
-  const template = templates[wedding.template] || templates.elegant;
+  const activeTemplate = resolveTemplate(wedding.template);
   const date = new Date(wedding.eventDate);
 
   const formattedDate = new Intl.DateTimeFormat(
@@ -160,7 +335,6 @@ export default function PublicInvitation({
     .join(', ');
 
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-
   const formattedTable = tableName ? formatTableLabel(tableName, locale) : null;
 
   const personalGreeting = guestName
@@ -170,6 +344,12 @@ export default function PublicInvitation({
         ? `Hörmətli ${guestName}`
         : `Dear ${guestName}`
     : null;
+
+  const initOne = getInitialLetter(wedding.partnerOne);
+  const initTwo = getInitialLetter(wedding.partnerTwo);
+
+  // Default photography couple background for Template 2
+  const photoBackground = wedding.coverImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80';
 
   function copyToClipboard() {
     if (!address) return;
@@ -185,10 +365,10 @@ export default function PublicInvitation({
       wedding.welcomeText || `Wedding celebration of ${wedding.partnerOne} & ${wedding.partnerTwo}`
     );
     const loc = encodeURIComponent(address);
-    const time = wedding.eventTime || '18:00';
+    const time = wedding.eventTime || '17:00';
     const [h, m] = time.split(':').map(Number);
     const start = new Date(date);
-    start.setHours(h || 18, m || 0, 0, 0);
+    start.setHours(h || 17, m || 0, 0, 0);
     const end = new Date(start);
     end.setHours(start.getHours() + 5);
 
@@ -197,10 +377,10 @@ export default function PublicInvitation({
   }
 
   function downloadIcs() {
-    const time = wedding.eventTime || '18:00';
+    const time = wedding.eventTime || '17:00';
     const [h, m] = time.split(':').map(Number);
     const start = new Date(date);
-    start.setHours(h || 18, m || 0, 0, 0);
+    start.setHours(h || 17, m || 0, 0, 0);
     const end = new Date(start);
     end.setHours(start.getHours() + 5);
 
@@ -233,265 +413,610 @@ export default function PublicInvitation({
     URL.revokeObjectURL(url);
   }
 
+  // Romantic gentle acoustic melody synthesis via Web Audio API
+  function toggleMusic() {
+    if (isPlaying) {
+      if (oscillatorIntervalRef.current) {
+        window.clearInterval(oscillatorIntervalRef.current);
+        oscillatorIntervalRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current = null;
+      }
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new AudioCtx();
+      audioContextRef.current = ctx;
+
+      // Romantic Canon in D inspired gentle arpeggios
+      const notes = [
+        293.66, 369.99, 440.0, 587.33,
+        220.0, 277.18, 329.63, 440.0,
+        246.94, 293.66, 369.99, 493.88,
+        185.0, 220.0, 277.18, 369.99,
+        196.0, 246.94, 293.66, 392.0,
+        146.83, 220.0, 293.66, 369.99,
+      ];
+      let step = 0;
+
+      const playNote = () => {
+        if (!ctx || ctx.state === 'closed') return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        const freq = notes[step % notes.length];
+        step++;
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.2);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 1.25);
+      };
+
+      playNote();
+      oscillatorIntervalRef.current = window.setInterval(playNote, 600);
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (oscillatorIntervalRef.current) {
+        window.clearInterval(oscillatorIntervalRef.current);
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+      }
+    };
+  }, []);
+
+  async function handleRsvpSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!rsvpGuestName.trim() || rsvpSending) return;
+
+    setRsvpSending(true);
+    try {
+      await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weddingSlug: wedding.slug || 'wedding',
+          guestName: rsvpGuestName.trim(),
+          guestSlug: guestSlug || undefined,
+          attending: rsvpAttending,
+          guestsCount: rsvpGuestsCount,
+          message: rsvpMessage.trim(),
+        }),
+      });
+      setRsvpDone(true);
+    } catch {
+      setRsvpDone(true);
+    } finally {
+      setRsvpSending(false);
+    }
+  }
+
   return (
-    <main className={`public-invitation ${template}`}>
-      {/* Ambient background particles */}
-      <div className="design-atmosphere" aria-hidden="true">
-        <span className="atmosphere-orb orb-one" />
-        <span className="atmosphere-orb orb-two" />
-        <span className="atmosphere-orb orb-three" />
-        <div className="floating-particles">
-          <span className="particle p1" />
-          <span className="particle p2" />
-          <span className="particle p3" />
-          <span className="particle p4" />
-          <span className="particle p5" />
-          <span className="particle p6" />
-        </div>
-      </div>
+    <main className={`public-invitation template-v2-${activeTemplate}`}>
+      {/* Background Ambience & Animation */}
+      {activeTemplate === 'classic' && <PetalsShower />}
+      {activeTemplate === 'modern' && <StardustParticles />}
+      {activeTemplate === 'minimal' && <OrganicDust />}
 
       <div className="invitation-shell">
-        {/* Topline header */}
-        <div className="invitation-topline">
-          <span>{guestName ? t.personalInvitation : t.intro}</span>
-          <span className="topline-symbol">
-            <TemplateOrnament template={wedding.template} className="w-4 h-4 inline-block" />
-          </span>
-        </div>
+        {/* ============================================================== */}
+        {/* TEMPLATE 1: КЛАССИЧЕСКИЙ (А. КРЕМОВЫЙ)                         */}
+        {/* ============================================================== */}
+        {activeTemplate === 'classic' && (
+          <section className="v2-card v2-classic-card">
+            {/* Corner Floral Ornaments */}
+            <div className="floral-corner-tl" aria-hidden="true"><FloralCorner position="top-left" /></div>
+            <div className="floral-corner-tr" aria-hidden="true"><FloralCorner position="top-right" /></div>
+            <div className="floral-corner-bl" aria-hidden="true"><FloralCorner position="bottom-left" /></div>
+            <div className="floral-corner-br" aria-hidden="true"><FloralCorner position="bottom-right" /></div>
 
-        {/* Hero Section */}
-        <section className="invitation-hero">
-          <div className="hero-decoration" aria-hidden="true">
-            <span className="hero-decoration-left">
-              <TemplateOrnament template={wedding.template} className="w-16 h-16" />
-            </span>
-            <span className="hero-decoration-right">
-              <TemplateOrnament template={wedding.template} className="w-16 h-16" />
-            </span>
-          </div>
-
-          <Reveal className="hero-content">
-            {/* Guest Salutation */}
-            {guestName ? (
-              <div className="hero-guest-salutation">
-                <span className="guest-eyebrow">{t.personalInvitation}</span>
-                <p className="hero-kicker guest-highlighted-name">{personalGreeting}</p>
-                <p className="hero-invitation-line">{t.invitation}</p>
-              </div>
-            ) : (
-              <p className="hero-kicker">{t.invitation}</p>
-            )}
-
-            {/* Couple Names */}
-            <h1 className="hero-names">
-              <span>{wedding.partnerOne}</span>
-              <i>{wedding.template === 'minimal' ? '+' : '&'}</i>
-              <span>{wedding.partnerTwo}</span>
-            </h1>
-
-            {/* Decorative Divider with SVG ornament */}
-            <div className="hero-divider" aria-hidden="true">
-              <span />
-              <i>
-                <TemplateOrnament template={wedding.template} className="w-5 h-5 inline-block" />
-              </i>
-              <span />
-            </div>
-
-            {/* Welcome Text */}
-            {wedding.welcomeText && (
-              <p className="hero-welcome">{wedding.welcomeText}</p>
-            )}
-
-            {/* Event Date */}
-            <p className="hero-date">{formattedDate}</p>
-
-            {/* VIP Table Badge */}
-            {formattedTable && (
-              <div className="invitation-table-badge" role="region" aria-label="Assigned Seating">
-                <div className="table-badge-shimmer" aria-hidden="true" />
-                <div className="table-badge-header">
-                  <CrestStarIcon className="w-3.5 h-3.5 text-accent" />
-                  <span className="table-badge-label">{t.tableReserved}</span>
-                  <CrestStarIcon className="w-3.5 h-3.5 text-accent" />
+            {/* Inner Gold Foil Frame */}
+            <div className="v2-classic-inner-frame">
+              <Reveal>
+                {/* Monogram Crest A & M */}
+                <div className="v2-classic-monogram" aria-hidden="true">
+                  <span>{initOne}</span>
+                  <i className="v2-classic-monogram-amp">&</i>
+                  <span>{initTwo}</span>
                 </div>
-                <div className="table-badge-body">
-                  <span className="table-badge-table-name">{formattedTable}</span>
-                  {seatNumber && (
-                    <span className="table-badge-seat-number">
-                      <span className="seat-separator" aria-hidden="true" />
-                      {t.seat} № {seatNumber}
-                      <span className="seat-separator" aria-hidden="true" />
-                    </span>
+
+                {/* Subtitle */}
+                <div className="v2-classic-subtitle">{t.weddingInvitation}</div>
+
+                {/* Couple Names in Cursive Script */}
+                <h1 className="v2-classic-names">
+                  <span>{wedding.partnerOne}</span>
+                  <span className="v2-classic-amp">{t.and}</span>
+                  <span>{wedding.partnerTwo}</span>
+                </h1>
+
+                {/* Delicate Gold Heart Outline */}
+                <div className="v2-classic-heart" aria-hidden="true">
+                  <HeartOutlineIcon className="w-5 h-5 text-amber-700/60 inline-block" />
+                </div>
+
+                {/* Guest Salutation if personalized link */}
+                {guestName && (
+                  <div className="v2-guest-badge">
+                    <span className="v2-guest-eyebrow">{t.personalInvitation}</span>
+                    <strong className="v2-guest-name">{personalGreeting}</strong>
+                  </div>
+                )}
+
+                {/* Welcome Message */}
+                <p className="v2-classic-welcome">
+                  {wedding.welcomeText || t.welcomeDefault}
+                </p>
+
+                {/* Details Bar: Date, Time, Venue with Icons */}
+                <div className="v2-classic-details-bar">
+                  <div className="v2-detail-pill">
+                    <CalendarIcon className="w-4 h-4 text-amber-800/80" />
+                    <span>{formattedDate}</span>
+                  </div>
+                  <div className="v2-detail-pill">
+                    <ClockIcon className="w-4 h-4 text-amber-800/80" />
+                    <span>{wedding.eventTime || '17:00'}</span>
+                  </div>
+                  {wedding.venueName && (
+                    <div className="v2-detail-pill v2-detail-pill-venue">
+                      <MapPinIcon className="w-4 h-4 text-amber-800/80" />
+                      <span>{wedding.venueName}</span>
+                    </div>
                   )}
                 </div>
-                <div className="table-badge-footer">
-                  <span>{t.waitingForYou}</span>
-                </div>
-              </div>
-            )}
-          </Reveal>
 
-          <div className="hero-bottom-mark" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </section>
-
-        {/* Event Details Grid */}
-        <Reveal className="invitation-details">
-          <div className="section-heading">
-            <span>{t.together}</span>
-            <i aria-hidden="true">
-              <TemplateOrnament template={wedding.template} className="w-4 h-4 inline-block" />
-            </i>
-          </div>
-
-          <div className={`details-grid ${formattedTable ? 'has-table-card' : ''}`}>
-            {/* 01 Date */}
-            <div className="detail-card detail-date">
-              <span className="detail-index">01</span>
-              <span className="detail-label">{t.date}</span>
-              <strong>{formattedDate}</strong>
-            </div>
-
-            {/* 02 Time */}
-            {wedding.eventTime && (
-              <div className="detail-card detail-time">
-                <span className="detail-index">02</span>
-                <span className="detail-label">{t.time}</span>
-                <strong>{wedding.eventTime}</strong>
-              </div>
-            )}
-
-            {/* 03 Venue & Navigation */}
-            {address && (
-              <div className="detail-card detail-venue">
-                <span className="detail-index">03</span>
-                <span className="detail-label">{t.venue}</span>
-                <strong>{wedding.venueName || wedding.venueAddress}</strong>
-                {wedding.venueName && wedding.venueAddress && (
-                  <span className="venue-address">{wedding.venueAddress}</span>
+                {/* VIP Table Badge for Guest */}
+                {formattedTable && (
+                  <div className="v2-table-badge">
+                    <CrestStarIcon className="w-3.5 h-3.5 text-amber-700" />
+                    <span className="v2-table-name">{formattedTable}</span>
+                    {seatNumber && (
+                      <span className="v2-seat-text">· {t.seat} № {seatNumber}</span>
+                    )}
+                    <CrestStarIcon className="w-3.5 h-3.5 text-amber-700" />
+                  </div>
                 )}
-                <div className="venue-actions">
-                  <a
-                    href={mapUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="venue-map-link"
-                  >
-                    <MapPinIcon className="w-3.5 h-3.5 inline-block" />
-                    <span>{t.map}</span>
-                    <ArrowUpRightIcon className="w-3 h-3 inline-block" />
-                  </a>
+
+                {/* RSVP Attendance Confirmation Button */}
+                <div className="v2-action-center">
                   <button
                     type="button"
-                    onClick={copyToClipboard}
-                    className="venue-copy-btn"
-                    title={t.copyAddress}
+                    className="v2-btn-classic-gold"
+                    onClick={() => setShowRsvp(true)}
                   >
-                    {copied ? (
-                      <>
-                        <CheckIcon className="w-3.5 h-3.5 inline-block" />
-                        <span>{t.copied}</span>
-                      </>
-                    ) : (
-                      <>
-                        <CopyIcon className="w-3.5 h-3.5 inline-block" />
-                        <span>{t.copyAddress}</span>
-                      </>
-                    )}
+                    <span>{t.rsvpButtonText}</span>
                   </button>
                 </div>
-              </div>
-            )}
+              </Reveal>
+            </div>
+          </section>
+        )}
 
-            {/* 04 Table Card in details grid */}
-            {formattedTable && (
-              <div className="detail-card detail-table-assigned">
-                <span className="detail-index">04</span>
-                <span className="detail-label">{t.table}</span>
-                <div className="detail-table-title-row">
-                  <TablePlateIcon className="w-5 h-5 text-accent inline-block" />
-                  <strong className="detail-table-title">{formattedTable}</strong>
-                </div>
-                {seatNumber && (
-                  <span className="detail-seat-info">
-                    {t.seat} № {seatNumber}
-                  </span>
+        {/* ============================================================== */}
+        {/* TEMPLATE 2: СОВРЕМЕННЫЙ (А. ФОТОГРАФИЧЕСКИЙ)                   */}
+        {/* ============================================================== */}
+        {activeTemplate === 'modern' && (
+          <section className="v2-card v2-modern-card">
+            {/* Couple Full Photo Background */}
+            <div
+              className="v2-modern-bg-photo"
+              style={{ backgroundImage: `url("${photoBackground}")` }}
+              aria-hidden="true"
+            />
+            {/* Cinematic Gradient Scrim */}
+            <div className="v2-modern-scrim" aria-hidden="true" />
+
+            <div className="v2-modern-content">
+              <Reveal>
+                {/* Subtitle */}
+                <div className="v2-modern-subtitle">{t.weddingInvitation}</div>
+
+                {/* Towering Bold Editorial Names */}
+                <h1 className="v2-modern-names">
+                  <span className="modern-name-one">{wedding.partnerOne}</span>
+                  <span className="modern-name-and">{t.and}</span>
+                  <span className="modern-name-two">{wedding.partnerTwo}</span>
+                </h1>
+
+                {/* Guest Salutation if personalized link */}
+                {guestName && (
+                  <div className="v2-modern-guest">
+                    <span className="v2-modern-guest-label">{t.personalInvitation}</span>
+                    <strong className="v2-modern-guest-name">{personalGreeting}</strong>
+                  </div>
                 )}
-                <span className="detail-table-guest-note">{t.tableReserved}</span>
-              </div>
-            )}
-          </div>
 
-          {/* Add to Calendar: Fixed inline action box, NEVER gets cut off or hidden */}
-          <div className="invitation-calendar-action">
-            <div className="calendar-action-box">
-              <div className="calendar-action-header">
-                <CalendarIcon className="w-4 h-4 text-accent inline-block" />
-                <span className="calendar-action-label">{t.addToCalendar}</span>
+                {/* Welcome Message */}
+                <p className="v2-modern-welcome">
+                  {wedding.welcomeText || t.welcomeDefault}
+                </p>
+
+                {/* Details Row */}
+                <div className="v2-modern-details-row">
+                  <div className="v2-modern-pill">
+                    <CalendarIcon className="w-4 h-4 text-white/90" />
+                    <span>{formattedDate}</span>
+                  </div>
+                  <div className="v2-modern-pill">
+                    <ClockIcon className="w-4 h-4 text-white/90" />
+                    <span>{wedding.eventTime || '17:00'}</span>
+                  </div>
+                  {wedding.venueName && (
+                    <div className="v2-modern-pill v2-modern-venue">
+                      <MapPinIcon className="w-4 h-4 text-white/90" />
+                      <span>{wedding.venueName}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* VIP Table Badge */}
+                {formattedTable && (
+                  <div className="v2-modern-table-badge">
+                    <CrestStarIcon className="w-3.5 h-3.5 text-amber-300" />
+                    <span>{formattedTable}</span>
+                    {seatNumber && <b>· {t.seat} № {seatNumber}</b>}
+                    <CrestStarIcon className="w-3.5 h-3.5 text-amber-300" />
+                  </div>
+                )}
+
+                {/* White Frosted Glass Action Button */}
+                <div className="v2-action-center">
+                  <button
+                    type="button"
+                    className="v2-btn-modern-white"
+                    onClick={() => setShowRsvp(true)}
+                  >
+                    <span>{t.rsvpButtonText}</span>
+                  </button>
+                </div>
+              </Reveal>
+            </div>
+          </section>
+        )}
+
+        {/* ============================================================== */}
+        {/* TEMPLATE 3: МИНИМАЛИСТИЧНЫЙ (С. ЛИНЕЙНЫЙ)                      */}
+        {/* ============================================================== */}
+        {activeTemplate === 'minimal' && (
+          <section className="v2-card v2-minimal-card">
+            <div className="v2-minimal-grid">
+              {/* Left Column: Asymmetrical Typography & Information */}
+              <div className="v2-minimal-content">
+                <Reveal>
+                  <div className="v2-minimal-subtitle">{t.weddingInvitation}</div>
+
+                  <h1 className="v2-minimal-names">
+                    <span className="minimal-line-1">{wedding.partnerOne}</span>
+                    <span className="minimal-line-2">{t.and} {wedding.partnerTwo}</span>
+                  </h1>
+
+                  {/* Guest Salutation if personalized link */}
+                  {guestName && (
+                    <div className="v2-minimal-guest">
+                      <span className="v2-minimal-guest-badge">{t.personalInvitation}</span>
+                      <p className="v2-minimal-guest-salutation">{personalGreeting}</p>
+                    </div>
+                  )}
+
+                  <p className="v2-minimal-welcome">
+                    {wedding.welcomeText || t.welcomeDefault}
+                  </p>
+
+                  <div className="v2-minimal-details">
+                    <div className="v2-minimal-item">
+                      <CalendarIcon className="w-4 h-4 text-stone-600" />
+                      <span>{formattedDate}</span>
+                    </div>
+                    <div className="v2-minimal-item">
+                      <ClockIcon className="w-4 h-4 text-stone-600" />
+                      <span>{wedding.eventTime || '17:00'}</span>
+                    </div>
+                    {wedding.venueName && (
+                      <div className="v2-minimal-item">
+                        <MapPinIcon className="w-4 h-4 text-stone-600" />
+                        <span>{wedding.venueName}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {formattedTable && (
+                    <div className="v2-minimal-table-badge">
+                      <TablePlateIcon className="w-4 h-4 text-stone-700" />
+                      <span>{formattedTable}</span>
+                      {seatNumber && <small>· {t.seat} № {seatNumber}</small>}
+                    </div>
+                  )}
+
+                  <div className="v2-minimal-action">
+                    <button
+                      type="button"
+                      className="v2-btn-minimal-taupe"
+                      onClick={() => setShowRsvp(true)}
+                    >
+                      <span>{t.rsvpButtonText}</span>
+                    </button>
+                  </div>
+                </Reveal>
               </div>
-              <div className="calendar-action-buttons">
-                <a
-                  href={getGoogleCalendarUrl()}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="calendar-action-btn google-btn"
-                >
-                  <GoogleCalendarIcon className="w-4 h-4 inline-block" />
-                  <span>{t.googleCalendar}</span>
-                  <ArrowUpRightIcon className="w-3 h-3 inline-block arrow-icon" />
-                </a>
-                <button
-                  type="button"
-                  onClick={downloadIcs}
-                  className="calendar-action-btn apple-btn"
-                >
-                  <AppleIcon className="w-4 h-4 inline-block" />
-                  <span>{t.appleCalendar}</span>
-                  <DownloadIcon className="w-3 h-3 inline-block arrow-icon" />
-                </button>
+
+              {/* Right Column: Exquisite Minimalist Botanical Line-Art */}
+              <div className="v2-minimal-artwork" aria-hidden="true">
+                <BotanicalLineArt className="v2-botanical-svg" />
               </div>
             </div>
+          </section>
+        )}
+
+        {/* ============================================================== */}
+        {/* INTERACTIVE CALENDAR, VENUE & ESSENTIALS SECTION               */}
+        {/* ============================================================== */}
+        <Reveal className="v2-essentials-section">
+          {/* Calendar & Address Actions */}
+          <div className="v2-interactive-calendar-card">
+            <div className="calendar-card-header">
+              <div className="calendar-header-icon">
+                <CalendarIcon className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <h3>{t.date}</h3>
+                <p>{formattedDate} {wedding.eventTime ? `· ${wedding.eventTime}` : ''}</p>
+              </div>
+            </div>
+
+            <div className="calendar-buttons-row">
+              <a
+                href={getGoogleCalendarUrl()}
+                target="_blank"
+                rel="noreferrer"
+                className="v2-btn-sub action-google-cal"
+              >
+                <GoogleCalendarIcon className="w-4 h-4 inline-block" />
+                <span>{t.googleCalendar}</span>
+              </a>
+              <button
+                type="button"
+                onClick={downloadIcs}
+                className="v2-btn-sub action-apple-cal"
+              >
+                <AppleIcon className="w-4 h-4 inline-block" />
+                <span>{t.appleCalendar}</span>
+              </button>
+            </div>
           </div>
+
+          {/* Venue Card with Copy Address & Maps */}
+          {address && (
+            <div className="v2-venue-card">
+              <div className="venue-card-header">
+                <div className="venue-header-icon">
+                  <MapPinIcon className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <h3>{wedding.venueName || t.venue}</h3>
+                  {wedding.venueAddress && <p>{wedding.venueAddress}</p>}
+                </div>
+              </div>
+
+              <div className="venue-buttons-row">
+                <button
+                  type="button"
+                  onClick={copyToClipboard}
+                  className={`v2-btn-sub action-copy-address ${copied ? 'is-copied' : ''}`}
+                >
+                  {copied ? <CheckIcon className="w-4 h-4 text-emerald-600 inline-block" /> : <CopyIcon className="w-4 h-4 inline-block" />}
+                  <span>{copied ? t.copied : t.copyAddress}</span>
+                </button>
+                <a
+                  href={mapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="v2-btn-sub action-open-map"
+                >
+                  <MapPinIcon className="w-4 h-4 inline-block" />
+                  <span>{t.map}</span>
+                </a>
+              </div>
+            </div>
+          )}
         </Reveal>
 
-        {/* Countdown Timer */}
-        <Reveal className="invitation-countdown">
-          <div className="countdown-heading">
-            <span>{t.countdown}</span>
-            <i aria-hidden="true">
-              <CrestStarIcon className="w-3.5 h-3.5 inline-block text-accent" />
-            </i>
-          </div>
+        {/* ============================================================== */}
+        {/* COUNTDOWN SECTION                                              */}
+        {/* ============================================================== */}
+        <Reveal className="v2-countdown-section">
+          <span className="v2-countdown-title">{t.countdown}</span>
           <Countdown date={wedding.eventDate} locale={locale} />
         </Reveal>
 
-        {/* Couple Story */}
+        {/* ============================================================== */}
+        {/* OUR STORY (IF PROVIDED)                                        */}
+        {/* ============================================================== */}
         {wedding.story && (
-          <Reveal className="invitation-story">
-            <span className="story-overline">{t.ourStory}</span>
-            <div className="story-decoration" aria-hidden="true">
-              <TemplateOrnament template={wedding.template} className="w-6 h-6 inline-block" />
-            </div>
-            <p>{wedding.story}</p>
+          <Reveal className="v2-story-section">
+            <h3 className="v2-story-title">{t.ourStory}</h3>
+            <p className="v2-story-text">{wedding.story}</p>
           </Reveal>
         )}
 
         {/* Footer */}
-        <Reveal className="invitation-footer">
-          <div className="footer-ornament" aria-hidden="true">
-            <TemplateOrnament template={wedding.template} className="w-6 h-6 inline-block" />
-          </div>
+        <footer className="v2-footer">
           <p>{t.footer}</p>
-          <span>{t.celebration}</span>
-          <div className="footer-names">
-            {wedding.partnerOne} <i>&</i> {wedding.partnerTwo}
-          </div>
-        </Reveal>
+          <small>{wedding.partnerOne} & {wedding.partnerTwo} · 2026</small>
+        </footer>
       </div>
+
+      {/* ============================================================== */}
+      {/* FLOATING AUDIO MUSIC PLAYER (BOTTOM-RIGHT)                      */}
+      {/* ============================================================== */}
+      <button
+        type="button"
+        className={`v2-music-toggle ${isPlaying ? 'is-playing' : ''}`}
+        onClick={toggleMusic}
+        title={isPlaying ? t.musicOff : t.musicOn}
+        aria-label={isPlaying ? t.musicOff : t.musicOn}
+      >
+        <span className="v2-music-pulse-ring" aria-hidden="true" />
+        {isPlaying ? (
+          <div className="v2-soundbars" aria-hidden="true">
+            <span className="bar b1" />
+            <span className="bar b2" />
+            <span className="bar b3" />
+          </div>
+        ) : (
+          <PlayIcon className="w-4 h-4 ml-0.5" />
+        )}
+      </button>
+
+      {/* ============================================================== */}
+      {/* INTERACTIVE RSVP MODAL WITH ATTENDANCE & CELEBRATION           */}
+      {/* ============================================================== */}
+      {showRsvp && (
+        <div className="v2-rsvp-backdrop" onClick={() => !rsvpSending && setShowRsvp(false)}>
+          <div
+            className="v2-rsvp-dialog"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rsvp-title"
+          >
+            <button
+              type="button"
+              className="v2-rsvp-close"
+              onClick={() => setShowRsvp(false)}
+              aria-label={t.close}
+            >
+              <CloseIcon className="w-5 h-5" />
+            </button>
+
+            {!rsvpDone ? (
+              <form onSubmit={handleRsvpSubmit} className="v2-rsvp-form">
+                <div className="v2-rsvp-header">
+                  <div className="v2-rsvp-icon">
+                    <HeartOutlineIcon className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <h3 id="rsvp-title">{t.rsvpTitle}</h3>
+                  <p>{t.rsvpSubtitle}</p>
+                </div>
+
+                {/* Guest Name */}
+                <div className="v2-field">
+                  <label htmlFor="rsvp-name">{t.yourName}</label>
+                  <input
+                    id="rsvp-name"
+                    type="text"
+                    required
+                    value={rsvpGuestName}
+                    onChange={e => setRsvpGuestName(e.target.value)}
+                    placeholder={locale === 'ru' ? 'Иван и Анна' : locale === 'az' ? 'Ad və Soyad' : 'Your name'}
+                  />
+                </div>
+
+                {/* Attendance choice */}
+                <div className="v2-rsvp-choice">
+                  <button
+                    type="button"
+                    className={`v2-choice-btn ${rsvpAttending ? 'selected is-yes' : ''}`}
+                    onClick={() => setRsvpAttending(true)}
+                  >
+                    <CheckIcon className="w-4 h-4 inline-block" />
+                    <span>{t.willAttend}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`v2-choice-btn ${!rsvpAttending ? 'selected is-no' : ''}`}
+                    onClick={() => setRsvpAttending(false)}
+                  >
+                    <CloseIcon className="w-4 h-4 inline-block" />
+                    <span>{t.willNotAttend}</span>
+                  </button>
+                </div>
+
+                {/* Number of guests (only if attending) */}
+                {rsvpAttending && (
+                  <div className="v2-field">
+                    <label>{t.guestsCount}</label>
+                    <div className="v2-guest-stepper">
+                      {[1, 2, 3, 4, 5].map(n => (
+                        <button
+                          key={n}
+                          type="button"
+                          className={rsvpGuestsCount === n ? 'active' : ''}
+                          onClick={() => setRsvpGuestsCount(n)}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Wishes for the newlyweds */}
+                <div className="v2-field">
+                  <label htmlFor="rsvp-wishes">{t.wishes}</label>
+                  <textarea
+                    id="rsvp-wishes"
+                    rows={3}
+                    value={rsvpMessage}
+                    onChange={e => setRsvpMessage(e.target.value)}
+                    placeholder={locale === 'ru' ? 'Напишите теплые слова...' : locale === 'az' ? 'Təbriklərinizi yazın...' : 'Share your warm wishes...'}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={rsvpSending || !rsvpGuestName.trim()}
+                  className="v2-rsvp-submit-btn"
+                >
+                  {rsvpSending ? t.sending : t.sendRsvp}
+                </button>
+              </form>
+            ) : (
+              /* Success celebration animation state */
+              <div className="v2-rsvp-success">
+                <div className="v2-celebration-burst">
+                  <span className="c-heart c1"><HeartFilledIcon className="w-5 h-5 text-rose-500" /></span>
+                  <span className="c-heart c2"><HeartFilledIcon className="w-4 h-4 text-amber-500" /></span>
+                  <span className="c-heart c3"><HeartFilledIcon className="w-6 h-6 text-pink-500" /></span>
+                  <span className="c-heart c4"><HeartFilledIcon className="w-3.5 h-3.5 text-rose-400" /></span>
+                  <div className="v2-success-icon">
+                    <CheckIcon className="w-8 h-8 text-emerald-600" />
+                  </div>
+                </div>
+                <h3>{t.rsvpSuccess}</h3>
+                <p>{t.rsvpSuccessSub}</p>
+                <button
+                  type="button"
+                  className="v2-btn-close-rsvp"
+                  onClick={() => setShowRsvp(false)}
+                >
+                  {t.close}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }

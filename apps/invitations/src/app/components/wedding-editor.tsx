@@ -9,6 +9,14 @@ import {
   DesktopIcon,
   MobileIcon,
   TemplateOrnament,
+  PhotoIcon,
+  UploadIcon,
+  FloralCorner,
+  BotanicalLineArt,
+  HeartOutlineIcon,
+  CalendarIcon,
+  ClockIcon,
+  MapPinIcon,
 } from './icons';
 
 type Wedding = {
@@ -24,6 +32,7 @@ type Wedding = {
   story: string | null;
   locale: string;
   template: string;
+  coverImage?: string | null;
   isPublished: boolean;
 };
 
@@ -47,16 +56,28 @@ type FormState = {
   story: string;
   locale: Locale;
   template: string;
+  coverImage: string | null;
 };
 
 const templates = [
-  { id: 'elegant', name: 'Editorial Luxury', desc: 'Fashion editorial, oversized typography' },
-  { id: 'soft-colorful', name: 'Bloom Romance', desc: 'Pastel florals and delicate motion' },
-  { id: 'azeri', name: 'Azerbaijani Heritage', desc: 'Shebeke geometry and oriental luxury' },
-  { id: 'minimal', name: 'Pure Minimal', desc: 'Architectural whitespace and typography' },
-  { id: 'botanical', name: 'Secret Garden', desc: 'Botanical atmosphere and organic forms' },
-  { id: 'romantic', name: 'Midnight', desc: 'Dark cinematic mood and starlight' },
-  { id: 'classic', name: 'Royal Affair', desc: 'Regal frames and timeless ornament' },
+  {
+    id: 'classic',
+    name: 'Шаблон 1 (Классический)',
+    variant: 'А. Кремовый',
+    desc: 'Элегантный и романтичный дизайн с цветочными уголками, монограммой и падающими лепестками',
+  },
+  {
+    id: 'modern',
+    name: 'Шаблон 2 (Современный)',
+    variant: 'А. Фотографический',
+    desc: 'Выразительный дизайн с фото пары, крупной типографикой и парящими золотыми частицами',
+  },
+  {
+    id: 'minimal',
+    name: 'Шаблон 3 (Минималистичный)',
+    variant: 'С. Линейный',
+    desc: 'Чистый дизайн с акцентом на типографику и изящную ботаническую line-art иллюстрацию',
+  },
 ];
 
 const dict = {
@@ -128,48 +149,94 @@ function dateLabel(value: string, locale: Locale) {
 }
 
 function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }) {
-  const [days, setDays] = useState<number | null>(null);
-  const t = dict[form.locale];
-
-  useEffect(() => {
-    if (!form.eventDate) { setDays(null); return; }
-    const update = () => setDays(Math.max(0, Math.ceil((new Date(`${form.eventDate}T${form.eventTime || '18:00'}:00`).getTime() - Date.now()) / 86400000)));
-    update();
-    const timer = window.setInterval(update, 60000);
-    return () => window.clearInterval(timer);
-  }, [form.eventDate, form.eventTime]);
-
   const names = [form.partnerOne || 'Alex', form.partnerTwo || 'Sam'];
-  const venue = form.venueName || t.noVenue;
-  const theme = `preview-${form.template}`;
+  const venue = form.venueName || (form.locale === 'ru' ? 'Место проведения' : form.locale === 'az' ? 'Toy məkanı' : 'Venue');
+  const activeTemplate = form.template === 'modern' || form.template === 'elegant' ? 'modern' : form.template === 'minimal' ? 'minimal' : 'classic';
+  const photoBg = form.coverImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80';
+  const initOne = (names[0] || 'A').trim().charAt(0).toUpperCase();
+  const initTwo = (names[1] || 'S').trim().charAt(0).toUpperCase();
+
+  const sub = form.locale === 'ru' ? 'ПРИГЛАШЕНИЕ НА СВАДЬБУ' : form.locale === 'az' ? 'TOY DƏVƏTNAMƏSİ' : 'WEDDING INVITATION';
+  const andWord = form.locale === 'az' ? 'və' : form.locale === 'ru' ? 'и' : '&';
+  const rsvpWord = form.locale === 'ru' ? 'Подтвердить участие' : form.locale === 'az' ? 'İştirakı təsdiq et' : 'Confirm attendance';
+  const welcome = form.welcomeText || (form.locale === 'ru' ? 'С радостью приглашаем вас разделить с нами особенный день — нашу свадьбу!' : form.locale === 'az' ? 'Sizi toy mərasimimizə dəvət edirik' : 'We invite you to celebrate our special day');
 
   return (
     <div className={`preview-device ${mode === 'mobile' ? 'preview-mobile' : ''}`}>
-      <div className={`invitation-canvas ${theme}`}>
-        <div className="preview-top-ornament"><TemplateOrnament template={form.template} className="w-5 h-5 mx-auto text-amber-500/80" /></div>
-        <div className="preview-content">
-          <p className="preview-kicker">{t.intro}</p>
-          <h1 className="preview-names">
-            <span>{names[0]}</span>
-            <i>{form.template === 'minimal' ? '+' : '&'}</i>
-            <span>{names[1]}</span>
-          </h1>
-          <div className="preview-rule" />
-          <p className="preview-welcome">{form.welcomeText || t.noWelcome}</p>
-          <div className="preview-event">
-            <div><small>{t.dateLabel}</small><strong>{dateLabel(form.eventDate, form.locale)}</strong></div>
-            <div><small>{t.timeLabel}</small><strong>{form.eventTime || '18:00'}</strong></div>
-            <div><small>{t.venueLabel}</small><strong>{venue}</strong><span>{form.venueAddress}</span></div>
+      <div className={`preview-canvas-v2 preview-v2-${activeTemplate}`}>
+        {/* Template 1: Classic Cream */}
+        {activeTemplate === 'classic' && (
+          <div className="preview-v2-classic">
+            <div className="preview-floral-tl" aria-hidden="true"><FloralCorner position="top-left" className="w-16 h-16" /></div>
+            <div className="preview-floral-tr" aria-hidden="true"><FloralCorner position="top-right" className="w-16 h-16" /></div>
+            <div className="preview-floral-bl" aria-hidden="true"><FloralCorner position="bottom-left" className="w-16 h-16" /></div>
+            <div className="preview-floral-br" aria-hidden="true"><FloralCorner position="bottom-right" className="w-16 h-16" /></div>
+            <div className="preview-classic-inner">
+              <div className="preview-monogram">{initOne} <i>&</i> {initTwo}</div>
+              <p className="preview-v2-subtitle">{sub}</p>
+              <h1 className="preview-v2-classic-names">
+                <span>{names[0]}</span>
+                <small>{andWord}</small>
+                <span>{names[1]}</span>
+              </h1>
+              <div className="preview-v2-heart"><HeartOutlineIcon className="w-4 h-4 text-amber-700/60 inline-block" /></div>
+              <p className="preview-v2-welcome">{welcome}</p>
+              <div className="preview-v2-details">
+                <span><CalendarIcon className="w-3.5 h-3.5 inline-block mr-1" />{dateLabel(form.eventDate, form.locale)}</span>
+                <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
+                <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
+              </div>
+              <div className="preview-v2-btn-classic">{rsvpWord}</div>
+            </div>
           </div>
-          {form.eventDate && <div className="preview-countdown">
-            <small>{t.countdown}</small>
-            <strong>{days === null ? '—' : days}</strong>
-            <span>{form.locale === 'ru' ? 'дней' : form.locale === 'az' ? 'gün' : 'days'}</span>
-          </div>}
-          {form.story && <div className="preview-story"><small>{t.story}</small><p>{form.story}</p></div>}
-          <div className="preview-bottom-rule" />
-          <p className="preview-footer">{t.footer}</p>
-        </div>
+        )}
+
+        {/* Template 2: Modern Photo */}
+        {activeTemplate === 'modern' && (
+          <div className="preview-v2-modern" style={{ backgroundImage: `url("${photoBg}")` }}>
+            <div className="preview-modern-scrim" />
+            <div className="preview-modern-content">
+              <p className="preview-v2-subtitle">{sub}</p>
+              <h1 className="preview-v2-modern-names">
+                <span>{names[0]}</span>
+                <small>{andWord}</small>
+                <span>{names[1]}</span>
+              </h1>
+              <p className="preview-v2-welcome">{welcome}</p>
+              <div className="preview-v2-details text-white/90">
+                <span><CalendarIcon className="w-3.5 h-3.5 inline-block mr-1" />{dateLabel(form.eventDate, form.locale)}</span>
+                <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
+                <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
+              </div>
+              <div className="preview-v2-btn-modern">{rsvpWord}</div>
+            </div>
+          </div>
+        )}
+
+        {/* Template 3: Minimal Linear */}
+        {activeTemplate === 'minimal' && (
+          <div className="preview-v2-minimal">
+            <div className="preview-minimal-grid">
+              <div className="preview-minimal-left">
+                <p className="preview-v2-subtitle">{sub}</p>
+                <h1 className="preview-v2-minimal-names">
+                  <span>{names[0]}</span>
+                  <span>{andWord} {names[1]}</span>
+                </h1>
+                <p className="preview-v2-welcome">{welcome}</p>
+                <div className="preview-v2-details">
+                  <span><CalendarIcon className="w-3.5 h-3.5 inline-block mr-1" />{dateLabel(form.eventDate, form.locale)}</span>
+                  <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
+                  <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
+                </div>
+                <div className="preview-v2-btn-minimal">{rsvpWord}</div>
+              </div>
+              <div className="preview-minimal-right">
+                <BotanicalLineArt className="w-20 h-auto opacity-70" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -209,7 +276,8 @@ export default function WeddingEditor({
     welcomeText: initialWedding?.welcomeText ?? '',
     story: initialWedding?.story ?? '',
     locale: (initialWedding?.locale as Locale) || 'az',
-    template: initialWedding?.template ?? 'elegant',
+    template: initialWedding?.template ?? 'classic',
+    coverImage: initialWedding?.coverImage ?? null,
   });
 
   useEffect(() => {
@@ -240,11 +308,43 @@ export default function WeddingEditor({
     return () => { cancelled = true; };
   }, [wedding?.id]);
 
-
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm(old => ({ ...old, [key]: value }));
     setHasChanges(true);
     setMessage('');
+  }
+
+  function handleImageUpload(file: File) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1600;
+        let width = img.width;
+        let height = img.height;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          update('coverImage', dataUrl);
+        }
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
   async function save() {
@@ -266,6 +366,7 @@ export default function WeddingEditor({
           venueAddress: form.venueAddress || null,
           welcomeText: form.welcomeText || null,
           story: form.story || null,
+          coverImage: form.coverImage || null,
         }),
       });
       const result = await response.json();
@@ -507,13 +608,114 @@ export default function WeddingEditor({
 
             {activeSection === 'design' && <>
               <div className="builder-group">
-                <h2>{t.design}</h2><p className="builder-hint">{t.designHint}</p>
+                <h2>{t.design}</h2>
+                <p className="builder-hint">{t.designHint}</p>
                 <div className="builder-template-grid">
-                  {templates.map((item, i) => <button type="button" key={item.id} onClick={() => update('template', item.id)} className={`builder-template ${form.template === item.id ? 'selected' : ''}`}>
-                    <div className={`template-art template-art-${item.id}`}><span><TemplateOrnament template={item.id} className="w-5 h-5 text-amber-500/80" /></span><b>{form.partnerOne || 'Alex'} & {form.partnerTwo || 'Sam'}</b><i>{i === 2 ? 'AZERBAIJAN' : 'WEDDING INVITATION'}</i></div>
-                    <div className="template-meta"><strong>{item.name}</strong><small>{item.desc}</small></div>
-                    {form.template === item.id && <span className="template-check"><CheckIcon className="w-3.5 h-3.5" /></span>}
-                  </button>)}
+                  {templates.map(item => {
+                    const isSelected = form.template === item.id || (form.template === 'elegant' && item.id === 'modern');
+                    return (
+                      <button
+                        type="button"
+                        key={item.id}
+                        onClick={() => update('template', item.id)}
+                        className={`builder-template ${isSelected ? 'selected' : ''}`}
+                      >
+                        <div className={`template-art template-art-${item.id}`}>
+                          <span><TemplateOrnament template={item.id} className="w-5 h-5 text-amber-500/80" /></span>
+                          <b>{item.variant}</b>
+                          <i>{item.name}</i>
+                        </div>
+                        <div className="template-meta">
+                          <strong>{item.name}</strong>
+                          <span className="text-amber-500/90 text-xs font-semibold">{item.variant}</span>
+                          <small>{item.desc}</small>
+                        </div>
+                        {isSelected && <span className="template-check"><CheckIcon className="w-3.5 h-3.5" /></span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Photo section for Template 2 (Photo) */}
+              <div className="builder-group">
+                <h2>{language === 'ru' ? 'Фотография пары' : language === 'az' ? 'Cütlük şəkli' : 'Couple photo'}</h2>
+                <p className="builder-hint">
+                  {language === 'ru'
+                    ? 'Главное фото для Шаблона 2 (Фотографический). Вы можете загрузить свой снимок или использовать романтичное фото.'
+                    : language === 'az'
+                      ? 'Şablon 2 (Fotoqrafik) üçün əsas şəkil. Şəxsi şəklinizi yükləyə bilərsiniz.'
+                      : 'Cover photo for Template 2 (Photo).'}
+                </p>
+
+                <div className="builder-photo-card">
+                  {form.coverImage ? (
+                    <div className="builder-photo-preview-box">
+                      <div
+                        className="builder-photo-img"
+                        style={{ backgroundImage: `url("${form.coverImage}")` }}
+                      />
+                      <div className="builder-photo-actions">
+                        <label className="builder-photo-btn">
+                          <UploadIcon className="w-3.5 h-3.5 inline-block mr-1" />
+                          <span>{language === 'ru' ? 'Заменить фото' : language === 'az' ? 'Şəkli dəyiş' : 'Change photo'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => {
+                              const f = e.target.files?.[0];
+                              if (f) handleImageUpload(f);
+                            }}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          className="builder-photo-btn danger"
+                          onClick={() => update('coverImage', null)}
+                        >
+                          {language === 'ru' ? 'Удалить' : language === 'az' ? 'Sil' : 'Remove'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="builder-photo-empty-box">
+                      <label className="builder-photo-upload-zone">
+                        <PhotoIcon className="w-8 h-8 text-neutral-400 mb-2 inline-block" />
+                        <strong>{language === 'ru' ? 'Выбрать фото с устройства' : language === 'az' ? 'Cihazdan şəkil seçin' : 'Upload photo'}</strong>
+                        <small>{language === 'ru' ? 'JPG, PNG, WebP (оптимизируется автоматически)' : 'JPG, PNG, WebP'}</small>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={e => {
+                            const f = e.target.files?.[0];
+                            if (f) handleImageUpload(f);
+                          }}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="builder-photo-preset-btn"
+                        onClick={() => update('coverImage', 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80')}
+                      >
+                        {language === 'ru' ? 'Использовать свадебное фото по умолчанию' : language === 'az' ? 'Standart toy şəklini seç' : 'Use default wedding photo'}
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="mt-3">
+                    <label className={label}>
+                      {language === 'ru' ? 'Или прямая ссылка на изображение (URL)' : language === 'az' ? 'Və ya birbaşa şəkil linki' : 'Or direct image URL'}
+                      <input
+                        type="url"
+                        className={input}
+                        placeholder="https://images.unsplash.com/..."
+                        value={form.coverImage || ''}
+                        onChange={e => update('coverImage', e.target.value)}
+                      />
+                    </label>
+                  </div>
                 </div>
               </div>
             </>}

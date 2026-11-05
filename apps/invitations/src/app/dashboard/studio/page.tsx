@@ -17,6 +17,10 @@ export default async function StudioPage() {
     where: { accountId: account.id },
   });
 
+  const theme = wedding?.theme && typeof wedding.theme === 'object' && !Array.isArray(wedding.theme)
+    ? wedding.theme as Record<string, unknown>
+    : {};
+
   return (
     <DashboardShell
       active="studio"
@@ -30,6 +34,7 @@ export default async function StudioPage() {
         initialWedding={wedding ? {
           ...wedding,
           eventDate: wedding.eventDate?.toISOString() ?? null,
+          coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
         } : null}
       />
     </DashboardShell>

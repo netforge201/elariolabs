@@ -16,7 +16,8 @@ const weddingSchema = z.object({
   welcomeText: z.string().max(5000).nullable().optional(),
   story: z.string().max(10000).nullable().optional(),
   locale: z.enum(['az', 'ru', 'en']).optional(),
-  template: z.enum(['elegant', 'soft-colorful', 'azeri', 'minimal', 'botanical', 'romantic', 'classic']).optional(),
+  template: z.string().max(50).optional(),
+  coverImage: z.string().max(5000000).nullable().optional(),
   isPublished: z.boolean().optional(),
 });
 
@@ -44,7 +45,20 @@ export async function GET() {
     where: { accountId: account.id },
   });
 
-  return NextResponse.json({ wedding });
+  if (!wedding) {
+    return NextResponse.json({ wedding: null });
+  }
+
+  const theme = wedding.theme && typeof wedding.theme === 'object' && !Array.isArray(wedding.theme)
+    ? wedding.theme as Record<string, unknown>
+    : {};
+
+  return NextResponse.json({
+    wedding: {
+      ...wedding,
+      coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
+    },
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -100,11 +114,17 @@ export async function POST(request: NextRequest) {
       welcomeText: data.welcomeText ?? null,
       story: data.story ?? null,
       locale: data.locale ?? 'az',
-      template: data.template ?? 'elegant',
+      template: data.template ?? 'classic',
+      theme: data.coverImage ? { coverImage: data.coverImage } : undefined,
     },
   });
 
-  return NextResponse.json({ wedding }, { status: 201 });
+  return NextResponse.json({
+    wedding: {
+      ...wedding,
+      coverImage: data.coverImage ?? null,
+    },
+  }, { status: 201 });
 }
 
 
@@ -170,6 +190,14 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
+  const existingTheme = existing.theme && typeof existing.theme === 'object' && !Array.isArray(existing.theme)
+    ? existing.theme as Record<string, unknown>
+    : {};
+
+  const nextTheme = data.coverImage !== undefined
+    ? { ...existingTheme, coverImage: data.coverImage }
+    : existingTheme;
+
   const wedding = await db.invitationWedding.update({
     where: { id: existing.id },
     data: {
@@ -185,6 +213,7 @@ export async function PATCH(request: NextRequest) {
       ...(data.story !== undefined && { story: data.story }),
       ...(data.locale !== undefined && { locale: data.locale }),
       ...(data.template !== undefined && { template: data.template }),
+      ...(data.coverImage !== undefined && { theme: nextTheme as never }),
       ...(data.isPublished !== undefined && {
         isPublished: data.isPublished,
         publishedAt: data.isPublished ? new Date() : null,
@@ -192,5 +221,10 @@ export async function PATCH(request: NextRequest) {
     },
   });
 
-  return NextResponse.json({ wedding });
+  return NextResponse.json({
+    wedding: {
+      ...wedding,
+      coverImage: typeof nextTheme.coverImage === 'string' ? nextTheme.coverImage : null,
+    },
+  });
 }

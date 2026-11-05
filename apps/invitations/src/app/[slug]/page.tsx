@@ -40,7 +40,12 @@ export default async function PublicWeddingPage({ params }: Props) {
   const wedding = await getWedding(slug);
   if (!wedding) notFound();
 
+  const theme = wedding.theme && typeof wedding.theme === 'object' && !Array.isArray(wedding.theme)
+    ? wedding.theme as Record<string, unknown>
+    : {};
+
   return <PublicInvitation wedding={{
+    slug: wedding.slug,
     partnerOne: wedding.partnerOne,
     partnerTwo: wedding.partnerTwo,
     eventDate: wedding.eventDate!.toISOString(),
@@ -51,5 +56,6 @@ export default async function PublicWeddingPage({ params }: Props) {
     story: wedding.story,
     locale: wedding.locale,
     template: wedding.template,
+    coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
   }} />;
 }
