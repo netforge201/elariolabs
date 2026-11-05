@@ -5766,3 +5766,31 @@ button, a {
 .builder-photo-preset-btn:hover {
   background: rgba(212, 175, 122, 0.08);
 }
+
+
+/* STORY-FIX: "Our story" block must wrap and stay inside the card */
+.v2-story-section {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 640px;
+  min-width: 0;
+  margin: 32px auto 0;
+  padding: clamp(20px, 5vw, 30px);
+  overflow: hidden;
+  color: inherit;
+  text-align: center;
+}
+.v2-story-title {
+  margin: 0 0 14px;
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+.v2-story-text {
+  margin: 0;
+  max-width: 100%;
+  color: inherit;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: auto;
+}

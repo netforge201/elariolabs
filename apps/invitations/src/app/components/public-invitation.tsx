@@ -299,13 +299,6 @@ export default function PublicInvitation({
   seatNumber?: number | null;
 }) {
   const [copied, setCopied] = useState(false);
-  const [showRsvp, setShowRsvp] = useState(false);
-  const [rsvpAttending, setRsvpAttending] = useState(true);
-  const [rsvpGuestsCount, setRsvpGuestsCount] = useState(1);
-  const [rsvpGuestName, setRsvpGuestName] = useState(guestName || '');
-  const [rsvpMessage, setRsvpMessage] = useState('');
-  const [rsvpSending, setRsvpSending] = useState(false);
-  const [rsvpDone, setRsvpDone] = useState(false);
 
   // Audio ambient player
   const [isPlaying, setIsPlaying] = useState(false);
@@ -485,32 +478,6 @@ export default function PublicInvitation({
     };
   }, []);
 
-  async function handleRsvpSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!rsvpGuestName.trim() || rsvpSending) return;
-
-    setRsvpSending(true);
-    try {
-      await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weddingSlug: wedding.slug || 'wedding',
-          guestName: rsvpGuestName.trim(),
-          guestSlug: guestSlug || undefined,
-          attending: rsvpAttending,
-          guestsCount: rsvpGuestsCount,
-          message: rsvpMessage.trim(),
-        }),
-      });
-      setRsvpDone(true);
-    } catch {
-      setRsvpDone(true);
-    } finally {
-      setRsvpSending(false);
-    }
-  }
-
   return (
     <main className={`public-invitation template-v2-${activeTemplate}`}>
       {/* Background Ambience & Animation */}
@@ -598,16 +565,6 @@ export default function PublicInvitation({
                   </div>
                 )}
 
-                {/* RSVP Attendance Confirmation Button */}
-                <div className="v2-action-center">
-                  <button
-                    type="button"
-                    className="v2-btn-classic-gold"
-                    onClick={() => setShowRsvp(true)}
-                  >
-                    <span>{t.rsvpButtonText}</span>
-                  </button>
-                </div>
               </Reveal>
             </div>
           </section>
@@ -680,16 +637,6 @@ export default function PublicInvitation({
                   </div>
                 )}
 
-                {/* White Frosted Glass Action Button */}
-                <div className="v2-action-center">
-                  <button
-                    type="button"
-                    className="v2-btn-modern-white"
-                    onClick={() => setShowRsvp(true)}
-                  >
-                    <span>{t.rsvpButtonText}</span>
-                  </button>
-                </div>
               </Reveal>
             </div>
           </section>
@@ -748,15 +695,6 @@ export default function PublicInvitation({
                     </div>
                   )}
 
-                  <div className="v2-minimal-action">
-                    <button
-                      type="button"
-                      className="v2-btn-minimal-taupe"
-                      onClick={() => setShowRsvp(true)}
-                    >
-                      <span>{t.rsvpButtonText}</span>
-                    </button>
-                  </div>
                 </Reveal>
               </div>
 
@@ -888,135 +826,6 @@ export default function PublicInvitation({
         )}
       </button>
 
-      {/* ============================================================== */}
-      {/* INTERACTIVE RSVP MODAL WITH ATTENDANCE & CELEBRATION           */}
-      {/* ============================================================== */}
-      {showRsvp && (
-        <div className="v2-rsvp-backdrop" onClick={() => !rsvpSending && setShowRsvp(false)}>
-          <div
-            className="v2-rsvp-dialog"
-            onClick={e => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="rsvp-title"
-          >
-            <button
-              type="button"
-              className="v2-rsvp-close"
-              onClick={() => setShowRsvp(false)}
-              aria-label={t.close}
-            >
-              <CloseIcon className="w-5 h-5" />
-            </button>
-
-            {!rsvpDone ? (
-              <form onSubmit={handleRsvpSubmit} className="v2-rsvp-form">
-                <div className="v2-rsvp-header">
-                  <div className="v2-rsvp-icon">
-                    <HeartOutlineIcon className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <h3 id="rsvp-title">{t.rsvpTitle}</h3>
-                  <p>{t.rsvpSubtitle}</p>
-                </div>
-
-                {/* Guest Name */}
-                <div className="v2-field">
-                  <label htmlFor="rsvp-name">{t.yourName}</label>
-                  <input
-                    id="rsvp-name"
-                    type="text"
-                    required
-                    value={rsvpGuestName}
-                    onChange={e => setRsvpGuestName(e.target.value)}
-                    placeholder={locale === 'ru' ? 'Иван и Анна' : locale === 'az' ? 'Ad və Soyad' : 'Your name'}
-                  />
-                </div>
-
-                {/* Attendance choice */}
-                <div className="v2-rsvp-choice">
-                  <button
-                    type="button"
-                    className={`v2-choice-btn ${rsvpAttending ? 'selected is-yes' : ''}`}
-                    onClick={() => setRsvpAttending(true)}
-                  >
-                    <CheckIcon className="w-4 h-4 inline-block" />
-                    <span>{t.willAttend}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className={`v2-choice-btn ${!rsvpAttending ? 'selected is-no' : ''}`}
-                    onClick={() => setRsvpAttending(false)}
-                  >
-                    <CloseIcon className="w-4 h-4 inline-block" />
-                    <span>{t.willNotAttend}</span>
-                  </button>
-                </div>
-
-                {/* Number of guests (only if attending) */}
-                {rsvpAttending && (
-                  <div className="v2-field">
-                    <label>{t.guestsCount}</label>
-                    <div className="v2-guest-stepper">
-                      {[1, 2, 3, 4, 5].map(n => (
-                        <button
-                          key={n}
-                          type="button"
-                          className={rsvpGuestsCount === n ? 'active' : ''}
-                          onClick={() => setRsvpGuestsCount(n)}
-                        >
-                          {n}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Wishes for the newlyweds */}
-                <div className="v2-field">
-                  <label htmlFor="rsvp-wishes">{t.wishes}</label>
-                  <textarea
-                    id="rsvp-wishes"
-                    rows={3}
-                    value={rsvpMessage}
-                    onChange={e => setRsvpMessage(e.target.value)}
-                    placeholder={locale === 'ru' ? 'Напишите теплые слова...' : locale === 'az' ? 'Təbriklərinizi yazın...' : 'Share your warm wishes...'}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={rsvpSending || !rsvpGuestName.trim()}
-                  className="v2-rsvp-submit-btn"
-                >
-                  {rsvpSending ? t.sending : t.sendRsvp}
-                </button>
-              </form>
-            ) : (
-              /* Success celebration animation state */
-              <div className="v2-rsvp-success">
-                <div className="v2-celebration-burst">
-                  <span className="c-heart c1"><HeartFilledIcon className="w-5 h-5 text-rose-500" /></span>
-                  <span className="c-heart c2"><HeartFilledIcon className="w-4 h-4 text-amber-500" /></span>
-                  <span className="c-heart c3"><HeartFilledIcon className="w-6 h-6 text-pink-500" /></span>
-                  <span className="c-heart c4"><HeartFilledIcon className="w-3.5 h-3.5 text-rose-400" /></span>
-                  <div className="v2-success-icon">
-                    <CheckIcon className="w-8 h-8 text-emerald-600" />
-                  </div>
-                </div>
-                <h3>{t.rsvpSuccess}</h3>
-                <p>{t.rsvpSuccessSub}</p>
-                <button
-                  type="button"
-                  className="v2-btn-close-rsvp"
-                  onClick={() => setShowRsvp(false)}
-                >
-                  {t.close}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </main>
   );
 }

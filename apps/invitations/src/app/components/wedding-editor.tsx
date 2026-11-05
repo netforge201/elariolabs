@@ -59,26 +59,25 @@ type FormState = {
   coverImage: string | null;
 };
 
-const templates = [
-  {
-    id: 'classic',
-    name: 'Шаблон 1 (Классический)',
-    variant: 'А. Кремовый',
-    desc: 'Элегантный и романтичный дизайн с цветочными уголками, монограммой и падающими лепестками',
+const templateTexts: Record<Locale, Record<string, { name: string; variant: string; desc: string }>> = {
+  ru: {
+    classic: { name: 'Шаблон 1 (Классический)', variant: 'А. Кремовый', desc: 'Элегантный и романтичный дизайн с цветочными уголками, монограммой и падающими лепестками' },
+    modern: { name: 'Шаблон 2 (Современный)', variant: 'А. Фотографический', desc: 'Выразительный дизайн с фото пары, крупной типографикой и парящими золотыми частицами' },
+    minimal: { name: 'Шаблон 3 (Минималистичный)', variant: 'С. Линейный', desc: 'Чистый дизайн с акцентом на типографику и изящную ботаническую line-art иллюстрацию' },
   },
-  {
-    id: 'modern',
-    name: 'Шаблон 2 (Современный)',
-    variant: 'А. Фотографический',
-    desc: 'Выразительный дизайн с фото пары, крупной типографикой и парящими золотыми частицами',
+  az: {
+    classic: { name: 'Şablon 1 (Klassik)', variant: 'A. Krem', desc: 'Çiçək küncləri, monoqram və düşən ləçəklərlə zərif və romantik dizayn' },
+    modern: { name: 'Şablon 2 (Müasir)', variant: 'A. Fotoqrafik', desc: 'Cütlüyün şəkli, iri tipoqrafiya və süzülən qızılı hissəciklərlə təsirli dizayn' },
+    minimal: { name: 'Şablon 3 (Minimalist)', variant: 'C. Xətti', desc: 'Tipoqrafiyaya və zərif botanik line-art illüstrasiyaya vurğu edən sadə dizayn' },
   },
-  {
-    id: 'minimal',
-    name: 'Шаблон 3 (Минималистичный)',
-    variant: 'С. Линейный',
-    desc: 'Чистый дизайн с акцентом на типографику и изящную ботаническую line-art иллюстрацию',
+  en: {
+    classic: { name: 'Template 1 (Classic)', variant: 'A. Cream', desc: 'An elegant, romantic design with floral corners, a monogram and falling petals' },
+    modern: { name: 'Template 2 (Modern)', variant: 'A. Photographic', desc: 'A bold design with a photo of the couple, large typography and floating golden particles' },
+    minimal: { name: 'Template 3 (Minimalist)', variant: 'C. Linear', desc: 'A clean design focused on typography and a delicate botanical line-art illustration' },
   },
-];
+};
+
+const templates = [{ id: 'classic' }, { id: 'modern' }, { id: 'minimal' }];
 
 const dict = {
   en: {
@@ -158,7 +157,6 @@ function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }
 
   const sub = form.locale === 'ru' ? 'ПРИГЛАШЕНИЕ НА СВАДЬБУ' : form.locale === 'az' ? 'TOY DƏVƏTNAMƏSİ' : 'WEDDING INVITATION';
   const andWord = form.locale === 'az' ? 'və' : form.locale === 'ru' ? 'и' : '&';
-  const rsvpWord = form.locale === 'ru' ? 'Подтвердить участие' : form.locale === 'az' ? 'İştirakı təsdiq et' : 'Confirm attendance';
   const welcome = form.welcomeText || (form.locale === 'ru' ? 'С радостью приглашаем вас разделить с нами особенный день — нашу свадьбу!' : form.locale === 'az' ? 'Sizi toy mərasimimizə dəvət edirik' : 'We invite you to celebrate our special day');
 
   return (
@@ -186,7 +184,6 @@ function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }
                 <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
                 <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
               </div>
-              <div className="preview-v2-btn-classic">{rsvpWord}</div>
             </div>
           </div>
         )}
@@ -208,7 +205,6 @@ function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }
                 <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
                 <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
               </div>
-              <div className="preview-v2-btn-modern">{rsvpWord}</div>
             </div>
           </div>
         )}
@@ -229,7 +225,6 @@ function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }
                   <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
                   <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
                 </div>
-                <div className="preview-v2-btn-minimal">{rsvpWord}</div>
               </div>
               <div className="preview-minimal-right">
                 <BotanicalLineArt className="w-20 h-auto opacity-70" />
@@ -602,7 +597,7 @@ export default function WeddingEditor({
                 <h2>{t.content}</h2>
                 <label className={label}>{t.welcome}<textarea className={input} rows={5} value={form.welcomeText} onChange={e => update('welcomeText', e.target.value)} maxLength={5000}/></label>
                 <label className={label}>{t.story}<textarea className={input} rows={8} value={form.story} onChange={e => update('story', e.target.value)} maxLength={10000}/></label>
-                <p className="builder-hint">Changes appear in the preview immediately. Save to publish them.</p>
+                <p className="builder-hint">{language === 'ru' ? 'Изменения сразу появляются в предпросмотре. Сохраните, чтобы они попали в приглашение.' : language === 'az' ? 'Dəyişikliklər dərhal önbaxışda görünür. Dəvətnaməyə düşməsi üçün yadda saxlayın.' : 'Changes appear in the preview immediately. Save to apply them to the invitation.'}</p>
               </div>
             </>}
 
@@ -611,7 +606,8 @@ export default function WeddingEditor({
                 <h2>{t.design}</h2>
                 <p className="builder-hint">{t.designHint}</p>
                 <div className="builder-template-grid">
-                  {templates.map(item => {
+                  {templates.map(tpl => {
+                    const item = { ...tpl, ...templateTexts[language][tpl.id] };
                     const isSelected = form.template === item.id || (form.template === 'elegant' && item.id === 'modern');
                     return (
                       <button
@@ -642,10 +638,10 @@ export default function WeddingEditor({
                 <h2>{language === 'ru' ? 'Фотография пары' : language === 'az' ? 'Cütlük şəkli' : 'Couple photo'}</h2>
                 <p className="builder-hint">
                   {language === 'ru'
-                    ? 'Главное фото для Шаблона 2 (Фотографический). Вы можете загрузить свой снимок или использовать романтичное фото.'
+                    ? `Главное фото для «${templateTexts.ru.modern.name}». Вы можете загрузить свой снимок или использовать романтичное фото.`
                     : language === 'az'
-                      ? 'Şablon 2 (Fotoqrafik) üçün əsas şəkil. Şəxsi şəklinizi yükləyə bilərsiniz.'
-                      : 'Cover photo for Template 2 (Photo).'}
+                      ? `«${templateTexts.az.modern.name}» üçün əsas şəkil. Şəxsi şəklinizi yükləyə və ya romantik şəkildən istifadə edə bilərsiniz.`
+                      : `Main photo for “${templateTexts.en.modern.name}”. You can upload your own picture or use a romantic stock photo.`}
                 </p>
 
                 <div className="builder-photo-card">
@@ -683,7 +679,7 @@ export default function WeddingEditor({
                       <label className="builder-photo-upload-zone">
                         <PhotoIcon className="w-8 h-8 text-neutral-400 mb-2 inline-block" />
                         <strong>{language === 'ru' ? 'Выбрать фото с устройства' : language === 'az' ? 'Cihazdan şəkil seçin' : 'Upload photo'}</strong>
-                        <small>{language === 'ru' ? 'JPG, PNG, WebP (оптимизируется автоматически)' : 'JPG, PNG, WebP'}</small>
+                        <small>{language === 'ru' ? 'JPG, PNG, WebP (оптимизируется автоматически)' : language === 'az' ? 'JPG, PNG, WebP (avtomatik optimallaşdırılır)' : 'JPG, PNG, WebP (optimized automatically)'}</small>
                         <input
                           type="file"
                           accept="image/*"
