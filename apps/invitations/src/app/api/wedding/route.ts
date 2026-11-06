@@ -49,7 +49,9 @@ function themeFields(theme: Theme) {
  * the request refers to an upload the account does not own, or selects a custom
  * source without providing it.
  */
-async function applyMusic(theme: Theme, data: MusicInput, accountId: string): Promise<string | null> {
+type MusicError = { error: string; code: 'upload_missing' | 'invalid' };
+
+async function applyMusic(theme: Theme, data: MusicInput, accountId: string): Promise<MusicError | null> {
   if (data.music !== undefined) theme.music = data.music;
   if (data.musicVolume !== undefined) theme.musicVolume = data.musicVolume;
   // Left over from the removed YouTube option.
@@ -62,11 +64,11 @@ async function applyMusic(theme: Theme, data: MusicInput, accountId: string): Pr
         where: { id: data.musicUpload.id, accountId },
         select: { id: true, filename: true, mimeType: true, size: true },
       });
-      if (!file) return 'Uploaded music not found — please upload the file again.';
+      if (!file) return { error: 'Uploaded music not found — please upload the file again.', code: 'upload_missing' };
       theme.musicUpload = { id: file.id, name: file.filename, mime: file.mimeType, size: file.size };
     }
   }
-  if (theme.music === MUSIC_UPLOAD && !theme.musicUpload) return 'Upload an audio file before selecting it.';
+  if (theme.music === MUSIC_UPLOAD && !theme.musicUpload) return { error: 'Upload an audio file before selecting it.', code: 'invalid' };
   return null;
 }
 
@@ -136,7 +138,7 @@ export async function POST(request: NextRequest) {
   const data = parsed.data;
   const theme: Theme = { ...(data.coverImage && { coverImage: data.coverImage }) };
   const musicError = await applyMusic(theme, data, account.id);
-  if (musicError) return NextResponse.json({ error: musicError }, { status: 400 });
+  if (musicError) return NextResponse.json(musicError, { status: 400 });
   if (theme.music === null) delete theme.music;
   const baseSlug = slugify(`${data.partnerOne}-${data.partnerTwo}`);
 
@@ -244,7 +246,10 @@ export async function PATCH(request: NextRequest) {
     ...(data.coverImage !== undefined && { coverImage: data.coverImage }),
   };
   const musicError = await applyMusic(nextTheme, data, account.id);
-  if (musicError) return NextResponse.json({ error: musicError }, { status: 400 });
+  if (musicError) {
+    // Hand back what is actually saved, so the editor can recover by itself.
+    return NextResponse.json({ ...musicError, current: readMusicSettings(existingTheme) }, { status: 400 });
+  }
 
   const wedding = await db.invitationWedding.update({
     where: { id: existing.id },
