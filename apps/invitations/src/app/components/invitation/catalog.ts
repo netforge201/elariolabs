@@ -76,7 +76,11 @@ export function templateMeta(id: string | null | undefined): TemplateMeta {
 
 export type TrackId = 'serenade' | 'promise' | 'memories' | 'wishes' | 'canon' | 'waltz' | 'evening' | 'nocturne';
 export const MUSIC_NONE = 'none';
-export type MusicChoice = TrackId | typeof MUSIC_NONE;
+/** The couple's own audio file (stored server-side, see /api/music). */
+export const MUSIC_UPLOAD = 'upload';
+/** A YouTube video, played through YouTube's embedded player. */
+export const MUSIC_YOUTUBE = 'youtube';
+export type MusicChoice = TrackId | typeof MUSIC_NONE | typeof MUSIC_UPLOAD | typeof MUSIC_YOUTUBE;
 
 export type TrackMeta = {
   id: TrackId;
@@ -164,15 +168,139 @@ export const TRACKS: TrackMeta[] = [
   },
 ];
 
-export const MUSIC_CHOICES: readonly string[] = [MUSIC_NONE, ...TRACKS.map(t => t.id)];
+export const MUSIC_CHOICES: readonly string[] = [MUSIC_NONE, MUSIC_UPLOAD, MUSIC_YOUTUBE, ...TRACKS.map(t => t.id)];
 
 /** Default for newly created invitations. */
 export const DEFAULT_TRACK: TrackId = 'serenade';
 
 /** Invitations saved before music selection existed keep their original melody. */
 export function resolveMusic(value: unknown): MusicChoice {
-  if (value === MUSIC_NONE) return MUSIC_NONE;
+  if (value === MUSIC_NONE || value === MUSIC_UPLOAD || value === MUSIC_YOUTUBE) return value;
   return TRACKS.some(t => t.id === value) ? (value as TrackId) : 'canon';
+}
+
+// ---------------------------------------------------------------------------
+// Custom music: uploaded files and YouTube videos
+// ---------------------------------------------------------------------------
+
+export type UploadedMusic = { id: string; name: string; mime: string; size: number };
+export type YoutubeMusic = { videoId: string; title: string | null; author: string | null };
+
+/** Everything music-related saved in an invitation's theme. */
+export type MusicSettings = {
+  music: MusicChoice;
+  musicUpload: UploadedMusic | null;
+  musicYoutube: YoutubeMusic | null;
+  /** 0–1, applied to every source. */
+  musicVolume: number;
+};
+
+export const DEFAULT_VOLUME = 0.8;
+export const MAX_AUDIO_BYTES = 10 * 1024 * 1024;
+export const AUDIO_ACCEPT = 'audio/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.flac,.webm';
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const YT_ID = /^[A-Za-z0-9_-]{11}$/;
+const str = (value: unknown, max: number) => (typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : null);
+
+function readUpload(value: unknown): UploadedMusic | null {
+  if (!value || typeof value !== 'object') return null;
+  const v = value as Record<string, unknown>;
+  if (typeof v.id !== 'string' || !UUID.test(v.id)) return null;
+  return {
+    id: v.id,
+    name: str(v.name, 240) ?? 'audio',
+    mime: str(v.mime, 60) ?? 'audio/mpeg',
+    size: typeof v.size === 'number' && v.size > 0 ? v.size : 0,
+  };
+}
+
+function readYoutube(value: unknown): YoutubeMusic | null {
+  if (!value || typeof value !== 'object') return null;
+  const v = value as Record<string, unknown>;
+  if (typeof v.videoId !== 'string' || !YT_ID.test(v.videoId)) return null;
+  return { videoId: v.videoId, title: str(v.title, 300), author: str(v.author, 200) };
+}
+
+/**
+ * Reads the music settings out of a stored theme object. Invitations that never
+ * had custom music behave exactly as before (legacy ones keep "canon").
+ */
+export function readMusicSettings(theme: Record<string, unknown> | null | undefined): Omit<MusicSettings, 'music'> & { music: string | null } {
+  const t = theme ?? {};
+  const volume = typeof t.musicVolume === 'number' && t.musicVolume >= 0 && t.musicVolume <= 1 ? t.musicVolume : DEFAULT_VOLUME;
+  return {
+    music: typeof t.music === 'string' ? t.music : null,
+    musicUpload: readUpload(t.musicUpload),
+    musicYoutube: readYoutube(t.musicYoutube),
+    musicVolume: volume,
+  };
+}
+
+/** A playable source for the music controller. */
+export type MusicSource =
+  | { kind: 'track'; id: TrackId }
+  | { kind: 'file'; id: string; name: string }
+  | { kind: 'youtube'; videoId: string; title: string | null };
+
+export function musicSourceKey(source: MusicSource): string {
+  if (source.kind === 'track') return `track:${source.id}`;
+  if (source.kind === 'file') return `file:${source.id}`;
+  return `youtube:${source.videoId}`;
+}
+
+export function musicFileUrl(id: string) {
+  return `/api/music/file/${id}`;
+}
+
+export function youtubeThumbnail(videoId: string) {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+}
+
+/** The source that actually plays for a choice, or null for silence. */
+export function resolveMusicSource(
+  choice: MusicChoice,
+  upload: UploadedMusic | null | undefined,
+  youtube: YoutubeMusic | null | undefined,
+): MusicSource | null {
+  if (choice === MUSIC_NONE) return null;
+  if (choice === MUSIC_UPLOAD) return upload ? { kind: 'file', id: upload.id, name: upload.name } : null;
+  if (choice === MUSIC_YOUTUBE) return youtube ? { kind: 'youtube', videoId: youtube.videoId, title: youtube.title } : null;
+  return { kind: 'track', id: choice };
+}
+
+/** File name without its extension, for display. */
+export function displayName(filename: string) {
+  return filename.replace(/\.[a-z0-9]{2,5}$/i, '') || filename;
+}
+
+/**
+ * Extracts the video id from the YouTube link formats people paste:
+ * watch?v=, youtu.be/, /shorts/, /embed/, /live/, music.youtube.com, the
+ * mobile site and youtube-nocookie.com — with any extra query parameters.
+ * Returns null for anything else (other sites, playlists without a video, …).
+ */
+export function parseYouTubeId(input: string): string | null {
+  const raw = input.trim();
+  if (!raw) return null;
+  if (YT_ID.test(raw)) return raw;
+  let url: URL;
+  try {
+    url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `https://${raw}`);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null;
+  const host = url.hostname.toLowerCase().replace(/^www\./, '');
+  let id: string | null = null;
+  if (host === 'youtu.be') {
+    id = url.pathname.split('/')[1] ?? null;
+  } else if (['youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtube-nocookie.com'].includes(host)) {
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts[0] === 'watch') id = url.searchParams.get('v');
+    else if (['shorts', 'embed', 'live', 'v', 'e'].includes(parts[0])) id = parts[1] ?? null;
+  }
+  return id && YT_ID.test(id) ? id : null;
 }
 
 export function trackMeta(id: TrackId): TrackMeta {

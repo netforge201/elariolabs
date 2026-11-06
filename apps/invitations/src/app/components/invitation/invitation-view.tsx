@@ -7,6 +7,7 @@ import { Cover, Hero, OPENING_DURATION } from './templates';
 import { Closing, Countdown, Details, Intro, Photo, Story } from './sections';
 import MusicControl, { INVITATION_OWNER } from './music-control';
 import { music } from './music-engine';
+import { musicSourceKey } from './catalog';
 
 export type { InvitationData, GuestInfo } from './model';
 
@@ -30,12 +31,13 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
   const preview = mode !== 'live';
   const [phase, setPhase] = useState<'closed' | 'opening' | 'open'>(isThumb ? 'open' : 'closed');
   const timer = useRef<number | null>(null);
-  const track = m.music === 'none' ? null : m.music;
+  const source = m.musicSource;
+  const sourceKey = source ? musicSourceKey(source) : null;
 
   function open() {
     if (phase !== 'closed') return;
     // Started from the tap itself, so browsers allow audio without any workaround.
-    if (track) void music().play(track, INVITATION_OWNER);
+    if (source) void music().play(source, INVITATION_OWNER, m.musicVolume);
     setPhase('opening');
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     timer.current = window.setTimeout(() => setPhase('open'), reduce ? 250 : OPENING_DURATION[m.template]);
@@ -51,14 +53,35 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
     return () => music().stop(INVITATION_OWNER);
   }, [isThumb]);
 
-  // In the studio the track can change while it is playing: follow it.
+  // Load the uploaded file / YouTube player ahead of the guest's tap, so it
+  // can start immediately (nothing plays until that tap).
+  useEffect(() => {
+    if (isThumb || !source || source.kind === 'track') return;
+    music().prepare(source);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the source identity
+  }, [sourceKey, isThumb]);
+
+  // Interface text of the YouTube card follows the invitation language.
+  useEffect(() => {
+    if (isThumb) return;
+    music().setLabels({ close: m.t.videoClose, tapToPlay: m.t.videoTap, unavailable: m.t.videoUnavailable });
+  }, [m.t, isThumb]);
+
+  // In the studio the music can change while it is playing: follow it.
   useEffect(() => {
     if (isThumb) return;
     const s = music().getSnapshot();
     if (s.owner !== INVITATION_OWNER) return;
-    if (!track) music().stop(INVITATION_OWNER);
-    else if (s.trackId !== track && (s.status === 'playing' || s.status === 'starting')) void music().play(track, INVITATION_OWNER);
-  }, [track, isThumb]);
+    if (!source) music().stop(INVITATION_OWNER);
+    else if (s.key !== sourceKey && (s.status === 'playing' || s.status === 'starting')) void music().play(source, INVITATION_OWNER, m.musicVolume);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the source identity
+  }, [sourceKey, isThumb]);
+
+  // Volume edits in the studio apply to the invitation that is playing.
+  useEffect(() => {
+    if (isThumb) return;
+    if (music().getSnapshot().owner === INVITATION_OWNER) music().setVolume(m.musicVolume);
+  }, [m.musicVolume, isThumb]);
 
   // Keep the page still while the live cover is showing.
   useEffect(() => {
@@ -92,10 +115,10 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
       </div>
 
       {!isThumb && phase !== 'open' && (
-        <Cover m={m} phase={phase} hasMusic={Boolean(track)} focus={mode === 'live'} onOpen={open} />
+        <Cover m={m} phase={phase} hasMusic={Boolean(source)} focus={mode === 'live'} onOpen={open} />
       )}
-      {!isThumb && track && (
-        <MusicControl track={track} locale={m.locale} t={m.t} hidden={phase === 'closed'} />
+      {!isThumb && source && (
+        <MusicControl source={source} volume={m.musicVolume} locale={m.locale} t={m.t} hidden={phase === 'closed'} />
       )}
     </div>
   );

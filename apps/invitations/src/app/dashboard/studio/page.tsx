@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import WeddingEditor from '@/app/components/wedding-editor';
 import DashboardShell from '@/app/components/dashboard-shell';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
+import { readMusicSettings } from '@/app/components/invitation/catalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,7 +37,7 @@ export default async function StudioPage() {
           ...wedding,
           eventDate: wedding.eventDate?.toISOString() ?? null,
           coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
-          music: typeof theme.music === 'string' ? theme.music : null,
+          ...readMusicSettings(theme),
         } : null}
       />
     </DashboardShell>

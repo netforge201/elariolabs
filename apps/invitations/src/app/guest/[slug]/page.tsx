@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import PublicInvitation from '@/app/components/public-invitation';
 import { normalizeSeatingPlan } from '@/lib/seating-types';
+import { readMusicSettings } from '@/app/components/invitation/catalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,7 +116,7 @@ export default async function GuestInvitationPage({ params }: Props) {
         locale: wedding.locale,
         template: wedding.template,
         coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
-        music: typeof theme.music === 'string' ? theme.music : null,
+        ...readMusicSettings(theme),
         timezone: wedding.timezone,
       }}
     />

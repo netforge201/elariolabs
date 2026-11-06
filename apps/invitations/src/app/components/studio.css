@@ -189,6 +189,45 @@
 .st-track-play:hover { border-color: var(--st-line-strong); }
 .st-track.is-playing .st-track-play { border-color: var(--st-ink); background: var(--st-ink); color: #fff; }
 
+/* Music: active source, upload & YouTube cards */
+.st-music-active { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--st-soft); color: var(--st-muted); font-size: 12.5px; }
+.st-music-active strong { min-width: 0; color: var(--st-ink); font-weight: 600; overflow-wrap: anywhere; }
+.st-music-active svg { color: var(--st-rose); }
+.st-mpanel { display: grid; gap: 10px; min-width: 0; }
+.st-drop.is-busy { cursor: progress; }
+.st-progress { display: block; width: min(240px, 80%); height: 4px; overflow: hidden; border-radius: 999px; background: var(--st-line); }
+.st-progress i { display: block; height: 100%; border-radius: inherit; background: var(--st-rose); transition: width .2s ease; }
+.st-mcard { display: grid; gap: 12px; min-width: 0; padding: 12px; border: 1px solid var(--st-line); border-radius: 12px; background: #fff; }
+.st-mcard.is-selected { border-color: var(--st-ink); box-shadow: 0 0 0 1px var(--st-ink); }
+.st-mcard-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.st-mcard-icon { display: grid; place-items: center; width: 42px; height: 42px; flex: none; border-radius: 10px; background: var(--st-soft); color: var(--st-rose); }
+.st-mthumb { width: 96px; flex: none; aspect-ratio: 16 / 9; border-radius: 8px; object-fit: cover; background: var(--st-soft); }
+.st-mcard-text { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.st-mcard-text strong { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.st-mcard-head--video .st-mcard-text strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; line-height: 1.35; }
+.st-mcard-text small { overflow: hidden; color: var(--st-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.st-mbadge { display: inline-flex; align-items: center; gap: 4px; flex: none; padding: 4px 8px; border-radius: 999px; background: #eef6f0; color: var(--st-ok); font-size: 11px; font-weight: 600; }
+.st-mplayer { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.st-mplay { display: grid; place-items: center; width: 36px; height: 36px; flex: none; padding: 0; border: 0; border-radius: 50%; background: var(--st-ink); color: #fff; cursor: pointer; }
+.st-mplay:hover { background: #4a3c42; }
+.st-mtime { flex: none; min-width: 34px; color: var(--st-muted); font-size: 11.5px; font-variant-numeric: tabular-nums; text-align: center; }
+.st-mseek, .st-volume input { flex: 1; min-width: 0; accent-color: var(--st-ink); }
+.st-mseek:disabled { opacity: .45; }
+.st-volume input { width: 100%; }
+.st-mactions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.st-track-play.is-on { border-color: var(--st-ink); background: var(--st-ink); color: #fff; }
+.st-merror, .st-mok { display: flex; align-items: flex-start; gap: 6px; margin: 0; font-size: 12.5px; line-height: 1.5; }
+.st-merror { color: var(--st-danger); }
+.st-mok { color: var(--st-ok); }
+.st-mok svg { flex: none; margin-top: 2px; }
+.st-mwarn { color: var(--st-warn); font-size: 12px; line-height: 1.5; }
+.st-myt-form { display: grid; gap: 10px; }
+.st-field input[aria-invalid='true'] { border-color: var(--st-danger); }
+@media (max-width: 420px) {
+  .st-mthumb { width: 76px; }
+  .st-mactions .st-btn, .st-mactions .st-track-play { flex: 1 1 auto; justify-content: center; }
+}
+
 /* ---------- Preview stage ---------- */
 
 .st-stage {

@@ -1,4 +1,7 @@
-import { resolveLocale, resolveMusic, resolveTemplate, type Locale, type MusicChoice, type TemplateId } from './catalog';
+import {
+  DEFAULT_VOLUME, resolveLocale, resolveMusic, resolveMusicSource, resolveTemplate,
+  type Locale, type MusicChoice, type MusicSource, type TemplateId, type UploadedMusic, type YoutubeMusic,
+} from './catalog';
 import { copy, formatTableLabel, type Copy } from './copy';
 import { dayKey, formatDateParts, type DateParts } from './event-time';
 
@@ -18,6 +21,9 @@ export type InvitationData = {
   template: string;
   coverImage?: string | null;
   music?: string | null;
+  musicUpload?: UploadedMusic | null;
+  musicYoutube?: YoutubeMusic | null;
+  musicVolume?: number | null;
 };
 
 export type GuestInfo = {
@@ -32,6 +38,9 @@ export type InvitationModel = {
   t: Copy;
   template: TemplateId;
   music: MusicChoice;
+  /** What actually plays (null = silent). */
+  musicSource: MusicSource | null;
+  musicVolume: number;
   names: [string, string];
   initials: [string, string];
   nameSize: 'regular' | 'long' | 'xlong';
@@ -66,12 +75,15 @@ export function buildModel(data: InvitationData, guest?: GuestInfo | null): Invi
   const day = data.eventDate && /^\d{4}-\d{2}-\d{2}/.test(data.eventDate) ? dayKey(data.eventDate) : null;
   const venueName = clean(data.venueName);
   const venueAddress = clean(data.venueAddress);
+  const music = resolveMusic(data.music);
 
   return {
     locale,
     t,
     template: resolveTemplate(data.template),
-    music: resolveMusic(data.music),
+    music,
+    musicSource: resolveMusicSource(music, data.musicUpload, data.musicYoutube),
+    musicVolume: typeof data.musicVolume === 'number' ? Math.max(0, Math.min(1, data.musicVolume)) : DEFAULT_VOLUME,
     names,
     initials: [initial(names[0]), initial(names[1])],
     nameSize: longest > 22 ? 'xlong' : longest > 13 ? 'long' : 'regular',

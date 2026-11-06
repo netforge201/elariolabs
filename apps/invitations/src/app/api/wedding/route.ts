@@ -3,7 +3,8 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { MUSIC_CHOICES } from '@/app/components/invitation/catalog';
+import { MUSIC_CHOICES, MUSIC_UPLOAD, MUSIC_YOUTUBE, readMusicSettings } from '@/app/components/invitation/catalog';
+import { pruneMusicFiles } from '@/lib/music-files';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,10 +21,65 @@ const weddingSchema = z.object({
   template: z.string().max(50).optional(),
   coverImage: z.string().max(5000000).nullable().optional(),
   music: z.string().refine(value => MUSIC_CHOICES.includes(value), 'Unknown music track').nullable().optional(),
+  // Only the id is trusted from the client; name/type/size come from the stored file.
+  musicUpload: z.object({ id: z.string().uuid() }).nullable().optional(),
+  musicYoutube: z.object({
+    videoId: z.string().regex(/^[A-Za-z0-9_-]{11}$/),
+    title: z.string().max(300).nullable().optional(),
+    author: z.string().max(200).nullable().optional(),
+  }).nullable().optional(),
+  musicVolume: z.number().min(0).max(1).optional(),
   isPublished: z.boolean().optional(),
 });
 
 const updateSchema = weddingSchema.partial().strict();
+
+type MusicInput = Pick<z.infer<typeof weddingSchema>, 'music' | 'musicUpload' | 'musicYoutube' | 'musicVolume'>;
+type Theme = Record<string, unknown>;
+
+function themeOf(value: unknown): Theme {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Theme : {};
+}
+
+/** Theme fields returned to the editor alongside the wedding row. */
+function themeFields(theme: Theme) {
+  return {
+    coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
+    ...readMusicSettings(theme),
+  };
+}
+
+/**
+ * Applies the music part of a request to a theme. Returns an error message when
+ * the request refers to an upload the account does not own, or selects a custom
+ * source without providing it.
+ */
+async function applyMusic(theme: Theme, data: MusicInput, accountId: string): Promise<string | null> {
+  if (data.music !== undefined) theme.music = data.music;
+  if (data.musicVolume !== undefined) theme.musicVolume = data.musicVolume;
+  if (data.musicYoutube !== undefined) {
+    theme.musicYoutube = data.musicYoutube
+      ? { videoId: data.musicYoutube.videoId, title: data.musicYoutube.title ?? null, author: data.musicYoutube.author ?? null }
+      : null;
+  }
+  if (data.musicUpload !== undefined) {
+    if (!data.musicUpload) {
+      theme.musicUpload = null;
+    } else {
+      const file = await db.invitationMusicFile.findFirst({
+        where: { id: data.musicUpload.id, accountId },
+        select: { id: true, filename: true, mimeType: true, size: true },
+      });
+      if (!file) return 'Uploaded music not found — please upload the file again.';
+      theme.musicUpload = { id: file.id, name: file.filename, mime: file.mimeType, size: file.size };
+    }
+  }
+  if (theme.music === MUSIC_UPLOAD && !theme.musicUpload) return 'Upload an audio file before selecting it.';
+  if (theme.music === MUSIC_YOUTUBE && !theme.musicYoutube) return 'Add a YouTube link before selecting it.';
+  return null;
+}
+
+const MUSIC_KEYS = ['music', 'musicUpload', 'musicYoutube', 'musicVolume'] as const;
 
 
 
@@ -51,16 +107,8 @@ export async function GET() {
     return NextResponse.json({ wedding: null });
   }
 
-  const theme = wedding.theme && typeof wedding.theme === 'object' && !Array.isArray(wedding.theme)
-    ? wedding.theme as Record<string, unknown>
-    : {};
-
   return NextResponse.json({
-    wedding: {
-      ...wedding,
-      coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
-      music: typeof theme.music === 'string' ? theme.music : null,
-    },
+    wedding: { ...wedding, ...themeFields(themeOf(wedding.theme)) },
   });
 }
 
@@ -95,6 +143,10 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data;
+  const theme: Theme = { ...(data.coverImage && { coverImage: data.coverImage }) };
+  const musicError = await applyMusic(theme, data, account.id);
+  if (musicError) return NextResponse.json({ error: musicError }, { status: 400 });
+  if (theme.music === null) delete theme.music;
   const baseSlug = slugify(`${data.partnerOne}-${data.partnerTwo}`);
 
   let slug = baseSlug;
@@ -118,21 +170,14 @@ export async function POST(request: NextRequest) {
       story: data.story ?? null,
       locale: data.locale ?? 'az',
       template: data.template ?? 'classic',
-      theme: data.coverImage || data.music
-        ? {
-          ...(data.coverImage && { coverImage: data.coverImage }),
-          ...(data.music && { music: data.music }),
-        }
-        : undefined,
+      theme: Object.keys(theme).length ? theme as never : undefined,
     },
   });
 
+  if (theme.musicUpload) await pruneMusicFiles(account.id, [(theme.musicUpload as { id: string }).id]);
+
   return NextResponse.json({
-    wedding: {
-      ...wedding,
-      coverImage: data.coverImage ?? null,
-      music: data.music ?? null,
-    },
+    wedding: { ...wedding, ...themeFields(theme) },
   }, { status: 201 });
 }
 
@@ -199,16 +244,16 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
-  const existingTheme = existing.theme && typeof existing.theme === 'object' && !Array.isArray(existing.theme)
-    ? existing.theme as Record<string, unknown>
-    : {};
+  const existingTheme = themeOf(existing.theme);
+  const previousUpload = readMusicSettings(existingTheme).musicUpload?.id ?? null;
 
-  const themeChanged = data.coverImage !== undefined || data.music !== undefined;
-  const nextTheme = {
+  const themeChanged = data.coverImage !== undefined || MUSIC_KEYS.some(key => data[key] !== undefined);
+  const nextTheme: Theme = {
     ...existingTheme,
     ...(data.coverImage !== undefined && { coverImage: data.coverImage }),
-    ...(data.music !== undefined && { music: data.music }),
   };
+  const musicError = await applyMusic(nextTheme, data, account.id);
+  if (musicError) return NextResponse.json({ error: musicError }, { status: 400 });
 
   const wedding = await db.invitationWedding.update({
     where: { id: existing.id },
@@ -233,11 +278,13 @@ export async function PATCH(request: NextRequest) {
     },
   });
 
+  // A replaced or removed upload is no longer referenced by anything.
+  const nextUpload = readMusicSettings(nextTheme).musicUpload?.id ?? null;
+  if (data.musicUpload !== undefined && nextUpload !== previousUpload) {
+    await pruneMusicFiles(account.id, [nextUpload]);
+  }
+
   return NextResponse.json({
-    wedding: {
-      ...wedding,
-      coverImage: typeof nextTheme.coverImage === 'string' ? nextTheme.coverImage : null,
-      music: typeof nextTheme.music === 'string' ? nextTheme.music : null,
-    },
+    wedding: { ...wedding, ...themeFields(nextTheme) },
   });
 }

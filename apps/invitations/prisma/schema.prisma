@@ -416,6 +416,7 @@ model InvitationAccount {
   updatedAt       DateTime            @updatedAt @map("updated_at")
   sessions        InvitationSession[]
   wedding         InvitationWedding?
+  musicFiles      InvitationMusicFile[]
 
   @@index([active, accessExpiresAt])
   @@map("invitation_accounts")
@@ -473,3 +474,20 @@ model InvitationGuest {
   @@index([weddingId])
   @@map("invitation_guests")
 }
+
+/// Audio a couple uploaded as their invitation's background music.
+/// Stored in the database so it works on any host without extra storage setup.
+model InvitationMusicFile {
+  id        String            @id @default(uuid()) @db.Uuid
+  accountId String            @map("account_id") @db.Uuid
+  filename  String
+  mimeType  String            @map("mime_type")
+  size      Int
+  data      Bytes
+  createdAt DateTime          @default(now()) @map("created_at")
+  account   InvitationAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@map("invitation_music_files")
+}
+

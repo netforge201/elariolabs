@@ -4,15 +4,16 @@ import './studio.css';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-  ArrowLeftIcon, ArrowUpRightIcon, CheckIcon, CopyIcon, DesktopIcon, MobileIcon, PauseIcon, PhotoIcon, PlayIcon, UploadIcon,
+  ArrowLeftIcon, ArrowUpRightIcon, CheckIcon, CopyIcon, DesktopIcon, MobileIcon, MusicIcon, PauseIcon, PhotoIcon, PlayIcon, UploadIcon,
 } from './icons';
 import InvitationView, { type InvitationData } from './invitation/invitation-view';
 import {
-  DEFAULT_TRACK, MUSIC_NONE, TEMPLATES, TRACKS, resolveMusic, resolveTemplate,
-  type Locale, type MusicChoice, type TemplateId, type TrackId,
+  AUDIO_ACCEPT, DEFAULT_TRACK, DEFAULT_VOLUME, MAX_AUDIO_BYTES, MUSIC_NONE, MUSIC_UPLOAD, MUSIC_YOUTUBE, TEMPLATES, TRACKS,
+  displayName, musicSourceKey, parseYouTubeId, resolveMusic, resolveTemplate, youtubeThumbnail,
+  type Locale, type MusicChoice, type MusicSource, type TemplateId, type TrackId, type UploadedMusic, type YoutubeMusic,
 } from './invitation/catalog';
 import { copy as invitationCopy } from './invitation/copy';
-import { music, useMusicSnapshot } from './invitation/music-engine';
+import { music, useFileProgress, useMusicSnapshot } from './invitation/music-engine';
 
 type Wedding = {
   id: string;
@@ -30,6 +31,9 @@ type Wedding = {
   timezone?: string;
   coverImage?: string | null;
   music?: string | null;
+  musicUpload?: UploadedMusic | null;
+  musicYoutube?: YoutubeMusic | null;
+  musicVolume?: number | null;
   isPublished: boolean;
 };
 
@@ -48,6 +52,10 @@ type FormState = {
   template: TemplateId;
   coverImage: string | null;
   music: MusicChoice;
+  /** Kept even while another source is selected, so switching back is instant. */
+  musicUpload: UploadedMusic | null;
+  musicYoutube: YoutubeMusic | null;
+  musicVolume: number;
 };
 
 type Step = 'details' | 'content' | 'design' | 'music';
@@ -75,6 +83,29 @@ const dict = {
     musicTitle: 'Background music', musicHint: 'Music starts when a guest taps to open the invitation — browsers never allow sound before that tap. Guests can pause it at any time.',
     noMusic: 'No music', noMusicSub: 'The invitation opens silently',
     listen: 'Listen', stop: 'Stop', musicSource: 'All tracks are generated in the browser — no files, nothing to license.',
+    tabBuiltin: 'Built-in', tabUpload: 'Your file', tabYoutube: 'YouTube', musicSourceLabel: 'Music source',
+    activeNow: 'On the invitation:', activeNone: 'No music',
+    audioUpload: 'Upload an audio file', audioUploadSub: 'MP3, M4A, AAC, WAV or OGG · up to 10 MB',
+    uploading: 'Uploading…', uploadedOk: 'Uploaded. Save to put it on your invitation.',
+    audioErr: {
+      type: 'This file is not a supported audio format. Use MP3, M4A, AAC, WAV or OGG.',
+      size: 'The file is larger than 10 MB. Please choose a shorter or more compressed file.',
+      auth: 'Your session has expired. Please sign in again.',
+      failed: 'Upload failed. Check your connection and try again.',
+    },
+    safariWarn: 'OGG, WebM and FLAC do not play on iPhone or Safari. MP3 or M4A works everywhere.',
+    useThis: 'Use this music', inUse: 'In use', removeMusic: 'Remove', seek: 'Playback position',
+    ytLabel: 'YouTube link', ytPlaceholder: 'https://www.youtube.com/watch?v=…', ytAdd: 'Add', ytChecking: 'Checking…', cancel: 'Cancel',
+    ytErr: {
+      invalid: 'This is not a YouTube video link. Paste a link like youtube.com/watch?v=…, youtu.be/… or youtube.com/shorts/….',
+      embed: 'The owner of this video does not allow it to be played on other sites. Please try another video.',
+      missing: 'This video was not found or is private.',
+      failed: 'Could not check the link. Please try again.',
+    },
+    ytAdded: 'Added. Save to put it on your invitation.',
+    ytUnverified: 'Added. YouTube could not be reached to check the video, so it will be checked when it plays.',
+    ytNote: "Plays in YouTube's own player. While it plays, guests see a small video card (YouTube requires the player to stay visible). Some videos, often official music videos, don't allow embedding.",
+    volume: 'Volume',
     preview: 'Live preview', mobile: 'Phone', desktop: 'Desktop', replay: 'Replay opening',
     sample: 'Sample names shown until you enter yours.',
     required: 'Enter both names before saving.',
@@ -106,6 +137,29 @@ const dict = {
     musicTitle: 'Фоновая музыка', musicHint: 'Музыка включается, когда гость нажимает «Открыть приглашение» — браузеры не разрешают звук до этого нажатия. Гость может выключить её в любой момент.',
     noMusic: 'Без музыки', noMusicSub: 'Приглашение откроется в тишине',
     listen: 'Слушать', stop: 'Стоп', musicSource: 'Все мелодии создаются прямо в браузере — без файлов и лицензий.',
+    tabBuiltin: 'Готовые', tabUpload: 'Свой файл', tabYoutube: 'YouTube', musicSourceLabel: 'Источник музыки',
+    activeNow: 'В приглашении:', activeNone: 'Без музыки',
+    audioUpload: 'Загрузите аудиофайл', audioUploadSub: 'MP3, M4A, AAC, WAV или OGG · до 10 МБ',
+    uploading: 'Загрузка…', uploadedOk: 'Загружено. Сохраните, чтобы музыка появилась в приглашении.',
+    audioErr: {
+      type: 'Этот формат не поддерживается. Используйте MP3, M4A, AAC, WAV или OGG.',
+      size: 'Файл больше 10 МБ. Выберите более короткий или сжатый файл.',
+      auth: 'Сессия истекла. Войдите снова.',
+      failed: 'Не удалось загрузить. Проверьте соединение и попробуйте ещё раз.',
+    },
+    safariWarn: 'OGG, WebM и FLAC не воспроизводятся на iPhone и в Safari. MP3 или M4A работают везде.',
+    useThis: 'Выбрать эту музыку', inUse: 'Выбрано', removeMusic: 'Удалить', seek: 'Позиция воспроизведения',
+    ytLabel: 'Ссылка на YouTube', ytPlaceholder: 'https://www.youtube.com/watch?v=…', ytAdd: 'Добавить', ytChecking: 'Проверка…', cancel: 'Отмена',
+    ytErr: {
+      invalid: 'Это не ссылка на видео YouTube. Вставьте ссылку вида youtube.com/watch?v=…, youtu.be/… или youtube.com/shorts/….',
+      embed: 'Автор видео запретил его воспроизведение на других сайтах. Выберите другое видео.',
+      missing: 'Видео не найдено или скрыто.',
+      failed: 'Не удалось проверить ссылку. Попробуйте ещё раз.',
+    },
+    ytAdded: 'Добавлено. Сохраните, чтобы музыка появилась в приглашении.',
+    ytUnverified: 'Добавлено. YouTube сейчас недоступен для проверки — видео проверится при воспроизведении.',
+    ytNote: 'Играет во встроенном плеере YouTube. Пока звучит музыка, гости видят небольшую карточку с видео — YouTube требует, чтобы плеер был виден. Некоторые видео (часто официальные клипы) запрещают встраивание.',
+    volume: 'Громкость',
     preview: 'Предпросмотр', mobile: 'Телефон', desktop: 'Компьютер', replay: 'Повторить открытие',
     sample: 'Пока вы не ввели имена, показаны примерные.',
     required: 'Введите оба имени.',
@@ -137,6 +191,29 @@ const dict = {
     musicTitle: 'Fon musiqisi', musicHint: 'Musiqi qonaq «Dəvətnaməni açın» düyməsinə toxunanda başlayır — brauzerlər bu toxunuşdan əvvəl səsə icazə vermir. Qonaq istənilən an onu dayandıra bilər.',
     noMusic: 'Musiqisiz', noMusicSub: 'Dəvətnamə səssiz açılır',
     listen: 'Dinlə', stop: 'Dayandır', musicSource: 'Bütün melodiyalar birbaşa brauzerdə yaradılır — fayl və lisenziya tələb olunmur.',
+    tabBuiltin: 'Hazır', tabUpload: 'Öz faylınız', tabYoutube: 'YouTube', musicSourceLabel: 'Musiqi mənbəyi',
+    activeNow: 'Dəvətnamədə:', activeNone: 'Musiqisiz',
+    audioUpload: 'Audio fayl yükləyin', audioUploadSub: 'MP3, M4A, AAC, WAV və ya OGG · 10 MB-a qədər',
+    uploading: 'Yüklənir…', uploadedOk: 'Yükləndi. Dəvətnamədə görünməsi üçün yadda saxlayın.',
+    audioErr: {
+      type: 'Bu fayl dəstəklənən audio format deyil. MP3, M4A, AAC, WAV və ya OGG istifadə edin.',
+      size: 'Fayl 10 MB-dan böyükdür. Daha qısa və ya sıxılmış fayl seçin.',
+      auth: 'Sessiyanın vaxtı bitib. Yenidən daxil olun.',
+      failed: 'Yükləmək alınmadı. Bağlantını yoxlayıb yenidən cəhd edin.',
+    },
+    safariWarn: 'OGG, WebM və FLAC iPhone və Safari-də oynamır. MP3 və ya M4A hər yerdə işləyir.',
+    useThis: 'Bu musiqini seç', inUse: 'Seçilib', removeMusic: 'Sil', seek: 'Oxutma mövqeyi',
+    ytLabel: 'YouTube linki', ytPlaceholder: 'https://www.youtube.com/watch?v=…', ytAdd: 'Əlavə et', ytChecking: 'Yoxlanılır…', cancel: 'Ləğv et',
+    ytErr: {
+      invalid: 'Bu YouTube video linki deyil. youtube.com/watch?v=…, youtu.be/… və ya youtube.com/shorts/… kimi link daxil edin.',
+      embed: 'Videonun sahibi onun başqa saytlarda oynadılmasına icazə vermir. Başqa video seçin.',
+      missing: 'Video tapılmadı və ya gizlidir.',
+      failed: 'Linki yoxlamaq alınmadı. Yenidən cəhd edin.',
+    },
+    ytAdded: 'Əlavə edildi. Dəvətnamədə görünməsi üçün yadda saxlayın.',
+    ytUnverified: 'Əlavə edildi. YouTube-a indi qoşulmaq mümkün olmadı — video oynadılanda yoxlanılacaq.',
+    ytNote: 'YouTube-un öz pleyerində oynayır. Musiqi çalanda qonaqlar kiçik video kartı görür — YouTube pleyerin görünən qalmasını tələb edir. Bəzi videolar (adətən rəsmi kliplər) yerləşdirməyə icazə vermir.',
+    volume: 'Səs səviyyəsi',
     preview: 'Canlı önbaxış', mobile: 'Telefon', desktop: 'Kompüter', replay: 'Açılışı təkrarla',
     sample: 'Adları daxil edənə qədər nümunə adlar göstərilir.',
     required: 'Hər iki adı daxil edin.',
@@ -207,6 +284,9 @@ function initialForm(w: Wedding | null): FormState {
     coverImage: w?.coverImage ?? null,
     // Existing invitations keep their saved (or legacy) track; new ones start on the 6/8 serenade.
     music: w ? resolveMusic(w.music) : DEFAULT_TRACK,
+    musicUpload: w?.musicUpload ?? null,
+    musicYoutube: w?.musicYoutube ?? null,
+    musicVolume: typeof w?.musicVolume === 'number' ? w.musicVolume : DEFAULT_VOLUME,
   };
 }
 
@@ -324,6 +404,12 @@ export default function WeddingEditor({
     setMessage('');
   }
 
+  function patch(values: Partial<FormState>) {
+    setForm(old => ({ ...old, ...values }));
+    setHasChanges(true);
+    setMessage('');
+  }
+
   const missing = useMemo(() => {
     const list: (keyof typeof t.missing)[] = [];
     if (!form.partnerOne.trim() || !form.partnerTwo.trim()) list.push('names');
@@ -351,6 +437,9 @@ export default function WeddingEditor({
     template: form.template,
     coverImage: form.coverImage,
     music: form.music,
+    musicUpload: form.musicUpload,
+    musicYoutube: form.musicYoutube,
+    musicVolume: form.musicVolume,
   }), [form, wedding?.slug, wedding?.timezone]);
 
   function handleImageUpload(file: File) {
@@ -750,7 +839,7 @@ export default function WeddingEditor({
             )}
 
             {step === 'music' && (
-              <MusicPicker value={form.music} onChange={value => update('music', value)} locale={language} t={t} />
+              <MusicPicker form={form} onPatch={patch} locale={language} t={t} />
             )}
           </div>
 
@@ -883,53 +972,364 @@ export default function WeddingEditor({
 
 // ---------------------------------------------------------------------------
 
-function MusicPicker({ value, onChange, locale, t }: {
-  value: MusicChoice;
-  onChange: (value: MusicChoice) => void;
+type MusicTab = 'builtin' | 'upload' | 'youtube';
+const tabFor = (choice: MusicChoice): MusicTab =>
+  choice === MUSIC_UPLOAD ? 'upload' : choice === MUSIC_YOUTUBE ? 'youtube' : 'builtin';
+
+type Dict = (typeof dict)['en'];
+type AudioErrorCode = keyof Dict['audioErr'];
+type YoutubeErrorCode = keyof Dict['ytErr'];
+
+/** Formats that Safari / iOS cannot play, so the couple gets a heads-up. */
+const NOT_ON_SAFARI = /\.(ogg|oga|opus|webm|flac)$/i;
+
+function formatBytes(bytes: number) {
+  return bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+function formatTime(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+  const s = Math.floor(seconds);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+function formatLabel(upload: UploadedMusic) {
+  const ext = /\.([a-z0-9]{2,5})$/i.exec(upload.name)?.[1];
+  return (ext ?? upload.mime.split('/')[1] ?? 'audio').toUpperCase();
+}
+
+/** Uploads with XMLHttpRequest so the editor can show real progress. */
+function uploadAudio(file: File, onProgress: (fraction: number) => void): Promise<UploadedMusic> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/music/upload');
+    xhr.responseType = 'json';
+    xhr.upload.onprogress = event => { if (event.lengthComputable) onProgress(event.loaded / event.total); };
+    xhr.onload = () => {
+      const body = xhr.response as { upload?: UploadedMusic; code?: string } | null;
+      if (xhr.status === 201 && body?.upload) resolve(body.upload);
+      else reject(new Error(body?.code === 'type' || body?.code === 'size' || body?.code === 'auth' ? body.code : 'failed'));
+    };
+    xhr.onerror = () => reject(new Error('failed'));
+    const data = new FormData();
+    data.append('file', file);
+    xhr.send(data);
+  });
+}
+
+function MusicPicker({ form, onPatch, locale, t }: {
+  form: FormState;
+  onPatch: (values: Partial<FormState>) => void;
   locale: Locale;
-  t: (typeof dict)['en'];
+  t: Dict;
 }) {
   const snapshot = useMusicSnapshot();
+  const [tab, setTab] = useState<MusicTab>(() => tabFor(form.music));
   useEffect(() => () => music().stop(PICKER_OWNER), []);
 
-  const previewing = (id: TrackId) =>
-    snapshot.owner === PICKER_OWNER && snapshot.trackId === id && (snapshot.status === 'playing' || snapshot.status === 'starting');
+  const previewing = (source: MusicSource) =>
+    snapshot.owner === PICKER_OWNER && snapshot.key === musicSourceKey(source)
+    && (snapshot.status === 'playing' || snapshot.status === 'starting');
+  const togglePreview = (source: MusicSource) => music().toggle(source, PICKER_OWNER, form.musicVolume);
+
+  const activeLabel = form.music === MUSIC_NONE ? t.activeNone
+    : form.music === MUSIC_UPLOAD ? displayName(form.musicUpload?.name ?? '')
+    : form.music === MUSIC_YOUTUBE ? form.musicYoutube?.title ?? 'YouTube'
+    : TRACKS.find(track => track.id === form.music)?.title[locale] ?? '';
+
+  function setVolume(percent: number) {
+    const volume = Math.max(0, Math.min(1, percent / 100));
+    onPatch({ musicVolume: volume });
+    if (music().getSnapshot().owner === PICKER_OWNER) music().setVolume(volume);
+  }
+
+  const tabs: [MusicTab, string][] = [['builtin', t.tabBuiltin], ['upload', t.tabUpload], ['youtube', t.tabYoutube]];
 
   return (
     <fieldset className="st-group">
       <legend>{t.musicTitle}</legend>
       <small className="st-hint">{t.musicHint}</small>
-      <div className="st-tracks" role="radiogroup" aria-label={t.musicTitle}>
-        <div className={`st-track ${value === MUSIC_NONE ? 'is-selected' : ''}`}>
-          <button type="button" role="radio" aria-checked={value === MUSIC_NONE} className="st-track-select"
-            onClick={() => { music().stop(PICKER_OWNER); onChange(MUSIC_NONE); }}>
-            <span className="st-track-radio" aria-hidden="true" />
-            <span className="st-track-text"><strong>{t.noMusic}</strong><small>{t.noMusicSub}</small></span>
-          </button>
-        </div>
-        {TRACKS.map(track => {
-          const playing = previewing(track.id);
-          return (
-            <div key={track.id} className={`st-track ${value === track.id ? 'is-selected' : ''} ${playing ? 'is-playing' : ''}`}>
-              <button type="button" role="radio" aria-checked={value === track.id} className="st-track-select" onClick={() => onChange(track.id)}>
+
+      <p className="st-music-active" aria-live="polite">
+        <MusicIcon className="w-3.5 h-3.5" aria-hidden="true" />
+        <span>{t.activeNow}</span> <strong>{activeLabel}</strong>
+      </p>
+
+      <div className="st-segment" role="radiogroup" aria-label={t.musicSourceLabel}>
+        {tabs.map(([id, label]) => (
+          <label key={id} className={tab === id ? 'is-active' : ''}>
+            <input type="radio" name="st-music-tab" checked={tab === id} onChange={() => setTab(id)} />
+            {label}
+          </label>
+        ))}
+      </div>
+
+      {tab === 'builtin' && (
+        <>
+          <div className="st-tracks" role="radiogroup" aria-label={t.musicTitle}>
+            <div className={`st-track ${form.music === MUSIC_NONE ? 'is-selected' : ''}`}>
+              <button type="button" role="radio" aria-checked={form.music === MUSIC_NONE} className="st-track-select"
+                onClick={() => { music().stop(PICKER_OWNER); onPatch({ music: MUSIC_NONE }); }}>
                 <span className="st-track-radio" aria-hidden="true" />
-                <span className="st-track-text">
-                  <strong>{track.title[locale]}</strong>
-                  <small>{track.mood[locale]}</small>
-                  <small className="st-track-note">{track.note[locale]}</small>
-                </span>
-              </button>
-              <button type="button" className="st-track-play" aria-pressed={playing}
-                aria-label={`${playing ? t.stop : t.listen}: ${track.title[locale]}`}
-                onClick={() => (playing ? music().stop(PICKER_OWNER) : void music().play(track.id, PICKER_OWNER))}>
-                {playing ? <PauseIcon className="w-3.5 h-3.5" aria-hidden="true" /> : <PlayIcon className="w-3.5 h-3.5" aria-hidden="true" />}
-                <span>{playing ? t.stop : t.listen}</span>
+                <span className="st-track-text"><strong>{t.noMusic}</strong><small>{t.noMusicSub}</small></span>
               </button>
             </div>
-          );
-        })}
-      </div>
-      <small className="st-hint">{t.musicSource}</small>
+            {TRACKS.map(track => {
+              const source: MusicSource = { kind: 'track', id: track.id };
+              const playing = previewing(source);
+              return (
+                <div key={track.id} className={`st-track ${form.music === track.id ? 'is-selected' : ''} ${playing ? 'is-playing' : ''}`}>
+                  <button type="button" role="radio" aria-checked={form.music === track.id} className="st-track-select" onClick={() => onPatch({ music: track.id as TrackId })}>
+                    <span className="st-track-radio" aria-hidden="true" />
+                    <span className="st-track-text">
+                      <strong>{track.title[locale]}</strong>
+                      <small>{track.mood[locale]}</small>
+                      <small className="st-track-note">{track.note[locale]}</small>
+                    </span>
+                  </button>
+                  <button type="button" className="st-track-play" aria-pressed={playing}
+                    aria-label={`${playing ? t.stop : t.listen}: ${track.title[locale]}`}
+                    onClick={() => (playing ? music().stop(PICKER_OWNER) : void music().play(source, PICKER_OWNER, form.musicVolume))}>
+                    {playing ? <PauseIcon className="w-3.5 h-3.5" aria-hidden="true" /> : <PlayIcon className="w-3.5 h-3.5" aria-hidden="true" />}
+                    <span>{playing ? t.stop : t.listen}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+          <small className="st-hint">{t.musicSource}</small>
+        </>
+      )}
+
+      {tab === 'upload' && (
+        <UploadPanel form={form} onPatch={onPatch} t={t} previewing={previewing} togglePreview={togglePreview} />
+      )}
+
+      {tab === 'youtube' && (
+        <YoutubePanel form={form} onPatch={onPatch} t={t} previewing={previewing} togglePreview={togglePreview} />
+      )}
+
+      {form.music !== MUSIC_NONE && (
+        <label className="st-field st-volume">
+          <span>{t.volume} · {Math.round(form.musicVolume * 100)}%</span>
+          <input type="range" min={0} max={100} step={5} value={Math.round(form.musicVolume * 100)}
+            onChange={e => setVolume(Number(e.target.value))} />
+        </label>
+      )}
     </fieldset>
+  );
+}
+
+type PanelProps = {
+  form: FormState;
+  onPatch: (values: Partial<FormState>) => void;
+  t: Dict;
+  previewing: (source: MusicSource) => boolean;
+  togglePreview: (source: MusicSource) => void;
+};
+
+function UploadPanel({ form, onPatch, t, previewing, togglePreview }: PanelProps) {
+  const [progress, setProgress] = useState<number | null>(null);
+  const [error, setError] = useState<AudioErrorCode | null>(null);
+  const [notice, setNotice] = useState(false);
+  const upload = form.musicUpload;
+  const source: MusicSource | null = upload ? { kind: 'file', id: upload.id, name: upload.name } : null;
+  const playing = source ? previewing(source) : false;
+  const position = useFileProgress(upload?.id ?? null);
+  const inUse = form.music === MUSIC_UPLOAD;
+
+  // Read the file's duration before it is played.
+  useEffect(() => { if (source) music().prepare(source); }, [source?.kind, upload?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function choose(file: File | undefined) {
+    if (!file) return;
+    setError(null); setNotice(false);
+    const looksLikeAudio = file.type.startsWith('audio/') || /\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|webm|mp4)$/i.test(file.name);
+    if (!looksLikeAudio) { setError('type'); return; }
+    if (file.size > MAX_AUDIO_BYTES) { setError('size'); return; }
+    setProgress(0);
+    try {
+      const uploaded = await uploadAudio(file, setProgress);
+      if (upload) music().stop(PICKER_OWNER);
+      onPatch({ musicUpload: uploaded, music: MUSIC_UPLOAD });
+      setNotice(true);
+    } catch (e) {
+      const code = e instanceof Error ? e.message : 'failed';
+      setError((['type', 'size', 'auth'].includes(code) ? code : 'failed') as AudioErrorCode);
+    } finally {
+      setProgress(null);
+    }
+  }
+
+  function remove() {
+    if (source && previewing(source)) music().stop(PICKER_OWNER);
+    setNotice(false);
+    onPatch({ musicUpload: null, ...(inUse && { music: DEFAULT_TRACK }) });
+  }
+
+  const fileInput = (
+    <input type="file" accept={AUDIO_ACCEPT} className="inv-sr" disabled={progress !== null}
+      onChange={e => { void choose(e.target.files?.[0]); e.currentTarget.value = ''; }} />
+  );
+
+  return (
+    <div className="st-mpanel">
+      {progress !== null ? (
+        <div className="st-drop is-busy" role="status">
+          <UploadIcon className="w-7 h-7" aria-hidden="true" />
+          <strong>{t.uploading} {Math.round(progress * 100)}%</strong>
+          <span className="st-progress" aria-hidden="true"><i style={{ width: `${Math.round(progress * 100)}%` }} /></span>
+        </div>
+      ) : upload ? (
+        <div className={`st-mcard ${inUse ? 'is-selected' : ''}`}>
+          <div className="st-mcard-head">
+            <span className="st-mcard-icon" aria-hidden="true"><MusicIcon className="w-5 h-5" /></span>
+            <span className="st-mcard-text">
+              <strong title={upload.name}>{upload.name}</strong>
+              <small>{formatLabel(upload)} · {formatBytes(upload.size)}</small>
+            </span>
+            {inUse && <span className="st-mbadge"><CheckIcon className="w-3 h-3" aria-hidden="true" />{t.inUse}</span>}
+          </div>
+          <div className="st-mplayer">
+            <button type="button" className="st-mplay" aria-pressed={playing}
+              aria-label={`${playing ? t.stop : t.listen}: ${upload.name}`}
+              onClick={() => source && togglePreview(source)}>
+              {playing ? <PauseIcon className="w-4 h-4" aria-hidden="true" /> : <PlayIcon className="w-4 h-4" aria-hidden="true" />}
+            </button>
+            <span className="st-mtime">{formatTime(position.current)}</span>
+            <input type="range" className="st-mseek" min={0} max={Math.max(position.duration, 0.1)} step={0.1}
+              value={Math.min(position.current, position.duration || 0)} aria-label={t.seek}
+              disabled={!position.duration}
+              onChange={e => music().seekFile(upload.id, Number(e.target.value))} />
+            <span className="st-mtime">{formatTime(position.duration)}</span>
+          </div>
+          {fileFailed(source) && <p className="st-merror" role="alert">{t.audioErr.failed}</p>}
+          {NOT_ON_SAFARI.test(upload.name) && <small className="st-mwarn">{t.safariWarn}</small>}
+          <div className="st-mactions">
+            {!inUse && (
+              <button type="button" className="st-btn st-btn--small st-btn--primary" onClick={() => onPatch({ music: MUSIC_UPLOAD })}>{t.useThis}</button>
+            )}
+            <label className="st-btn st-btn--small">
+              <UploadIcon className="w-3.5 h-3.5" aria-hidden="true" />{t.replace}
+              {fileInput}
+            </label>
+            <button type="button" className="st-btn st-btn--small st-btn--danger" onClick={remove}>{t.removeMusic}</button>
+          </div>
+        </div>
+      ) : (
+        <label className="st-drop">
+          <UploadIcon className="w-7 h-7" aria-hidden="true" />
+          <strong>{t.audioUpload}</strong>
+          <small>{t.audioUploadSub}</small>
+          {fileInput}
+        </label>
+      )}
+      {error && <p className="st-merror" role="alert">{t.audioErr[error]}</p>}
+      {notice && !error && <p className="st-mok" role="status"><CheckIcon className="w-3.5 h-3.5" aria-hidden="true" />{t.uploadedOk}</p>}
+    </div>
+  );
+}
+
+/** True when the uploaded file failed to load in the shared player. */
+function fileFailed(source: MusicSource | null) {
+  if (!source) return false;
+  const s = music().getSnapshot();
+  return s.key === musicSourceKey(source) && s.status === 'error';
+}
+
+function YoutubePanel({ form, onPatch, t, previewing, togglePreview }: PanelProps) {
+  const video = form.musicYoutube;
+  const [editing, setEditing] = useState(!video);
+  const [url, setUrl] = useState('');
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState<YoutubeErrorCode | null>(null);
+  const [notice, setNotice] = useState<'added' | 'unverified' | null>(null);
+  const source: MusicSource | null = video ? { kind: 'youtube', videoId: video.videoId, title: video.title } : null;
+  const playing = source ? previewing(source) : false;
+  const inUse = form.music === MUSIC_YOUTUBE;
+
+  async function add(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null); setNotice(null);
+    const id = parseYouTubeId(url);
+    if (!id) { setError('invalid'); return; }
+    setChecking(true);
+    try {
+      const response = await fetch(`/api/music/youtube?url=${encodeURIComponent(url)}`);
+      const body = await response.json().catch(() => ({})) as { video?: YoutubeMusic; verified?: boolean; code?: string };
+      if (!response.ok || !body.video) {
+        setError(body.code === 'embed' || body.code === 'missing' || body.code === 'invalid' ? body.code : 'failed');
+        return;
+      }
+      if (video) music().stop(PICKER_OWNER);
+      onPatch({ musicYoutube: body.video, music: MUSIC_YOUTUBE });
+      setNotice(body.verified ? 'added' : 'unverified');
+      setEditing(false);
+      setUrl('');
+    } catch {
+      setError('failed');
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  function remove() {
+    if (source && previewing(source)) music().stop(PICKER_OWNER);
+    setNotice(null);
+    setEditing(true);
+    onPatch({ musicYoutube: null, ...(inUse && { music: DEFAULT_TRACK }) });
+  }
+
+  return (
+    <div className="st-mpanel">
+      {video && !editing && (
+        <div className={`st-mcard ${inUse ? 'is-selected' : ''}`}>
+          <div className="st-mcard-head st-mcard-head--video">
+            {/* eslint-disable-next-line @next/next/no-img-element -- YouTube's own thumbnail host */}
+            <img className="st-mthumb" src={youtubeThumbnail(video.videoId)} alt="" loading="lazy" />
+            <span className="st-mcard-text">
+              <strong title={video.title ?? undefined}>{video.title ?? 'YouTube'}</strong>
+              <small>{video.author ?? `youtu.be/${video.videoId}`}</small>
+            </span>
+            {inUse && <span className="st-mbadge"><CheckIcon className="w-3 h-3" aria-hidden="true" />{t.inUse}</span>}
+          </div>
+          <div className="st-mactions">
+            <button type="button" className={`st-track-play ${playing ? 'is-on' : ''}`} aria-pressed={playing}
+              onClick={() => source && togglePreview(source)}>
+              {playing ? <PauseIcon className="w-3.5 h-3.5" aria-hidden="true" /> : <PlayIcon className="w-3.5 h-3.5" aria-hidden="true" />}
+              <span>{playing ? t.stop : t.listen}</span>
+            </button>
+            {!inUse && (
+              <button type="button" className="st-btn st-btn--small st-btn--primary" onClick={() => onPatch({ music: MUSIC_YOUTUBE })}>{t.useThis}</button>
+            )}
+            <button type="button" className="st-btn st-btn--small" onClick={() => { setEditing(true); setNotice(null); }}>{t.replace}</button>
+            <button type="button" className="st-btn st-btn--small st-btn--danger" onClick={remove}>{t.removeMusic}</button>
+          </div>
+        </div>
+      )}
+      {(editing || !video) && (
+        <form className="st-myt-form" onSubmit={add} noValidate>
+          <label className="st-field">
+            <span>{t.ytLabel}</span>
+            <input type="url" inputMode="url" autoComplete="off" spellCheck={false} placeholder={t.ytPlaceholder}
+              value={url} onChange={e => { setUrl(e.target.value); setError(null); }}
+              aria-invalid={error ? true : undefined} disabled={checking} />
+          </label>
+          <div className="st-mactions">
+            <button type="submit" className="st-btn st-btn--small st-btn--primary" disabled={checking || !url.trim()}>
+              {checking ? t.ytChecking : t.ytAdd}
+            </button>
+            {video && (
+              <button type="button" className="st-btn st-btn--small" onClick={() => { setEditing(false); setError(null); setUrl(''); }}>{t.cancel}</button>
+            )}
+          </div>
+        </form>
+      )}
+      {error && <p className="st-merror" role="alert">{t.ytErr[error]}</p>}
+      {notice && !error && (
+        <p className="st-mok" role="status"><CheckIcon className="w-3.5 h-3.5" aria-hidden="true" />{notice === 'added' ? t.ytAdded : t.ytUnverified}</p>
+      )}
+      <small className="st-hint">{t.ytNote}</small>
+    </div>
   );
 }

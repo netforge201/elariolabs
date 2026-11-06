@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import PublicInvitation from '../components/public-invitation';
+import { readMusicSettings } from '@/app/components/invitation/catalog';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -57,7 +58,7 @@ export default async function PublicWeddingPage({ params }: Props) {
     locale: wedding.locale,
     template: wedding.template,
     coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
-    music: typeof theme.music === 'string' ? theme.music : null,
+    ...readMusicSettings(theme),
     timezone: wedding.timezone,
   }} />;
 }

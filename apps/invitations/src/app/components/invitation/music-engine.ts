@@ -1,16 +1,20 @@
 'use client';
 
-// A small, dependency-free generative music engine built on the Web Audio API.
+// A small, dependency-free music engine for invitations.
 //
-// - One AudioContext and one controller for the whole page, so the invitation,
-//   the editor preview and the music picker can never play on top of each other.
+// - Built-in tracks are generated live with the Web Audio API.
+// - A couple's uploaded file plays through one shared <audio> element.
+// - A YouTube video plays through YouTube's embedded player (youtube-player.ts).
+// - One controller for the whole page owns all three, so the invitation, the
+//   editor preview and the music picker can never play on top of each other.
 // - Playback only ever starts from a user gesture (play()/toggle() are called
 //   from click handlers); nothing here tries to get around autoplay rules.
 // - Pausing fades out and suspends the context, so resuming is instant and no
 //   duplicate schedulers or audio graphs are created.
 
-import { useSyncExternalStore } from 'react';
-import type { TrackId } from './catalog';
+import { useCallback, useSyncExternalStore } from 'react';
+import { musicFileUrl, musicSourceKey, type MusicSource, type TrackId } from './catalog';
+import { YouTubeDock, type YouTubeLabels } from './youtube-player';
 import { SIX_EIGHT } from './compositions-6-8';
 
 // ---------------------------------------------------------------------------
@@ -420,17 +424,39 @@ class Sequencer {
 // Controller (one per page)
 // ---------------------------------------------------------------------------
 
-export type MusicStatus = 'idle' | 'starting' | 'playing' | 'paused' | 'error';
-export type MusicSnapshot = { status: MusicStatus; trackId: TrackId | null; owner: string | null };
+export type { MusicSource } from './catalog';
+export type MusicStatus = 'idle' | 'starting' | 'playing' | 'paused' | 'blocked' | 'error';
+export type MusicSnapshot = {
+  status: MusicStatus;
+  /** musicSourceKey() of the active source. */
+  key: string | null;
+  kind: MusicSource['kind'] | null;
+  /** Set when the active source is a built-in track. */
+  trackId: TrackId | null;
+  owner: string | null;
+};
+export type FileProgress = { current: number; duration: number };
+
+type SourceInput = MusicSource | TrackId;
+const toSource = (input: SourceInput): MusicSource => (typeof input === 'string' ? { kind: 'track', id: input } : input);
 
 const VOLUME = 0.7;
-const IDLE: MusicSnapshot = { status: 'idle', trackId: null, owner: null };
+const IDLE: MusicSnapshot = { status: 'idle', key: null, kind: null, trackId: null, owner: null };
+const ACTIVE: MusicStatus[] = ['starting', 'playing', 'paused', 'blocked'];
+const DEFAULT_LABELS: YouTubeLabels = {
+  close: 'Close video', tapToPlay: 'Tap ▶ on the video to start the music', unavailable: 'This video cannot be played here',
+};
 
 class MusicController {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private reverb: AudioNode | null = null;
   private sequencer: Sequencer | null = null;
+  private audio: HTMLAudioElement | null = null;
+  private youtube: YouTubeDock | null = null;
+  private source: MusicSource | null = null;
+  private volume = 1;
+  private labels = DEFAULT_LABELS;
   private suspendTimer: number | null = null;
   private resumeOnVisible = false;
   private snapshot: MusicSnapshot = IDLE;
@@ -448,6 +474,12 @@ class MusicController {
     this.snapshot = { ...this.snapshot, ...next };
     this.listeners.forEach(l => l());
   }
+
+  private isCurrent(key: string) {
+    return this.snapshot.key === key && this.snapshot.status !== 'idle';
+  }
+
+  // ----- built-in tracks (Web Audio) -----
 
   private ensureContext(): AudioContext | null {
     if (this.ctx) return this.ctx;
@@ -468,20 +500,9 @@ class MusicController {
     this.ctx = ctx;
     this.master = master;
     this.reverb = convolver;
-
     document.addEventListener('visibilitychange', this.onVisibility);
     return ctx;
   }
-
-  private onVisibility = () => {
-    if (document.hidden && this.snapshot.status === 'playing') {
-      this.resumeOnVisible = true;
-      this.pause();
-    } else if (!document.hidden && this.resumeOnVisible && this.snapshot.trackId) {
-      this.resumeOnVisible = false;
-      void this.play(this.snapshot.trackId, this.snapshot.owner ?? 'page');
-    }
-  };
 
   private fadeMaster(to: number, seconds: number) {
     if (!this.ctx || !this.master) return;
@@ -492,20 +513,26 @@ class MusicController {
     gain.linearRampToValueAtTime(Math.max(to, 0.0001), now + seconds);
   }
 
-  async play(trackId: TrackId, owner: string) {
+  private suspendSoon(check: () => boolean) {
+    if (!this.ctx) return;
+    const ctx = this.ctx;
+    if (this.suspendTimer !== null) window.clearTimeout(this.suspendTimer);
+    this.suspendTimer = window.setTimeout(() => {
+      this.suspendTimer = null;
+      if (check()) void ctx.suspend().catch(() => {});
+    }, 420);
+  }
+
+  private async playTrack(trackId: TrackId, key: string, resume: boolean) {
     const ctx = this.ensureContext();
     if (!ctx || !this.master || !this.reverb) {
-      this.set({ status: 'error', trackId, owner });
+      this.set({ status: 'error' });
       return;
     }
     if (this.suspendTimer !== null) {
       window.clearTimeout(this.suspendTimer);
       this.suspendTimer = null;
     }
-
-    const sameTrack = this.sequencer && this.snapshot.trackId === trackId;
-    this.set({ status: 'starting', trackId, owner });
-
     try {
       if (ctx.state !== 'running') await ctx.resume();
     } catch {
@@ -513,53 +540,221 @@ class MusicController {
       return;
     }
     // A newer call may have changed the request while we were waiting.
-    if (this.snapshot.trackId !== trackId || this.snapshot.status !== 'starting') return;
+    if (this.snapshot.key !== key || this.snapshot.status !== 'starting') return;
 
-    if (!sameTrack) {
+    if (!resume || !this.sequencer) {
       this.sequencer?.stop();
       const composition = COMPOSITIONS[trackId] ?? COMPOSITIONS.canon;
       this.sequencer = new Sequencer(ctx, { dry: this.master, wet: this.reverb }, composition);
       this.sequencer.start();
     }
-    this.fadeMaster(VOLUME, sameTrack ? 0.6 : 1.4);
+    this.fadeMaster(VOLUME * this.volume, resume ? 0.6 : 1.4);
     this.set({ status: 'playing' });
   }
 
-  pause() {
-    if (!this.ctx || (this.snapshot.status !== 'playing' && this.snapshot.status !== 'starting')) return;
-    this.fadeMaster(0, 0.35);
-    this.set({ status: 'paused' });
-    const ctx = this.ctx;
-    this.suspendTimer = window.setTimeout(() => {
-      this.suspendTimer = null;
-      if (this.snapshot.status === 'paused') void ctx.suspend().catch(() => {});
-    }, 420);
+  private stopTrack(fade = 0.3) {
+    if (!this.sequencer) return;
+    this.sequencer.stop(fade);
+    this.sequencer = null;
+    this.fadeMaster(0, fade);
+    this.suspendSoon(() => !this.sequencer);
   }
 
-  toggle(trackId: TrackId, owner: string) {
+  // ----- uploaded files (<audio>) -----
+
+  private ensureAudio(): HTMLAudioElement {
+    if (this.audio) return this.audio;
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    audio.loop = true;
+    const mine = () => this.source?.kind === 'file' && this.snapshot.kind === 'file';
+    audio.addEventListener('playing', () => {
+      if (mine() && (this.snapshot.status === 'starting' || this.snapshot.status === 'blocked')) this.set({ status: 'playing' });
+    });
+    audio.addEventListener('waiting', () => {
+      if (mine() && this.snapshot.status === 'playing') this.set({ status: 'starting' });
+    });
+    audio.addEventListener('error', () => {
+      if (mine() && audio.getAttribute('src')) this.set({ status: 'error' });
+    });
+    this.audio = audio;
+    document.addEventListener('visibilitychange', this.onVisibility);
+    return audio;
+  }
+
+  private setFile(id: string) {
+    const audio = this.ensureAudio();
+    const url = musicFileUrl(id);
+    if (audio.getAttribute('src') !== url) {
+      audio.setAttribute('src', url);
+      audio.load();
+    }
+    return audio;
+  }
+
+  private playFile(source: Extract<MusicSource, { kind: 'file' }>, key: string) {
+    const audio = this.setFile(source.id);
+    audio.volume = this.volume;
+    let attempt: Promise<void>;
+    try {
+      // Called synchronously from the tap, which is what browsers require.
+      attempt = audio.play();
+    } catch {
+      this.set({ status: 'error' });
+      return;
+    }
+    attempt.then(() => {
+      if (this.isCurrent(key) && this.snapshot.status === 'starting') this.set({ status: 'playing' });
+    }).catch((error: DOMException) => {
+      if (!this.isCurrent(key) || error?.name === 'AbortError') return;
+      this.set({ status: error?.name === 'NotAllowedError' ? 'blocked' : 'error' });
+    });
+  }
+
+  /** Position of the uploaded file, for the editor's preview player. */
+  subscribeFileProgress = (listener: () => void) => {
+    const audio = this.ensureAudio();
+    const events = ['timeupdate', 'durationchange', 'loadedmetadata', 'emptied', 'seeked'];
+    events.forEach(e => audio.addEventListener(e, listener));
+    return () => events.forEach(e => audio.removeEventListener(e, listener));
+  };
+
+  fileProgress(id: string): FileProgress {
+    const audio = this.audio;
+    if (!audio || audio.getAttribute('src') !== musicFileUrl(id)) return NO_PROGRESS;
+    const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    const current = audio.currentTime;
+    if (this.lastProgress.current !== current || this.lastProgress.duration !== duration) {
+      this.lastProgress = { current, duration };
+    }
+    return this.lastProgress;
+  }
+  private lastProgress: FileProgress = NO_PROGRESS;
+
+  seekFile(id: string, seconds: number) {
+    const audio = this.setFile(id);
+    try { audio.currentTime = Math.max(0, seconds); } catch { /* not seekable yet */ }
+  }
+
+  // ----- YouTube -----
+
+  private ensureYouTube(): YouTubeDock {
+    if (this.youtube) return this.youtube;
+    const mine = () => this.source?.kind === 'youtube' && this.snapshot.kind === 'youtube' && this.snapshot.status !== 'idle';
+    this.youtube = new YouTubeDock(event => {
+      if (event === 'closed') { this.stop(); return; }
+      if (!mine()) return;
+      if (event === 'playing') this.set({ status: 'playing' });
+      else if (event === 'paused') this.set({ status: 'paused' });
+      else if (event === 'buffering' && this.snapshot.status !== 'paused') this.set({ status: 'starting' });
+      else if (event === 'blocked') this.set({ status: 'blocked' });
+      else if (event === 'error') this.set({ status: 'error' });
+    }, this.labels);
+    document.addEventListener('visibilitychange', this.onVisibility);
+    return this.youtube;
+  }
+
+  // ----- public API -----
+
+  /** Interface text for the YouTube card, in the invitation's language. */
+  setLabels(labels: YouTubeLabels) {
+    this.labels = labels;
+    this.youtube?.setLabels(labels);
+  }
+
+  /** 0–1. Applies immediately to whatever is playing. */
+  setVolume(volume: number) {
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.sequencer && this.snapshot.status === 'playing') this.fadeMaster(VOLUME * this.volume, 0.15);
+    if (this.audio) this.audio.volume = this.volume;
+    this.youtube?.setVolume(this.volume);
+  }
+
+  /**
+   * Gets a source ready without playing it (no user gesture needed), so the
+   * guest's tap can start it instantly. Never interrupts what is playing.
+   */
+  prepare(input: SourceInput) {
+    const source = toSource(input);
+    const busy = (kind: MusicSource['kind']) => this.snapshot.kind === kind && ACTIVE.includes(this.snapshot.status);
+    if (source.kind === 'file' && !busy('file')) this.setFile(source.id);
+    if (source.kind === 'youtube' && !busy('youtube')) this.ensureYouTube().load(source.videoId, source.title);
+  }
+
+  /** Must be called from a user gesture (tap/click) the first time. */
+  async play(input: SourceInput, owner: string, volume?: number) {
+    const source = toSource(input);
+    const key = musicSourceKey(source);
+    if (volume !== undefined) this.volume = Math.max(0, Math.min(1, volume));
+    const same = this.source !== null && musicSourceKey(this.source) === key && this.snapshot.status !== 'idle';
+
+    // Only one source may sound at a time.
+    if (source.kind !== 'track' || !same) this.stopTrack();
+    if (this.audio && (source.kind !== 'file' || !same)) this.audio.pause();
+    if (this.youtube && source.kind !== 'youtube') this.youtube.stop();
+
+    this.source = source;
+    this.set({ status: 'starting', key, kind: source.kind, trackId: source.kind === 'track' ? source.id : null, owner });
+
+    if (source.kind === 'file') {
+      this.playFile(source, key);
+    } else if (source.kind === 'youtube') {
+      const yt = this.ensureYouTube();
+      if (!same) yt.load(source.videoId, source.title);
+      yt.setVolume(this.volume);
+      yt.play();
+    } else {
+      await this.playTrack(source.id, key, same);
+    }
+  }
+
+  pause() {
+    const { status, kind } = this.snapshot;
+    if (status !== 'playing' && status !== 'starting' && status !== 'blocked') return;
+    if (kind === 'track' && this.ctx) {
+      this.fadeMaster(0, 0.35);
+      this.suspendSoon(() => this.snapshot.status === 'paused');
+    } else if (kind === 'file') {
+      this.audio?.pause();
+    } else if (kind === 'youtube') {
+      this.youtube?.pause();
+    }
+    this.set({ status: 'paused' });
+  }
+
+  toggle(input: SourceInput, owner: string, volume?: number) {
     const s = this.snapshot;
-    if ((s.status === 'playing' || s.status === 'starting') && s.trackId === trackId && s.owner === owner) this.pause();
-    else void this.play(trackId, owner);
+    const key = musicSourceKey(toSource(input));
+    if ((s.status === 'playing' || s.status === 'starting') && s.key === key && s.owner === owner) this.pause();
+    else void this.play(input, owner, volume);
   }
 
   /** Stops playback entirely. With an owner, only stops if that owner started it. */
   stop(owner?: string) {
     if (owner && this.snapshot.owner !== owner) return;
     this.resumeOnVisible = false;
-    this.sequencer?.stop(0.3);
-    this.sequencer = null;
-    if (this.ctx) {
-      this.fadeMaster(0, 0.3);
-      const ctx = this.ctx;
-      if (this.suspendTimer !== null) window.clearTimeout(this.suspendTimer);
-      this.suspendTimer = window.setTimeout(() => {
-        this.suspendTimer = null;
-        if (!this.sequencer) void ctx.suspend().catch(() => {});
-      }, 400);
+    this.stopTrack();
+    if (this.audio) {
+      this.audio.pause();
+      try { this.audio.currentTime = 0; } catch { /* not loaded */ }
     }
+    this.youtube?.stop();
+    this.source = null;
     this.set(IDLE);
   }
+
+  private onVisibility = () => {
+    if (document.hidden && this.snapshot.status === 'playing') {
+      this.resumeOnVisible = true;
+      this.pause();
+    } else if (!document.hidden && this.resumeOnVisible && this.source) {
+      this.resumeOnVisible = false;
+      void this.play(this.source, this.snapshot.owner ?? 'page');
+    }
+  };
 }
+
+const NO_PROGRESS: FileProgress = { current: 0, duration: 0 };
 
 let controller: MusicController | null = null;
 export function music(): MusicController {
@@ -575,4 +770,14 @@ const serverController = {
 export function useMusicSnapshot(): MusicSnapshot {
   const c = typeof window === 'undefined' ? serverController : music();
   return useSyncExternalStore(c.subscribe, c.getSnapshot, () => IDLE);
+}
+
+/** Playback position of an uploaded file (zeros when another file is loaded). */
+export function useFileProgress(id: string | null): FileProgress {
+  const subscribe = useCallback(
+    (listener: () => void) => (!id ? () => {} : music().subscribeFileProgress(listener)),
+    [id],
+  );
+  const read = useCallback(() => (id ? music().fileProgress(id) : NO_PROGRESS), [id]);
+  return useSyncExternalStore(subscribe, read, () => NO_PROGRESS);
 }
