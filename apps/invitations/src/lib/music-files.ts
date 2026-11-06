@@ -40,14 +40,31 @@ export async function savedUploadId(accountId: string): Promise<string | null> {
   return typeof upload?.id === 'string' ? upload.id : null;
 }
 
+/** Replaced or removed uploads are kept this long before they are deleted. */
+const SPARE_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
+/** …and at most this many of them per account (newest first). */
+const MAX_SPARE_FILES = 3;
+
 /**
  * Deletes the account's uploads that nothing refers to any more. `keep` lists
- * the ids still in use (the saved one and/or one waiting to be saved), so each
- * account holds at most two files at any time.
+ * the ids in use (the saved one and/or one waiting to be saved).
+ *
+ * Unreferenced files are not deleted straight away: an editor open in another
+ * tab, or restored with the browser's Back button, may still point at the
+ * previous file and must be able to save it. They are removed once they are
+ * older than the grace period, or when more than a few have piled up, so each
+ * account stores at most 1 + MAX_SPARE_FILES files.
  */
 export async function pruneMusicFiles(accountId: string, keep: (string | null | undefined)[]) {
   const ids = keep.filter((id): id is string => Boolean(id));
-  await db.invitationMusicFile.deleteMany({
+  const spare = await db.invitationMusicFile.findMany({
     where: { accountId, ...(ids.length ? { id: { notIn: ids } } : {}) },
+    select: { id: true, createdAt: true },
+    orderBy: { createdAt: 'desc' },
   });
+  const cutoff = Date.now() - SPARE_GRACE_MS;
+  const expired = spare
+    .filter((file, index) => index >= MAX_SPARE_FILES || file.createdAt.getTime() < cutoff)
+    .map(file => file.id);
+  if (expired.length) await db.invitationMusicFile.deleteMany({ where: { accountId, id: { in: expired } } });
 }
