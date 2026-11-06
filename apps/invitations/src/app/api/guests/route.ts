@@ -3,6 +3,9 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { TEMPLATE_IDS, resolveTemplate } from '@/app/components/invitation/catalog';
+
+const templateSchema = z.enum(TEMPLATE_IDS as [string, ...string[]]);
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +31,7 @@ export async function GET() {
   const guests = await db.invitationGuest.findMany({
     where: { weddingId: wedding.id },
     orderBy: { createdAt: 'desc' },
-    select: { id: true, name: true, slug: true, createdAt: true },
+    select: { id: true, name: true, slug: true, template: true, createdAt: true },
   });
 
   return NextResponse.json({ guests });
@@ -44,6 +47,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = z.object({
     name: z.string().trim().min(1).max(160),
+    template: templateSchema.optional(),
   }).safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {
@@ -52,7 +56,7 @@ export async function POST(request: NextRequest) {
 
   const wedding = await db.invitationWedding.findUnique({
     where: { accountId: account.id },
-    select: { id: true },
+    select: { id: true, template: true },
   });
   if (!wedding) {
     return NextResponse.json({ error: 'Create and save the wedding first.' }, { status: 400 });
@@ -72,11 +76,53 @@ export async function POST(request: NextRequest) {
       weddingId: wedding.id,
       name: parsed.data.name,
       slug,
+      // Every guest always has a valid design of their own. By default it is the
+      // wedding's current design; in global mode it is simply not used for rendering.
+      template: parsed.data.template ?? resolveTemplate(wedding.template),
     },
-    select: { id: true, name: true, slug: true, createdAt: true },
+    select: { id: true, name: true, slug: true, template: true, createdAt: true },
   });
 
   return NextResponse.json({ guest }, { status: 201 });
+}
+
+/** Changes one guest's own design. No other guest and no wedding setting is touched. */
+export async function PATCH(request: NextRequest) {
+  if (!sameOrigin(request)) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 });
+  }
+
+  const account = await currentInvitationAccount();
+  if (!account) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const parsed = z.object({ id: z.string().uuid(), template: templateSchema })
+    .safeParse(await request.json().catch(() => null));
+
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid guest design' }, { status: 400 });
+  }
+
+  const wedding = await db.invitationWedding.findUnique({
+    where: { accountId: account.id },
+    select: { id: true },
+  });
+  if (!wedding) return NextResponse.json({ error: 'Wedding not found' }, { status: 404 });
+
+  const result = await db.invitationGuest.updateMany({
+    where: { id: parsed.data.id, weddingId: wedding.id },
+    data: { template: parsed.data.template },
+  });
+
+  if (!result.count) {
+    return NextResponse.json({ error: 'Guest not found' }, { status: 404 });
+  }
+
+  const guest = await db.invitationGuest.findUnique({
+    where: { id: parsed.data.id },
+    select: { id: true, name: true, slug: true, template: true, createdAt: true },
+  });
+
+  return NextResponse.json({ guest });
 }
 
 export async function DELETE(request: NextRequest) {

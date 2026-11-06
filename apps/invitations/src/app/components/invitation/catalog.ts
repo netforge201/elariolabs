@@ -16,6 +16,45 @@ export function resolveTemplate(template: string | null | undefined): TemplateId
   return 'classic';
 }
 
+export const TEMPLATE_IDS: readonly TemplateId[] = ['classic', 'modern', 'minimal'];
+
+export function isTemplateId(value: unknown): value is TemplateId {
+  return typeof value === 'string' && (TEMPLATE_IDS as readonly string[]).includes(value);
+}
+
+// ---------------------------------------------------------------------------
+// Design modes
+// ---------------------------------------------------------------------------
+
+/**
+ * "global": every invitation uses the wedding's template.
+ * "individual": each guest's invitation uses that guest's own template.
+ * The two values are stored separately (wedding.template / guest.template),
+ * so switching modes never changes either of them.
+ */
+export type DesignMode = 'global' | 'individual';
+export const DESIGN_MODES: readonly DesignMode[] = ['global', 'individual'];
+
+export function resolveDesignMode(value: string | null | undefined): DesignMode {
+  return value === 'individual' ? 'individual' : 'global';
+}
+
+/**
+ * The one rule every renderer uses to pick a design.
+ * - global mode → the wedding's template
+ * - individual mode → the guest's template
+ * - no guest (the couple's main link) or a missing/invalid guest value → the
+ *   wedding's template, a safe default that always exists.
+ */
+export function invitationTemplate(
+  wedding: { template: string | null | undefined; designMode?: string | null },
+  guestTemplate?: string | null,
+): TemplateId {
+  const global = resolveTemplate(wedding.template);
+  if (resolveDesignMode(wedding.designMode) !== 'individual') return global;
+  return isTemplateId(guestTemplate) ? guestTemplate : global;
+}
+
 export type TemplateMeta = {
   id: TemplateId;
   name: Localized;

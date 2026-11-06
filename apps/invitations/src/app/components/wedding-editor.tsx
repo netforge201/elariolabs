@@ -9,8 +9,8 @@ import {
 import InvitationView, { type InvitationData } from './invitation/invitation-view';
 import {
   AUDIO_ACCEPT, DEFAULT_TRACK, DEFAULT_VOLUME, MAX_AUDIO_BYTES, MUSIC_NONE, MUSIC_UPLOAD, TEMPLATES, TRACKS,
-  displayName, musicSourceKey, resolveMusic, resolveTemplate,
-  type Locale, type MusicChoice, type MusicSource, type TemplateId, type TrackId, type UploadedMusic,
+  displayName, musicSourceKey, resolveDesignMode, resolveMusic, resolveTemplate, templateMeta,
+  type DesignMode, type Locale, type MusicChoice, type MusicSource, type TemplateId, type TrackId, type UploadedMusic,
 } from './invitation/catalog';
 import { copy as invitationCopy } from './invitation/copy';
 import { music, useFileProgress, useMusicSnapshot } from './invitation/music-engine';
@@ -28,6 +28,7 @@ type Wedding = {
   story: string | null;
   locale: string;
   template: string;
+  designMode?: string;
   timezone?: string;
   coverImage?: string | null;
   music?: string | null;
@@ -36,7 +37,7 @@ type Wedding = {
   isPublished: boolean;
 };
 
-type Guest = { id: string; name: string; slug: string; createdAt: string };
+type Guest = { id: string; name: string; slug: string; template?: string; createdAt: string };
 
 type FormState = {
   partnerOne: string;
@@ -49,6 +50,8 @@ type FormState = {
   story: string;
   locale: Locale;
   template: TemplateId;
+  /** Stored separately from guests' own designs; switching never changes them. */
+  designMode: DesignMode;
   coverImage: string | null;
   music: MusicChoice;
   /** Kept even while a built-in track is selected, so switching back is instant. */
@@ -230,6 +233,45 @@ const guestDict = {
   },
 };
 
+const designModeDict = {
+  en: {
+    label: 'Design mode', global: 'One design for all', individual: 'Design per guest',
+    globalActive: (name: string) => `Global design is on: every invitation uses ${name}.`,
+    individualActive: 'Individual designs are on: each personal invitation uses the design assigned to that guest below.',
+    keptNote: 'Guests\u2019 own designs stay saved while the global design is on.',
+    defaultNote: 'The design selected here is used for the main invitation link and as the starting design for new guests.',
+    globalPicker: 'Design for all guests', defaultPicker: 'Main link & new guests',
+    guestDesign: 'Design', usesGlobal: (name: string) => `Global: ${name}`,
+    savedHint: 'Saved for individual mode',
+    saveMode: 'Save to apply the design mode to guest links.',
+    updated: (guest: string, name: string) => `${guest}: ${name}`,
+  },
+  ru: {
+    label: 'Режим дизайна', global: 'Один дизайн для всех', individual: 'Дизайн для каждого гостя',
+    globalActive: (name: string) => `Включён общий дизайн: все приглашения используют «${name}».`,
+    individualActive: 'Включены индивидуальные дизайны: каждое именное приглашение использует дизайн, назначенный гостю ниже.',
+    keptNote: 'Индивидуальные дизайны гостей сохраняются, пока включён общий дизайн.',
+    defaultNote: 'Выбранный здесь дизайн используется для основной ссылки и как начальный для новых гостей.',
+    globalPicker: 'Дизайн для всех гостей', defaultPicker: 'Основная ссылка и новые гости',
+    guestDesign: 'Дизайн', usesGlobal: (name: string) => `Общий: ${name}`,
+    savedHint: 'Сохранён для индивидуального режима',
+    saveMode: 'Сохраните, чтобы режим дизайна применился к ссылкам гостей.',
+    updated: (guest: string, name: string) => `${guest}: ${name}`,
+  },
+  az: {
+    label: 'Dizayn rejimi', global: 'Hamı üçün bir dizayn', individual: 'Hər qonağa öz dizaynı',
+    globalActive: (name: string) => `Ümumi dizayn aktivdir: bütün dəvətnamələr «${name}» dizaynındadır.`,
+    individualActive: 'Fərdi dizaynlar aktivdir: hər adlı dəvətnamə aşağıda həmin qonağa təyin edilmiş dizaynı istifadə edir.',
+    keptNote: 'Ümumi dizayn aktiv olduqda qonaqların fərdi dizaynları saxlanılır.',
+    defaultNote: 'Burada seçilən dizayn əsas keçid üçün və yeni qonaqların ilkin dizaynı kimi istifadə olunur.',
+    globalPicker: 'Bütün qonaqlar üçün dizayn', defaultPicker: 'Əsas keçid və yeni qonaqlar',
+    guestDesign: 'Dizayn', usesGlobal: (name: string) => `Ümumi: ${name}`,
+    savedHint: 'Fərdi rejim üçün saxlanılıb',
+    saveMode: 'Dizayn rejiminin qonaq keçidlərinə tətbiqi üçün yadda saxlayın.',
+    updated: (guest: string, name: string) => `${guest}: ${name}`,
+  },
+};
+
 const SAMPLE_NAMES: Record<Locale, [string, string]> = {
   az: ['Leyla', 'Elvin'],
   ru: ['Анна', 'Михаил'],
@@ -255,6 +297,7 @@ function initialForm(w: Wedding | null): FormState {
     story: w?.story ?? '',
     locale: w?.locale === 'ru' || w?.locale === 'en' ? w.locale : 'az',
     template: resolveTemplate(w?.template ?? 'classic'),
+    designMode: resolveDesignMode(w?.designMode),
     coverImage: w?.coverImage ?? null,
     // Existing invitations keep their saved (or legacy) track; new ones start on the 6/8 serenade.
     music: w ? resolveMusic(w.music) : DEFAULT_TRACK,
@@ -322,6 +365,7 @@ export default function WeddingEditor({
   const language = locale;
   const t = dict[language];
   const g = guestDict[language];
+  const dm = designModeDict[language];
 
   const [origin, setOrigin] = useState('');
   const [wedding, setWedding] = useState<Wedding | null>(initialWedding);
@@ -599,6 +643,26 @@ export default function WeddingEditor({
     }
   }
 
+  /** Saves one guest's own design immediately. Other guests are never touched. */
+  async function setGuestTemplate(guest: Guest, template: TemplateId) {
+    if (guest.template === template) return;
+    setGuestBusy(true); setGuestError(''); setGuestMessage('');
+    try {
+      const response = await fetch('/api/guests', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: guest.id, template }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not update design');
+      setGuests(old => old.map(item => (item.id === guest.id ? { ...item, ...result.guest } : item)));
+      setGuestMessage(dm.updated(guest.name, templateMeta(template).name[language]));
+    } catch (err) {
+      setGuestError(err instanceof Error ? err.message : 'Error');
+    } finally {
+      setGuestBusy(false);
+    }
+  }
+
   async function deleteGuest(id: string) {
     if (!window.confirm(g.confirm)) return;
     setGuestBusy(true); setGuestError('');
@@ -828,7 +892,25 @@ export default function WeddingEditor({
             {step === 'design' && (
               <fieldset className="st-group">
                 <legend>{t.designTitle}</legend>
+                <div className="st-segment st-design-mode" role="radiogroup" aria-label={dm.label}>
+                  {(['global', 'individual'] as DesignMode[]).map(mode => (
+                    <label key={mode} className={form.designMode === mode ? 'is-active' : ''}>
+                      <input type="radio" name="st-design-mode" value={mode} checked={form.designMode === mode}
+                        onChange={() => update('designMode', mode)} />
+                      <span>{mode === 'global' ? dm.global : dm.individual}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className="st-design-mode-note" role="status">
+                  <strong>
+                    {form.designMode === 'global'
+                      ? dm.globalActive(templateMeta(form.template).name[language])
+                      : dm.individualActive}
+                  </strong>
+                  <span>{form.designMode === 'global' ? dm.keptNote : dm.defaultNote}</span>
+                </p>
                 <small className="st-hint">{t.designHint}</small>
+                <p className="st-kicker st-design-picker-label">{form.designMode === 'global' ? dm.globalPicker : dm.defaultPicker}</p>
                 <div className="st-templates" role="radiogroup" aria-label={t.designTitle}>
                   {TEMPLATES.map(tpl => {
                     const selected = form.template === tpl.id;
@@ -922,6 +1004,15 @@ export default function WeddingEditor({
             <div>
               <h2 id="st-guests-title">{g.title}</h2>
               <p>{g.sub}</p>
+              <p className="st-design-mode-badge">
+                <span>{dm.label}:</span>{' '}
+                <strong>
+                  {form.designMode === 'global'
+                    ? `${dm.global} · ${templateMeta(form.template).name[language]}`
+                    : dm.individual}
+                </strong>
+                {resolveDesignMode(wedding.designMode) !== form.designMode && <em>{dm.saveMode}</em>}
+              </p>
             </div>
             <strong className="st-count">{guests.length}</strong>
           </header>
@@ -974,11 +1065,24 @@ export default function WeddingEditor({
             {guests.length === 0 ? (
               <li className="st-hint">{g.empty}</li>
             ) : guests.map(guest => (
-              <li key={guest.id} className="st-guest">
+              <li key={guest.id} className="st-guest st-guest--design">
                 <div>
                   <strong>{guest.name}</strong>
                   <small>{origin ? `${origin}/guest/${guest.slug}` : `/guest/${guest.slug}`}</small>
                 </div>
+                <label className="st-guest-design" title={form.designMode === 'global' ? dm.savedHint : undefined}>
+                  <span className="inv-sr">{`${dm.guestDesign}: ${guest.name}`}</span>
+                  {form.designMode === 'global' && (
+                    <small className="st-guest-design-global">{dm.usesGlobal(templateMeta(form.template).name[language])}</small>
+                  )}
+                  <select
+                    value={resolveTemplate(guest.template ?? wedding.template)}
+                    disabled={guestBusy || form.designMode === 'global'}
+                    onChange={event => void setGuestTemplate(guest, event.target.value as TemplateId)}
+                  >
+                    {TEMPLATES.map(tpl => <option key={tpl.id} value={tpl.id}>{tpl.name[language]}</option>)}
+                  </select>
+                </label>
                 <button type="button" className="st-btn st-btn--small" onClick={() => void copyGuestLink(guest.slug)}>{g.copy}</button>
                 <button type="button" className="st-icon-btn" disabled={guestBusy} onClick={() => void deleteGuest(guest.id)} aria-label={`${g.remove}: ${guest.name}`}>×</button>
               </li>

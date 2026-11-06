@@ -448,7 +448,10 @@ model InvitationWedding {
   welcomeText  String?           @map("welcome_text")
   story        String?
   locale       String            @default("az")
+  /// The wedding's global design. In "global" mode every invitation uses it.
   template     String            @default("elegant")
+  /// "global" | "individual" (migration 009). Independent of guest designs.
+  designMode   String            @default("global") @map("design_mode")
   theme        Json?
   isPublished  Boolean           @default(false) @map("is_published")
   publishedAt  DateTime?         @map("published_at")
@@ -467,6 +470,8 @@ model InvitationGuest {
   weddingId String            @map("wedding_id") @db.Uuid
   name      String
   slug      String            @unique
+  /// The guest's own design, used only in "individual" mode (migration 009).
+  template  String            @default("classic")
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
   wedding   InvitationWedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)

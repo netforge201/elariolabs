@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { resolveTemplate } from '@/app/components/invitation/catalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
 
   const wedding = await db.invitationWedding.findUnique({
     where: { accountId: account.id },
-    select: { id: true },
+    select: { id: true, template: true },
   });
 
   if (!wedding) {
@@ -86,7 +87,9 @@ export async function POST(request: NextRequest) {
     existingGuests.map((guest) => normalizeName(guest.name)),
   );
 
-  const newGuests: { weddingId: string; name: string; slug: string }[] = [];
+  const newGuests: { weddingId: string; name: string; slug: string; template: string }[] = [];
+  // Imported guests start with the wedding's current design (never empty).
+  const defaultTemplate = resolveTemplate(wedding.template);
 
   for (const [normalized, name] of uniqueNames) {
     if (existingNames.has(normalized)) {
@@ -100,6 +103,7 @@ export async function POST(request: NextRequest) {
       weddingId: wedding.id,
       name,
       slug: `${base}-${randomBytes(8).toString('hex')}`,
+      template: defaultTemplate,
     });
   }
 
@@ -124,6 +128,7 @@ export async function POST(request: NextRequest) {
       id: true,
       name: true,
       slug: true,
+      template: true,
       createdAt: true,
     },
     orderBy: { createdAt: 'desc' },

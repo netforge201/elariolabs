@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import PublicInvitation from '../components/public-invitation';
-import { readMusicSettings } from '@/app/components/invitation/catalog';
+import { invitationTemplate, readMusicSettings } from '@/app/components/invitation/catalog';
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -56,7 +56,8 @@ export default async function PublicWeddingPage({ params }: Props) {
     welcomeText: wedding.welcomeText,
     story: wedding.story,
     locale: wedding.locale,
-    template: wedding.template,
+    // The couple's main link has no guest, so it always uses the wedding's design.
+    template: invitationTemplate(wedding),
     coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
     ...readMusicSettings(theme),
     timezone: wedding.timezone,

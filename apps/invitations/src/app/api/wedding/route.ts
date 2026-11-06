@@ -3,7 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { MUSIC_CHOICES, MUSIC_UPLOAD, readMusicSettings } from '@/app/components/invitation/catalog';
+import { DESIGN_MODES, MUSIC_CHOICES, MUSIC_UPLOAD, readMusicSettings } from '@/app/components/invitation/catalog';
 import { pruneMusicFiles } from '@/lib/music-files';
 
 export const dynamic = 'force-dynamic';
@@ -19,6 +19,8 @@ const weddingSchema = z.object({
   story: z.string().max(10000).nullable().optional(),
   locale: z.enum(['az', 'ru', 'en']).optional(),
   template: z.string().max(50).optional(),
+  // Stored on its own column; changing it never rewrites guests' designs.
+  designMode: z.enum(DESIGN_MODES as [string, ...string[]]).optional(),
   coverImage: z.string().max(5000000).nullable().optional(),
   music: z.string().refine(value => MUSIC_CHOICES.includes(value), 'Unknown music track').nullable().optional(),
   // Only the id is trusted from the client; name/type/size come from the stored file.
@@ -163,6 +165,7 @@ export async function POST(request: NextRequest) {
       story: data.story ?? null,
       locale: data.locale ?? 'az',
       template: data.template ?? 'classic',
+      designMode: data.designMode ?? 'global',
       theme: Object.keys(theme).length ? theme as never : undefined,
     },
   });
@@ -266,6 +269,7 @@ export async function PATCH(request: NextRequest) {
       ...(data.story !== undefined && { story: data.story }),
       ...(data.locale !== undefined && { locale: data.locale }),
       ...(data.template !== undefined && { template: data.template }),
+      ...(data.designMode !== undefined && { designMode: data.designMode }),
       ...(themeChanged && { theme: nextTheme as never }),
       ...(data.isPublished !== undefined && {
         isPublished: data.isPublished,

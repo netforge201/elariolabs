@@ -9,6 +9,9 @@ import { templateMeta } from '@/app/components/invitation/catalog';
 
 export const dynamic = 'force-dynamic';
 
+/** Shown instead of a single design name when each guest has their own design. */
+const INDIVIDUAL_LABEL = { az: 'Hər qonağa öz dizaynı', ru: 'Дизайн для каждого гостя', en: 'Design per guest' } as const;
+
 const translations = {
   az: {
     eyebrow: 'ŞƏXSİ KABİNET', welcome: 'Hekayəniz', welcome2: 'burada başlayır.',
@@ -154,7 +157,7 @@ export default async function DashboardPage() {
             <div><span>{t.date}</span><strong>{date}</strong></div>
             <div><span>{t.time}</span><strong>{wedding?.eventTime || t.unspecified}</strong></div>
             <div><span>{t.venue}</span><strong>{wedding?.venueName || t.noVenue}</strong></div>
-            <div><span>{t.design}</span><strong>{wedding ? `${templateMeta(wedding.template).name[locale]} · ${templateMeta(wedding.template).style[locale]}` : t.unspecified}</strong></div>
+            <div><span>{t.design}</span><strong>{wedding ? (wedding.designMode === 'individual' ? INDIVIDUAL_LABEL[locale] : `${templateMeta(wedding.template).name[locale]} · ${templateMeta(wedding.template).style[locale]}`) : t.unspecified}</strong></div>
           </div>
         </div>
         <div className="overview-quick-card">
