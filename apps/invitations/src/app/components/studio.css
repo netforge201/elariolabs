@@ -129,7 +129,8 @@
 
 /* Photo */
 .st-photo { position: relative; overflow: hidden; border: 1px solid var(--st-line); border-radius: 12px; }
-.st-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.st-photo { width: min(100%, 240px); }
+.st-photo img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; }
 .st-photo-actions { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 8px; }
 .st-drop {
   position: relative; display: grid; justify-items: center; gap: 6px;

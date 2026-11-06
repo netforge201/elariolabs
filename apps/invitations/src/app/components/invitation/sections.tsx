@@ -234,7 +234,7 @@ export function Story({ m }: SectionProps) {
 
 // ---------------------------------------------------------------------------
 
-type Saved = { attending: boolean; guestsCount: number; name: string };
+type Saved = { guestsCount: number; name: string };
 
 function storageKey(m: InvitationModel) {
   return `inv-rsvp:${m.slug}:${m.guest?.slug ?? ''}`;
@@ -243,7 +243,6 @@ function storageKey(m: InvitationModel) {
 export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
   const headingId = useId();
   const [name, setName] = useState(m.guest?.name ?? '');
-  const [attending, setAttending] = useState<boolean | null>(null);
   const [count, setCount] = useState(1);
   const [wishes, setWishes] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
@@ -255,7 +254,6 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
       const raw = window.localStorage.getItem(storageKey(m));
       if (!raw) return;
       const saved = JSON.parse(raw) as Saved;
-      setAttending(saved.attending);
       setCount(saved.guestsCount || 1);
       if (saved.name) setName(saved.name);
       setStatus('done');
@@ -267,7 +265,7 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
-    if (preview || attending === null) return;
+    if (preview) return;
     if (!name.trim()) { setError(m.t.rsvpNameRequired); return; }
     setStatus('sending');
     setError('');
@@ -279,14 +277,14 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
           weddingSlug: m.slug,
           guestName: name.trim(),
           guestSlug: m.guest?.slug,
-          attending,
-          guestsCount: attending ? count : 1,
+          attending: true,
+          guestsCount: count,
           message: wishes.trim() || undefined,
         }),
       });
       if (!response.ok) throw new Error();
       try {
-        window.localStorage.setItem(storageKey(m), JSON.stringify({ attending, guestsCount: count, name: name.trim() } satisfies Saved));
+        window.localStorage.setItem(storageKey(m), JSON.stringify({ guestsCount: count, name: name.trim() } satisfies Saved));
       } catch { /* storage unavailable */ }
       setStatus('done');
     } catch {
@@ -303,7 +301,7 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
         {status === 'done' ? (
           <div className="inv-rsvp-done" role="status">
             <span className="inv-rsvp-done-mark" aria-hidden="true"><CheckIcon className="inv-btn-icon" /></span>
-            <p className="inv-rsvp-done-title">{attending ? m.t.rsvpThanksYes : m.t.rsvpThanksNo}</p>
+            <p className="inv-rsvp-done-title">{m.t.rsvpThanksYes}</p>
             <p className="inv-detail-sub">{m.t.rsvpThanksSub}</p>
             <button type="button" className="inv-link-btn" onClick={() => setStatus('idle')}>{m.t.changeAnswer}</button>
           </div>
@@ -311,31 +309,19 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
           <form className="inv-rsvp-form" onSubmit={submit} noValidate>
             <p className="inv-rsvp-sub">{m.t.rsvpSubtitle}</p>
 
-            <div className="inv-choice" role="radiogroup" aria-label={m.t.rsvpTitle}>
-              {[true, false].map(value => (
-                <label key={String(value)} className={`inv-choice-option ${attending === value ? 'is-selected' : ''}`}>
-                  <input type="radio" name="attending" checked={attending === value} onChange={() => setAttending(value)} />
-                  <span className="inv-choice-dot" aria-hidden="true" />
-                  <span>{value ? m.t.willAttend : m.t.willNotAttend}</span>
-                </label>
-              ))}
-            </div>
-
             <label className="inv-field">
               <span className="inv-label">{m.t.yourName}</span>
               <input value={name} onChange={e => setName(e.target.value)} maxLength={100} autoComplete="name" required />
             </label>
 
-            {attending && (
-              <div className="inv-field">
-                <span className="inv-label" id={`${headingId}-count`}>{m.t.guestsCount}</span>
-                <div className="inv-stepper" role="group" aria-labelledby={`${headingId}-count`}>
-                  <button type="button" onClick={() => setCount(c => Math.max(1, c - 1))} disabled={count <= 1} aria-label={m.t.fewer}>−</button>
-                  <output aria-live="polite">{count}</output>
-                  <button type="button" onClick={() => setCount(c => Math.min(10, c + 1))} disabled={count >= 10} aria-label={m.t.more}>+</button>
-                </div>
+            <div className="inv-field">
+              <span className="inv-label" id={`${headingId}-count`}>{m.t.guestsCount}</span>
+              <div className="inv-stepper" role="group" aria-labelledby={`${headingId}-count`}>
+                <button type="button" onClick={() => setCount(c => Math.max(1, c - 1))} disabled={count <= 1} aria-label={m.t.fewer}>−</button>
+                <output aria-live="polite">{count}</output>
+                <button type="button" onClick={() => setCount(c => Math.min(10, c + 1))} disabled={count >= 10} aria-label={m.t.more}>+</button>
               </div>
-            )}
+            </div>
 
             <label className="inv-field">
               <span className="inv-label">{m.t.wishes} <small>({m.t.optional})</small></span>
@@ -344,7 +330,7 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
 
             {error && <p className="inv-rsvp-error" role="alert">{error}</p>}
 
-            <button type="submit" className="inv-btn inv-btn--primary" disabled={preview || attending === null || status === 'sending'}>
+            <button type="submit" className="inv-btn inv-btn--primary" disabled={preview || status === 'sending'}>
               {status === 'sending' ? m.t.sending : m.t.sendRsvp}
             </button>
             {preview && <p className="inv-rsvp-note">{m.t.rsvpPreview}</p>}
