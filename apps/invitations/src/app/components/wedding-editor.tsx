@@ -8,7 +8,7 @@ import {
 } from './icons';
 import InvitationView, { type InvitationData } from './invitation/invitation-view';
 import {
-  MUSIC_NONE, TEMPLATES, TRACKS, resolveMusic, resolveTemplate,
+  DEFAULT_TRACK, MUSIC_NONE, TEMPLATES, TRACKS, resolveMusic, resolveTemplate,
   type Locale, type MusicChoice, type TemplateId, type TrackId,
 } from './invitation/catalog';
 import { copy as invitationCopy } from './invitation/copy';
@@ -205,7 +205,8 @@ function initialForm(w: Wedding | null): FormState {
     locale: w?.locale === 'ru' || w?.locale === 'en' ? w.locale : 'az',
     template: resolveTemplate(w?.template ?? 'classic'),
     coverImage: w?.coverImage ?? null,
-    music: resolveMusic(w?.music),
+    // Existing invitations keep their saved (or legacy) track; new ones start on the 6/8 serenade.
+    music: w ? resolveMusic(w.music) : DEFAULT_TRACK,
   };
 }
 

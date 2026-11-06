@@ -74,7 +74,7 @@ export function templateMeta(id: string | null | undefined): TemplateMeta {
 // Music
 // ---------------------------------------------------------------------------
 
-export type TrackId = 'canon' | 'waltz' | 'evening' | 'nocturne';
+export type TrackId = 'serenade' | 'promise' | 'memories' | 'wishes' | 'canon' | 'waltz' | 'evening' | 'nocturne';
 export const MUSIC_NONE = 'none';
 export type MusicChoice = TrackId | typeof MUSIC_NONE;
 
@@ -92,6 +92,48 @@ export type TrackMeta = {
  * that invitations played before music selection existed, so it stays default.
  */
 export const TRACKS: TrackMeta[] = [
+  // Original compositions in 6/8 (compound duple: two dotted-quarter beats per
+  // bar), one for each kind of celebration. See compositions-6-8.ts.
+  {
+    id: 'serenade',
+    title: { az: 'Serenada', ru: 'Серенада', en: 'Serenade' },
+    mood: { az: 'Toy · fortepiano və simlilər · 6/8', ru: 'Свадьба · фортепиано и струнные · 6/8', en: 'Wedding · piano & strings · 6/8' },
+    note: {
+      az: 'Orijinal kompozisiya · Mi-bemol major',
+      ru: 'Оригинальная композиция · ми-бемоль мажор',
+      en: 'Original composition · E♭ major',
+    },
+  },
+  {
+    id: 'promise',
+    title: { az: 'Əhd', ru: 'Обещание', en: 'The Promise' },
+    mood: { az: 'Nişan · arfa və fortepiano · 6/8', ru: 'Помолвка · арфа и фортепиано · 6/8', en: 'Engagement · harp & piano · 6/8' },
+    note: {
+      az: 'Orijinal kompozisiya · Sol major',
+      ru: 'Оригинальная композиция · соль мажор',
+      en: 'Original composition · G major',
+    },
+  },
+  {
+    id: 'memories',
+    title: { az: 'Xatirələr', ru: 'Воспоминания', en: 'Memories' },
+    mood: { az: 'İldönümü · violonçel və fortepiano · 6/8', ru: 'Годовщина · виолончель и фортепиано · 6/8', en: 'Anniversary · cello & piano · 6/8' },
+    note: {
+      az: 'Orijinal kompozisiya · Re minor',
+      ru: 'Оригинальная композиция · ре минор',
+      en: 'Original composition · D minor',
+    },
+  },
+  {
+    id: 'wishes',
+    title: { az: 'Arzular', ru: 'Пожелания', en: 'Wishes' },
+    mood: { az: 'Ad günü · fortepiano və çelesta · 6/8', ru: 'День рождения · фортепиано и челеста · 6/8', en: 'Birthday · piano & celesta · 6/8' },
+    note: {
+      az: 'Orijinal kompozisiya · Re major',
+      ru: 'Оригинальная композиция · ре мажор',
+      en: 'Original composition · D major',
+    },
+  },
   {
     id: 'canon',
     title: { az: 'Kanon', ru: 'Канон', en: 'Canon' },
@@ -123,6 +165,9 @@ export const TRACKS: TrackMeta[] = [
 ];
 
 export const MUSIC_CHOICES: readonly string[] = [MUSIC_NONE, ...TRACKS.map(t => t.id)];
+
+/** Default for newly created invitations. */
+export const DEFAULT_TRACK: TrackId = 'serenade';
 
 /** Invitations saved before music selection existed keep their original melody. */
 export function resolveMusic(value: unknown): MusicChoice {

@@ -11,6 +11,7 @@
 
 import { useSyncExternalStore } from 'react';
 import type { TrackId } from './catalog';
+import { SIX_EIGHT } from './compositions-6-8';
 
 // ---------------------------------------------------------------------------
 // Notes & compositions
@@ -28,10 +29,30 @@ function hz(note: string): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-type Voice = 'piano' | 'harp' | 'bell' | 'pad' | 'bass';
+type Voice = 'piano' | 'harp' | 'bell' | 'pad' | 'bass' | 'strings' | 'cello';
 /** at/len are in beats relative to the start of the bar. */
-type NoteEvent = { at: number; note: string; len: number; voice: Voice; vel: number };
-type Composition = { bpm: number; beatsPerBar: number; bar: (index: number) => NoteEvent[] };
+export type NoteEvent = { at: number; note: string; len: number; voice: Voice; vel: number };
+export type Meter = {
+  numerator: number;
+  denominator: number;
+  /** Felt pulses per bar (2 for 6/8: two dotted-quarter beats). */
+  pulses: number;
+  /** Tempo of the felt pulse (the dotted quarter in 6/8). */
+  pulseBpm: number;
+};
+export type Composition = {
+  /** Rate of the scheduler's beat unit. For 6/8 pieces the unit is the eighth note. */
+  bpm: number;
+  /** Output trim so tracks sit at a similar loudness (default 1). */
+  gain?: number;
+  beatsPerBar: number;
+  bar: (index: number) => NoteEvent[];
+  meter?: Meter;
+  key?: string;
+  introBars?: number;
+  /** Bars in one pass of the looping form (after the intro). */
+  loopBars?: number;
+};
 
 const ev = (at: number, note: string, len: number, voice: Voice, vel: number): NoteEvent => ({ at, note, len, voice, vel });
 type Line = [number, string, number][];
@@ -174,7 +195,7 @@ const nocturne: Composition = {
   },
 };
 
-const COMPOSITIONS: Record<TrackId, Composition> = { canon, waltz, evening, nocturne };
+export const COMPOSITIONS: Record<TrackId, Composition> = { ...SIX_EIGHT, canon, waltz, evening, nocturne };
 
 // ---------------------------------------------------------------------------
 // Synthesis
@@ -182,7 +203,7 @@ const COMPOSITIONS: Record<TrackId, Composition> = { canon, waltz, evening, noct
 
 type Bus = { dry: AudioNode; wet: AudioNode };
 
-function playNote(ctx: AudioContext, bus: Bus, event: NoteEvent, start: number, secondsPerBeat: number) {
+function playNote(ctx: BaseAudioContext, bus: Bus, event: NoteEvent, start: number, secondsPerBeat: number) {
   const f = hz(event.note);
   const length = event.len * secondsPerBeat;
   const out = ctx.createGain();
@@ -235,18 +256,62 @@ function playNote(ctx: AudioContext, bus: Bus, event: NoteEvent, start: number, 
     env.exponentialRampToValueAtTime(event.vel * 0.45, start + length);
     end = start + length + 0.9;
     env.exponentialRampToValueAtTime(0.0001, end);
+  } else if (event.voice === 'strings' || event.voice === 'cello') {
+    // Bowed strings: two detuned saws through a gentle two-stage low-pass,
+    // a soft attack and a vibrato that only blooms once the note is held.
+    const cello = event.voice === 'cello';
+    const tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass';
+    tone.frequency.value = cello ? 1300 : Math.min(2600, f * 4.5);
+    tone.Q.value = 0.6;
+    const soften = ctx.createBiquadFilter();
+    soften.type = 'lowpass';
+    soften.frequency.value = cello ? 2400 : 4200;
+    soften.Q.value = 0.3;
+    tone.connect(soften).connect(out);
+    nodes.push(tone, soften);
+
+    const vibrato = ctx.createOscillator();
+    vibrato.frequency.value = cello ? 4.6 : 5.3;
+    const depth = ctx.createGain();
+    depth.gain.setValueAtTime(0, start);
+    depth.gain.linearRampToValueAtTime(0, start + Math.min(0.25, length * 0.4));
+    depth.gain.linearRampToValueAtTime(cello ? 7 : 9, start + Math.min(0.9, length * 0.8) + 0.05);
+    vibrato.connect(depth);
+    nodes.push(vibrato, depth);
+    for (const cents of [-6, 6]) {
+      const g = osc('sawtooth', f, 0.42, cents);
+      depth.connect(oscillators[oscillators.length - 1].detune);
+      g.connect(tone);
+    }
+    osc('triangle', f, 0.35).connect(tone);
+    oscillators.push(vibrato);
+
+    const peak = event.vel * 0.5;
+    const attack = Math.min(cello ? 0.22 : 0.3, Math.max(0.07, length * 0.4));
+    env.linearRampToValueAtTime(peak, start + attack);
+    env.linearRampToValueAtTime(peak * 0.86, start + Math.max(length, attack + 0.05));
+    end = start + Math.max(length, attack + 0.05) + (cello ? 0.7 : 0.9);
+    env.linearRampToValueAtTime(0.0001, end);
   } else {
     // piano / harp: plucked string with a closing filter
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    const bright = event.voice === 'harp' ? 3600 : 2600;
+    // Harder keystrokes sound brighter, so accents in the bar are heard in the
+    // tone as well as the loudness.
+    const bright = event.voice === 'harp' ? 3600 : 1900 + Math.min(event.vel, 0.5) * 2000;
     filter.frequency.setValueAtTime(bright, start);
     filter.frequency.exponentialRampToValueAtTime(700, start + 1.4);
     filter.connect(out);
     nodes.push(filter);
-    osc('triangle', f, 1).connect(filter);
+    osc('triangle', f, event.voice === 'piano' ? 0.8 : 1).connect(filter);
     osc('sine', f * 2, 0.22).connect(filter);
-    if (event.voice === 'piano') osc('sine', f * 3, 0.06).connect(filter);
+    if (event.voice === 'piano') {
+      osc('sine', f * 3, 0.06).connect(filter);
+      // A slightly detuned second string gives melody notes a natural shimmer.
+      // Quiet accompaniment notes skip it to keep the oscillator count low on phones.
+      if (event.vel >= 0.25) osc('triangle', f, 0.3, 3).connect(filter);
+    }
     env.exponentialRampToValueAtTime(event.vel, start + 0.008);
     env.exponentialRampToValueAtTime(event.vel * 0.32, start + 0.45);
     end = start + Math.max(length, 0.5) + (event.voice === 'harp' ? 1.4 : 1.1);
@@ -257,7 +322,7 @@ function playNote(ctx: AudioContext, bus: Bus, event: NoteEvent, start: number, 
   oscillators[0].onended = () => nodes.forEach(n => n.disconnect());
 }
 
-function impulseResponse(ctx: AudioContext, seconds = 3) {
+function impulseResponse(ctx: BaseAudioContext, seconds = 3) {
   const rate = ctx.sampleRate;
   const length = Math.floor(rate * seconds);
   const buffer = ctx.createBuffer(2, length, rate);
@@ -266,6 +331,40 @@ function impulseResponse(ctx: AudioContext, seconds = 3) {
     for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 3.2);
   }
   return buffer;
+}
+
+/** Master gain → gentle compressor → speakers, with a shared reverb send. */
+function createOutput(ctx: BaseAudioContext) {
+  const master = ctx.createGain();
+  const compressor = ctx.createDynamicsCompressor();
+  compressor.threshold.value = -16;
+  compressor.ratio.value = 3;
+  master.connect(compressor).connect(ctx.destination);
+
+  const convolver = ctx.createConvolver();
+  convolver.buffer = impulseResponse(ctx);
+  const wet = ctx.createGain();
+  wet.gain.value = 0.32;
+  convolver.connect(wet).connect(master);
+  return { master, convolver };
+}
+
+/**
+ * Renders the first `bars` bars of a track into any context — used with an
+ * OfflineAudioContext to analyse the real synthesized output. Not used by the
+ * live player, which schedules incrementally through Sequencer.
+ */
+export function scheduleTrack(ctx: BaseAudioContext, trackId: TrackId, bars: number, startAt = 0.05) {
+  const composition = COMPOSITIONS[trackId];
+  const { master, convolver } = createOutput(ctx);
+  master.gain.value = VOLUME * (composition.gain ?? 1);
+  const bus = { dry: master, wet: convolver };
+  const secondsPerBeat = 60 / composition.bpm;
+  for (let bar = 0; bar < bars; bar++) {
+    const barStart = startAt + bar * composition.beatsPerBar * secondsPerBeat;
+    for (const event of composition.bar(bar)) playNote(ctx, bus, event, barStart + event.at * secondsPerBeat, secondsPerBeat);
+  }
+  return bars * composition.beatsPerBar * secondsPerBeat;
 }
 
 /** Schedules one composition into its own gain node, a bar at a time. */
@@ -281,6 +380,8 @@ class Sequencer {
     this.send = ctx.createGain();
     this.dry.connect(destination.dry);
     this.send.connect(destination.wet);
+    this.dry.gain.value = composition.gain ?? 1;
+    this.send.gain.value = composition.gain ?? 1;
     this.nextBarAt = ctx.currentTime + 0.12;
   }
 
@@ -361,18 +462,8 @@ class MusicController {
     }
 
     const ctx = new Ctor();
-    const master = ctx.createGain();
+    const { master, convolver } = createOutput(ctx);
     master.gain.value = 0.0001;
-    const compressor = ctx.createDynamicsCompressor();
-    compressor.threshold.value = -16;
-    compressor.ratio.value = 3;
-    master.connect(compressor).connect(ctx.destination);
-
-    const convolver = ctx.createConvolver();
-    convolver.buffer = impulseResponse(ctx);
-    const wet = ctx.createGain();
-    wet.gain.value = 0.32;
-    convolver.connect(wet).connect(master);
 
     this.ctx = ctx;
     this.master = master;
