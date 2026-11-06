@@ -92,6 +92,8 @@ const dict = {
       failed: 'Upload failed. Check your connection and try again.',
     },
     safariWarn: 'OGG, WebM and FLAC do not play on iPhone or Safari. MP3 or M4A works everywhere.',
+    uploadMissing: 'That music file is no longer available, so your saved music was restored. Check the Music step and save again.',
+    fileGone: 'This file could not be loaded. Please upload it again.',
     useThis: 'Use this music', inUse: 'In use', removeMusic: 'Remove', seek: 'Playback position',
     volume: 'Volume',
     preview: 'Live preview', mobile: 'Phone', desktop: 'Desktop', replay: 'Replay opening',
@@ -136,6 +138,8 @@ const dict = {
       failed: 'Не удалось загрузить. Проверьте соединение и попробуйте ещё раз.',
     },
     safariWarn: 'OGG, WebM и FLAC не воспроизводятся на iPhone и в Safari. MP3 или M4A работают везде.',
+    uploadMissing: 'Этот аудиофайл больше недоступен, поэтому восстановлена сохранённая музыка. Проверьте раздел «Музыка» и сохраните снова.',
+    fileGone: 'Не удалось загрузить этот файл. Загрузите его ещё раз.',
     useThis: 'Выбрать эту музыку', inUse: 'Выбрано', removeMusic: 'Удалить', seek: 'Позиция воспроизведения',
     volume: 'Громкость',
     preview: 'Предпросмотр', mobile: 'Телефон', desktop: 'Компьютер', replay: 'Повторить открытие',
@@ -180,6 +184,8 @@ const dict = {
       failed: 'Yükləmək alınmadı. Bağlantını yoxlayıb yenidən cəhd edin.',
     },
     safariWarn: 'OGG, WebM və FLAC iPhone və Safari-də oynamır. MP3 və ya M4A hər yerdə işləyir.',
+    uploadMissing: 'Bu musiqi faylı artıq mövcud deyil, ona görə yadda saxlanmış musiqi bərpa olundu. «Musiqi» bölməsini yoxlayıb yenidən yadda saxlayın.',
+    fileGone: 'Bu faylı yükləmək alınmadı. Onu yenidən yükləyin.',
     useThis: 'Bu musiqini seç', inUse: 'Seçilib', removeMusic: 'Sil', seek: 'Oxutma mövqeyi',
     volume: 'Səs səviyyəsi',
     preview: 'Canlı önbaxış', mobile: 'Telefon', desktop: 'Kompüter', replay: 'Açılışı təkrarla',
@@ -341,6 +347,41 @@ export default function WeddingEditor({
 
   const formRef = useRef(form);
   useEffect(() => { formRef.current = form; }, [form]);
+  const dirtyRef = useRef(hasChanges);
+  useEffect(() => { dirtyRef.current = hasChanges; }, [hasChanges]);
+
+  // The page can be stale: restored by the browser's Back button, or left open
+  // in another tab while the invitation was changed elsewhere. Whenever the
+  // editor is opened or comes back into focus with no unsaved edits, reload
+  // the saved invitation so it never works from an outdated copy.
+  useEffect(() => {
+    let busy = false;
+    const sync = async () => {
+      if (busy || dirtyRef.current || document.hidden) return;
+      busy = true;
+      try {
+        const response = await fetch('/api/wedding', { cache: 'no-store' });
+        if (!response.ok) return;
+        const latest = (await response.json()).wedding as Wedding | null;
+        if (!latest || dirtyRef.current) return;
+        setWedding(latest);
+        const next = initialForm(latest);
+        setForm(old => (JSON.stringify(old) === JSON.stringify(next) ? old : next));
+      } catch { /* offline: keep what is shown */ } finally {
+        busy = false;
+      }
+    };
+    void sync();
+    const onVisible = () => { if (!document.hidden) void sync(); };
+    window.addEventListener('focus', onVisible);
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('pageshow', onVisible);
+    return () => {
+      window.removeEventListener('focus', onVisible);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('pageshow', onVisible);
+    };
+  }, []);
   useEffect(() => { setOrigin(window.location.origin); }, []);
 
   const weddingId = wedding?.id;
@@ -462,6 +503,19 @@ export default function WeddingEditor({
       const result = await response.json();
       if (!response.ok) {
         if (response.status === 409 && result.wedding) setWedding(result.wedding);
+        if (result.code === 'upload_missing') {
+          // The file this page pointed at is gone; fall back to what is saved.
+          const current = result.current as { music: string | null; musicUpload: UploadedMusic | null } | undefined;
+          const savedUpload = current?.musicUpload ?? null;
+          const savedChoice = current?.music ? resolveMusic(current.music) : DEFAULT_TRACK;
+          setForm(old => ({
+            ...old,
+            musicUpload: savedUpload,
+            music: savedChoice === MUSIC_UPLOAD && !savedUpload ? DEFAULT_TRACK : savedChoice,
+          }));
+          setStep('music');
+          throw new Error(t.uploadMissing);
+        }
         throw new Error(result.error || t.error);
       }
       setWedding(result.wedding);
@@ -1162,7 +1216,7 @@ function UploadPanel({ form, onPatch, t, previewing, togglePreview }: PanelProps
               onChange={e => music().seekFile(upload.id, Number(e.target.value))} />
             <span className="st-mtime">{formatTime(position.duration)}</span>
           </div>
-          {fileFailed(source) && <p className="st-merror" role="alert">{t.audioErr.failed}</p>}
+          {fileFailed(source) && <p className="st-merror" role="alert">{t.fileGone}</p>}
           {NOT_ON_SAFARI.test(upload.name) && <small className="st-mwarn">{t.safariWarn}</small>}
           <div className="st-mactions">
             {!inUse && (
