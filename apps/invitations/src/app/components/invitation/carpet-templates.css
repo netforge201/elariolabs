@@ -1,0 +1,455 @@
+/* =====================================================================
+   AZERBAIJANI CARPET & BUTA COLLECTION
+   Six designs that share the invitation renderer. Every rule here is scoped
+   to one of the six template classes or to kx-* elements that only these
+   designs render, so the original three designs are not affected.
+   ===================================================================== */
+
+/* ---------- Palettes (+ tokens for the shared sections) ---------- */
+
+.inv-t-carpet {
+  --k-red: #b3262e; --k-deepred: #7d1a22; --k-navy: #1c2347; --k-gold: #d4a957;
+  --k-cream: #f4e9d3; --k-orange: #e0782f; --k-ground: #141a38; --k-green: #3f6b4f;
+  --k-field: #f6ecd6; --k-ink: #3b1d1f; --k-accent: #9c1f27;
+  --bg: #efe3c8; --bg-2: #f5ecd9; --paper: #faf3e4;
+  --ink: #2a1c1d; --muted: #6b5148; --accent: #a8242b; --accent-ink: #8f1f26;
+  --line: rgba(168, 36, 43, .22); --line-strong: rgba(28, 35, 71, .38); --field: rgba(255, 255, 255, .55);
+  --primary: #1c2347; --primary-ink: #f6ecd6;
+}
+.inv-t-buta {
+  --k-red: #c0392b; --k-deepred: #7f1d1d; --k-navy: #0f1533; --k-gold: #e5c27a;
+  --k-cream: #f3e6c8; --k-orange: #e48a3a; --k-ground: #0b1029; --k-green: #4d7a5a;
+  --k-field: #131a3a; --k-ink: #f3e6c8; --k-accent: #e5c27a;
+  --bg: #0f1533; --bg-2: #141c40; --paper: #141c40;
+  --ink: #f3e6c8; --muted: rgba(243, 230, 200, .72); --accent: #e5c27a; --accent-ink: #e9cc8e;
+  --line: rgba(229, 194, 122, .22); --line-strong: rgba(229, 194, 122, .45); --field: rgba(255, 255, 255, .04);
+  --primary: #e5c27a; --primary-ink: #0f1533;
+}
+.inv-t-palace {
+  --k-red: #a3202a; --k-deepred: #6e1219; --k-navy: #1f2a5a; --k-gold: #d3a64f;
+  --k-cream: #f6ecd8; --k-orange: #d9732c; --k-ground: #18204a; --k-green: #3d6a50;
+  --k-field: #f8efdc; --k-ink: #3a1418; --k-accent: #a3202a;
+  --bg: #f1e5cd; --bg-2: #f7eedd; --paper: #fbf4e6;
+  --ink: #33151a; --muted: #6f4d47; --accent: #a3202a; --accent-ink: #8c1b24;
+  --line: rgba(163, 32, 42, .22); --line-strong: rgba(31, 42, 90, .35); --field: rgba(255, 255, 255, .55);
+  --primary: #a3202a; --primary-ink: #fbf4e6;
+}
+.inv-t-asymmetric {
+  --k-red: #c2312f; --k-deepred: #6a131d; --k-navy: #22306b; --k-gold: #e3bf6f;
+  --k-cream: #f4e4c4; --k-orange: #e07b33; --k-ground: #1a2352; --k-green: #4b7558;
+  --k-field: #4a0f17; --k-ink: #f4e4c4; --k-accent: #e3bf6f;
+  --bg: #3f0c14; --bg-2: #4a0f17; --paper: #4a0f17;
+  --ink: #f4e4c4; --muted: rgba(244, 228, 196, .74); --accent: #e3bf6f; --accent-ink: #ebcd8a;
+  --line: rgba(227, 191, 111, .22); --line-strong: rgba(227, 191, 111, .45); --field: rgba(255, 255, 255, .05);
+  --primary: #e3bf6f; --primary-ink: #3f0c14;
+}
+.inv-t-garden {
+  --k-red: #b3262e; --k-deepred: #7d1a22; --k-navy: #1f2a5a; --k-gold: #c99a48;
+  --k-cream: #fbf4e6; --k-orange: #df7a2e; --k-ground: #1f2a5a; --k-green: #4f7a52;
+  --k-field: #fbf4e6; --k-ink: #3b1d1f; --k-accent: #a8242b;
+  --bg: #f8efdd; --bg-2: #fcf6ea; --paper: #fffaf0;
+  --ink: #2c1d1f; --muted: #6d5650; --accent: #a8242b; --accent-ink: #8f1f26;
+  --line: rgba(168, 36, 43, .18); --line-strong: rgba(31, 42, 90, .3); --field: rgba(255, 255, 255, .6);
+  --primary: #1f2a5a; --primary-ink: #fffaf0;
+}
+.inv-t-heritage {
+  --k-red: #b3262e; --k-deepred: #7a1a20; --k-navy: #17204a; --k-gold: #d9b46a;
+  --k-cream: #f1e3c3; --k-orange: #df7a2e; --k-ground: #0f1840; --k-green: #4f8a62;
+  --k-field: #0f3326; --k-ink: #f1e3c3; --k-accent: #d9b46a;
+  --bg: #0c2a20; --bg-2: #0f3326; --paper: #0f3326;
+  --ink: #f1e3c3; --muted: rgba(241, 227, 195, .74); --accent: #d9b46a; --accent-ink: #e2c283;
+  --line: rgba(217, 180, 106, .22); --line-strong: rgba(217, 180, 106, .45); --field: rgba(255, 255, 255, .05);
+  --primary: #d9b46a; --primary-ink: #0c2a20;
+}
+.inv-t-carpet, .inv-t-buta, .inv-t-palace, .inv-t-asymmetric, .inv-t-garden, .inv-t-heritage {
+  --radius: 4px;
+  --display: var(--f-serif);
+  --measure: 720px;
+  --open-delay: .5s;
+  --music-bg: color-mix(in srgb, var(--paper) 88%, transparent);
+  --music-ink: var(--ink);
+  --music-line: var(--line-strong);
+}
+
+html:has(.inv-mode-live.inv-t-carpet), html:has(.inv-mode-live.inv-t-carpet) body { background: #efe3c8; }
+html:has(.inv-mode-live.inv-t-buta), html:has(.inv-mode-live.inv-t-buta) body { background: #0f1533; }
+html:has(.inv-mode-live.inv-t-palace), html:has(.inv-mode-live.inv-t-palace) body { background: #f1e5cd; }
+html:has(.inv-mode-live.inv-t-asymmetric), html:has(.inv-mode-live.inv-t-asymmetric) body { background: #3f0c14; }
+html:has(.inv-mode-live.inv-t-garden), html:has(.inv-mode-live.inv-t-garden) body { background: #f8efdd; }
+html:has(.inv-mode-live.inv-t-heritage), html:has(.inv-mode-live.inv-t-heritage) body { background: #0c2a20; }
+
+/* ---------- Palette classes used inside the SVG ornaments ---------- */
+
+.kr { fill: var(--k-red); }
+.kR { fill: var(--k-deepred); }
+.kn { fill: var(--k-navy); }
+.kg { fill: var(--k-gold); }
+.kc { fill: var(--k-cream); }
+.ko { fill: var(--k-orange); }
+.kd { fill: var(--k-ground); }
+.kt { fill: var(--k-green); }
+.ksg { stroke: var(--k-gold); }
+.ksn { stroke: var(--k-navy); }
+.ksr { stroke: var(--k-red); }
+
+/* ---------- Hero shell and card ---------- */
+
+.inv-hero--k {
+  display: grid;
+  place-items: center;
+  padding: clamp(10px, 3.2cqi, 48px);
+  padding-bottom: clamp(44px, 7cqi, 64px);
+}
+.kx-hero--carpet { background: radial-gradient(120% 70% at 50% 0%, #f6ecd7, transparent 70%), var(--bg); }
+.kx-hero--buta { background: radial-gradient(90% 60% at 50% 30%, #1a2350, transparent 75%), var(--bg); }
+.kx-hero--palace { background: radial-gradient(120% 70% at 50% 0%, #f8efde, transparent 70%), var(--bg); }
+.kx-hero--asymmetric { background: radial-gradient(90% 60% at 60% 30%, #571320, transparent 75%), var(--bg); }
+.kx-hero--garden { background: radial-gradient(120% 80% at 50% 10%, #fffaf0, transparent 70%), var(--bg); }
+.kx-hero--heritage { background: radial-gradient(90% 60% at 50% 30%, #11392a, transparent 75%), var(--bg); }
+
+.kx-card {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 560px);
+  min-height: min(calc(var(--inv-h) - 64px), 940px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px rgba(20, 10, 10, .12), 0 34px 70px -34px rgba(20, 10, 10, .6);
+  /* The card's width as a length, so corner ornaments can be sized from it and
+     the text can reserve exactly the space they take (no overlap at any size). */
+  --kx-cw: min(calc(100cqi - 2 * clamp(10px, 3.2cqi, 48px)), 560px);
+}
+.inv-mode-thumbnail .inv-hero--k { padding: 12px 12px 12px; }
+.inv-mode-thumbnail .kx-card { min-height: calc(var(--inv-h) - 24px); }
+
+.kx-frame, .kx-frame-layer { position: absolute; inset: 0; pointer-events: none; }
+.kx-band { display: block; }
+.kx-band > svg { display: block; width: 100%; height: 100%; }
+.kx-strip { position: absolute; }
+.kx-corner { position: absolute; display: block; }
+.kx-ground { position: absolute; inset: 0; display: block; }
+
+/* ---------- Shared text block ---------- */
+
+.kx-text {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--kx-text-w, 360px);
+  padding: var(--kx-pad-y, 120px) var(--kx-pad-x, 24px);
+  text-align: center;
+  color: var(--k-ink);
+}
+.kx-text > :nth-child(1) { --i: 0; }
+.kx-text > :nth-child(2) { --i: 1; }
+.kx-text > :nth-child(3) { --i: 2; }
+.kx-text > :nth-child(4) { --i: 3; }
+.kx-text > :nth-child(5) { --i: 4; }
+.kx-text > :nth-child(6) { --i: 5; }
+
+.kx-eyebrow { max-width: 26ch; color: var(--k-accent); font-size: 10px; letter-spacing: .26em; }
+.kx-names {
+  margin-top: 16px;
+  color: var(--k-accent);
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(2.5rem, 12.5cqi, 4.4rem);
+  line-height: .98;
+  max-width: 100%;
+}
+.kx-names.inv-names--long { font-size: clamp(2rem, 9.2cqi, 3.4rem); }
+.kx-names.inv-names--xlong { font-size: clamp(1.6rem, 7cqi, 2.6rem); }
+.kx-names .inv-amp { color: var(--k-gold); font-family: 'Marck Script', var(--f-serif); font-style: normal; font-size: .52em; margin: .06em 0; }
+.kx-divider { width: min(220px, 76%); height: auto; margin: 20px 0 16px; }
+.kx-invite {
+  margin: 0 0 18px;
+  max-width: 24ch;
+  font-family: var(--f-serif);
+  font-size: clamp(.98rem, 4cqi, 1.12rem);
+  font-weight: 600;
+  letter-spacing: .1em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.kx-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  max-width: 100%;
+  font-family: var(--f-serif);
+  font-size: clamp(1rem, 4.2cqi, 1.16rem);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.kx-meta + .kx-meta { margin-top: 10px; }
+.kx-meta strong { font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.kx-weekday { opacity: .8; }
+.kx-icon { flex: none; width: 15px; height: 15px; margin-top: .18em; color: var(--k-accent); }
+.kx-venue span { font-weight: 600; }
+
+/* Dark designs: light ink */
+.kx-card--buta, .kx-card--asymmetric, .kx-card--heritage { color: var(--k-ink); }
+
+/* =====================================================================
+   4 · CARPET FRAME
+   ===================================================================== */
+
+.kx-card--carpet { background: var(--k-ground); --kx-text-w: 400px; --kx-pad-y: 124px; }
+.kx-carpet { position: absolute; inset: 0; z-index: 1; }
+.kx-card--carpet .kx-field-wrap {
+  position: absolute; inset: var(--kx-frame); z-index: 1;
+  filter: drop-shadow(1.5px 0 0 var(--k-gold)) drop-shadow(-1.5px 0 0 var(--k-gold)) drop-shadow(0 1.5px 0 var(--k-gold)) drop-shadow(0 -1.5px 0 var(--k-gold));
+}
+.kx-card--carpet .kx-field {
+  position: absolute; inset: 0;
+  --s: 10px; --w: 50px;
+  background:
+    radial-gradient(120% 60% at 50% 50%, #fcf6e8 0%, transparent 70%),
+    var(--k-field);
+  /* Stepped notches top and bottom, where the göl medallions sit. */
+  clip-path: polygon(
+    0 0,
+    calc(50% - var(--w) - var(--s) * 2) 0, calc(50% - var(--w) - var(--s) * 2) var(--s), calc(50% - var(--w) - var(--s)) var(--s),
+    calc(50% - var(--w) - var(--s)) calc(var(--s) * 2), calc(50% - var(--w)) calc(var(--s) * 2), calc(50% - var(--w)) calc(var(--s) * 3),
+    calc(50% + var(--w)) calc(var(--s) * 3), calc(50% + var(--w)) calc(var(--s) * 2), calc(50% + var(--w) + var(--s)) calc(var(--s) * 2),
+    calc(50% + var(--w) + var(--s)) var(--s), calc(50% + var(--w) + var(--s) * 2) var(--s), calc(50% + var(--w) + var(--s) * 2) 0,
+    100% 0, 100% 100%,
+    calc(50% + var(--w) + var(--s) * 2) 100%, calc(50% + var(--w) + var(--s) * 2) calc(100% - var(--s)), calc(50% + var(--w) + var(--s)) calc(100% - var(--s)),
+    calc(50% + var(--w) + var(--s)) calc(100% - var(--s) * 2), calc(50% + var(--w)) calc(100% - var(--s) * 2), calc(50% + var(--w)) calc(100% - var(--s) * 3),
+    calc(50% - var(--w)) calc(100% - var(--s) * 3), calc(50% - var(--w)) calc(100% - var(--s) * 2), calc(50% - var(--w) - var(--s)) calc(100% - var(--s) * 2),
+    calc(50% - var(--w) - var(--s)) calc(100% - var(--s)), calc(50% - var(--w) - var(--s) * 2) calc(100% - var(--s)), calc(50% - var(--w) - var(--s) * 2) 100%,
+    0 100%
+  );
+}
+/* Quarter-göl spandrels turn each corner of the field (2 px per knot). */
+.kx-spandrel { position: absolute; z-index: 2; width: 46px; height: 46px; shape-rendering: crispEdges; }
+.kx-spandrel--tl { top: var(--kx-frame); left: var(--kx-frame); }
+.kx-spandrel--tr { top: var(--kx-frame); right: var(--kx-frame); transform: scaleX(-1); }
+.kx-spandrel--bl { bottom: var(--kx-frame); left: var(--kx-frame); transform: scaleY(-1); }
+.kx-spandrel--br { bottom: var(--kx-frame); right: var(--kx-frame); transform: scale(-1); }
+.kx-card--carpet .kx-medallion { position: absolute; left: 50%; z-index: 3; width: 90px; height: 90px; margin-left: -45px; shape-rendering: crispEdges; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .28)); }
+.kx-card--carpet .kx-medallion--top { top: calc(var(--kx-frame) - 32px); }
+.kx-card--carpet .kx-medallion--bottom { bottom: calc(var(--kx-frame) - 32px); }
+.kx-card--carpet .kx-text { --kx-pad-x: 70px; max-width: 540px; }
+
+/* =====================================================================
+   5 · BUTA ELEGANCE
+   ===================================================================== */
+
+.kx-card--buta {
+  --kx-text-w: 330px;
+  --kx-orn: min(calc(var(--kx-cw) * .4), calc(var(--inv-h) * .19), 230px);
+  /* Corner butas are ~1.42 × orn tall, the vines 1.4 × orn: reserve that above and below the text. */
+  --kx-pad-y: calc(var(--kx-orn) * 1.5);
+  background:
+    radial-gradient(70% 45% at 50% 50%, rgba(229, 194, 122, .08), transparent 70%),
+    radial-gradient(120% 80% at 50% 0%, #182150, transparent 70%),
+    var(--k-field);
+  box-shadow: inset 0 0 0 1px rgba(229, 194, 122, .25), 0 2px 6px rgba(20, 10, 10, .12), 0 34px 70px -34px rgba(0, 0, 0, .7);
+}
+.kx-ornaments { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.kx-card--buta .kx-buta { position: absolute; height: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35)); }
+/* balalı buta hangs from the top-right corner; floral buta rises from the bottom-left */
+.kx-card--buta .kx-buta--tr { top: calc(var(--kx-orn) * -.08); right: calc(var(--kx-orn) * -.12); width: var(--kx-orn); transform: rotate(180deg); }
+.kx-card--buta .kx-buta--bl { bottom: calc(var(--kx-orn) * -.06); left: calc(var(--kx-orn) * -.1); width: calc(var(--kx-orn) * 1.04); }
+.kx-card--buta .kx-vine { position: absolute; height: calc(var(--kx-orn) * 1.4); width: auto; opacity: .95; }
+.kx-card--buta .kx-vine--tl { top: 2%; left: 1%; }
+.kx-card--buta .kx-vine--br { bottom: 2%; right: 1%; transform: rotate(180deg); }
+
+/* =====================================================================
+   6 · ORIENTAL PALACE
+   ===================================================================== */
+
+.kx-card--palace { background: var(--k-red); --kx-inset: 13%; }
+.kx-card--palace .kx-arch {
+  position: absolute; z-index: 1;
+  top: 66px; bottom: 60px; left: var(--kx-inset); right: var(--kx-inset);
+  display: flex; flex-direction: column;
+  filter: drop-shadow(2.5px 0 0 var(--k-gold)) drop-shadow(-2.5px 0 0 var(--k-gold)) drop-shadow(0 2.5px 0 var(--k-gold)) drop-shadow(0 -2.5px 0 var(--k-gold))
+          drop-shadow(3px 0 0 var(--k-navy)) drop-shadow(-3px 0 0 var(--k-navy)) drop-shadow(0 3px 0 var(--k-navy)) drop-shadow(0 -3px 0 var(--k-navy));
+}
+.kx-card--palace .kx-cap { display: block; width: 100%; height: auto; aspect-ratio: 200 / 92; margin-bottom: -1px; fill: var(--k-field); }
+.kx-card--palace .kx-arch-body { flex: 1; background: radial-gradient(110% 55% at 50% 30%, #fffaf0, transparent 75%), var(--k-field); }
+.kx-card--palace .kx-medallion { position: absolute; left: 50%; z-index: 3; width: 81px; height: 81px; margin-left: -40.5px; shape-rendering: crispEdges; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3)); }
+.kx-card--palace .kx-medallion--crown { top: 22px; }
+.kx-card--palace .kx-medallion--base { bottom: 20px; }
+/* pendant hangs inside the arch, just under its apex */
+.kx-pendant { position: absolute; z-index: 2; left: 50%; top: 104px; width: 34px; height: auto; margin-left: -17px; }
+.kx-text--arch {
+  --kx-pad-x: calc(var(--kx-inset, 13%) + 20px);
+  max-width: 100%;
+  padding-top: calc(var(--kx-arch-top, 66px) + 38cqi * .5 + 40px);
+  padding-bottom: 104px;
+}
+@container inv (min-width: 600px) {
+  .kx-text--arch { padding-top: calc(var(--kx-arch-top, 66px) + 160px); }
+}
+
+/* =====================================================================
+   7 · TRADITIONAL ASYMMETRIC
+   ===================================================================== */
+
+.kx-card--asymmetric {
+  --kx-strip: clamp(84px, 26%, 144px);
+  --kx-orn: min(calc(var(--kx-cw) * .56), calc(var(--inv-h) * .3), 300px);
+  background:
+    radial-gradient(80% 60% at 70% 35%, #5a1521, transparent 70%),
+    linear-gradient(180deg, #4f1019, #3a0a12);
+  box-shadow: inset 0 0 0 1px rgba(227, 191, 111, .22), 0 2px 6px rgba(20, 10, 10, .12), 0 34px 70px -34px rgba(0, 0, 0, .7);
+}
+.kx-strip-panel { position: absolute; z-index: 1; top: 0; bottom: 0; left: 0; width: var(--kx-strip); }
+.kx-strip-field { position: absolute; top: 0; bottom: 0; left: 0; right: 9px; }
+.kx-strip-guard { position: absolute; top: 0; bottom: 0; right: 0; width: 9px; }
+/* 3 px per knot keeps the göl crisp */
+.kx-strip-medallion { position: absolute; left: calc(50% - 4.5px); width: 81px; height: 81px; margin-left: -40.5px; shape-rendering: crispEdges; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .45)); }
+.kx-strip-medallion--1 { top: 7%; }
+.kx-strip-medallion--2 { top: 30%; }
+.kx-card--asymmetric .kx-buta--anchor {
+  position: absolute; z-index: 2;
+  left: calc(var(--kx-orn) * -.16); bottom: calc(var(--kx-orn) * -.12);
+  width: var(--kx-orn); height: auto;
+  transform: rotate(8deg);
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .45));
+}
+.kx-counter { position: absolute; z-index: 2; top: 20px; right: 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.kx-counter-buta { width: 36px; height: auto; transform: rotate(180deg); }
+.kx-counter-rule { width: 1px; height: 72px; background: linear-gradient(180deg, var(--k-gold), transparent); }
+.kx-text--offset {
+  --kx-pad-x: 20px;
+  align-self: flex-start;
+  margin-left: calc(var(--kx-strip) + 10px);
+  max-width: calc(100% - var(--kx-strip) - 10px);
+  padding-top: clamp(116px, 26%, 200px);
+  /* the anchor buta is ~1.42 × its width tall and rises ~85 % of that */
+  padding-bottom: calc(var(--kx-orn) * 1.12);
+}
+
+/* =====================================================================
+   8 · BUTA GARDEN
+   ===================================================================== */
+
+.kx-card--garden {
+  --kx-text-w: 340px;
+  --kx-orn: min(calc(var(--kx-cw) * .36), calc(var(--inv-h) * .19), 190px);
+  --kx-pad-y: calc(var(--kx-orn) * 1.02 + 22px);
+  background:
+    radial-gradient(70% 50% at 50% 50%, #fffdf6, transparent 75%),
+    var(--k-field);
+}
+.kx-card--garden .kx-rule {
+  position: absolute; inset: 12px; z-index: 0; border-radius: 10px;
+  border: 1.5px solid var(--k-red);
+  box-shadow: inset 0 0 0 4px var(--k-field), inset 0 0 0 5px var(--k-gold);
+}
+.kx-corner-spray { position: absolute; width: var(--kx-orn); height: var(--kx-orn); }
+.kx-corner-spray--tl { top: 16px; left: 16px; }
+.kx-corner-spray--tr { top: 16px; right: 16px; transform: scaleX(-1); }
+.kx-corner-spray--bl { bottom: 16px; left: 16px; transform: scaleY(-1); }
+.kx-corner-spray--br { bottom: 16px; right: 16px; transform: scale(-1); }
+.kx-card--garden .kx-crown { position: absolute; top: 22px; left: 50%; width: calc(var(--kx-orn) * .72); height: auto; transform: translateX(-50%); }
+.kx-card--garden .kx-crest { position: absolute; bottom: 22px; left: 50%; width: calc(var(--kx-orn) * .62); height: auto; transform: translateX(-50%) rotate(180deg); }
+
+/* =====================================================================
+   9 · AZERBAIJANI HERITAGE
+   ===================================================================== */
+
+.kx-card--heritage { background: var(--k-navy); --kx-inset: 15%; }
+.kx-heritage { position: absolute; inset: 0; z-index: 0; }
+.kx-card--heritage .kx-ground { position: absolute; inset: var(--kx-frame); }
+.kx-card--heritage .kx-arch {
+  position: absolute; z-index: 1;
+  top: 84px; bottom: calc(var(--kx-frame) + 16px); left: var(--kx-inset); right: var(--kx-inset);
+  display: flex; flex-direction: column;
+  filter: drop-shadow(2px 0 0 var(--k-gold)) drop-shadow(-2px 0 0 var(--k-gold)) drop-shadow(0 2px 0 var(--k-gold)) drop-shadow(0 -2px 0 var(--k-gold))
+          drop-shadow(2.5px 0 0 var(--k-red)) drop-shadow(-2.5px 0 0 var(--k-red)) drop-shadow(0 2.5px 0 var(--k-red)) drop-shadow(0 -2.5px 0 var(--k-red))
+          drop-shadow(1.5px 0 0 var(--k-gold)) drop-shadow(-1.5px 0 0 var(--k-gold)) drop-shadow(0 1.5px 0 var(--k-gold)) drop-shadow(0 -1.5px 0 var(--k-gold));
+}
+.kx-card--heritage .kx-cap { display: block; width: 100%; height: auto; aspect-ratio: 200 / 110; margin-bottom: -1px; fill: var(--k-field); }
+.kx-card--heritage .kx-arch-body { flex: 1; background: radial-gradient(90% 50% at 50% 35%, rgba(217, 180, 106, .1), transparent 70%), var(--k-field); }
+/* 2 px per knot */
+.kx-card--heritage .kx-medallion { position: absolute; left: 50%; z-index: 3; width: 98px; height: 98px; margin-left: -49px; shape-rendering: crispEdges; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .4)); }
+.kx-card--heritage .kx-medallion--crown { top: 56px; }
+.kx-woven-row {
+  position: absolute; z-index: 2;
+  left: calc(var(--kx-inset) + 10px); right: calc(var(--kx-inset) + 10px); bottom: calc(var(--kx-frame) + 30px);
+  display: flex; justify-content: space-evenly; align-items: flex-end;
+}
+/* 2 px per knot (19 × 26) */
+.kx-woven { width: 38px; height: 52px; shape-rendering: crispEdges; }
+.kx-woven.is-flipped { transform: scaleX(-1); }
+.kx-card--heritage .kx-text--arch { --kx-arch-top: 84px; padding-bottom: 170px; }
+
+/* =====================================================================
+   Opening cover: two woven doors
+   ===================================================================== */
+
+.inv-cover--k { padding: 18px; color: var(--k-ink); }
+.kx-door {
+  position: absolute; top: 0; bottom: 0; width: 50.5%; z-index: 0; overflow: hidden;
+  background: var(--k-ground);
+  transition: transform 1.05s var(--ease-curtain) .15s;
+}
+.kx-door--left { left: 0; }
+.kx-door--right { right: 0; }
+.kx-door-field { position: absolute; inset: 0; display: block; }
+.kx-door-edge {
+  position: absolute; top: 0; bottom: 0; width: 6px;
+  background: linear-gradient(90deg, var(--k-gold), var(--k-deepred) 40%, var(--k-gold));
+}
+.kx-door--left .kx-door-edge { right: 0; }
+.kx-door--right .kx-door-edge { left: 0; }
+/* Butas sit low on each door so they show below the name plaque; mirrored pair. */
+.kx-door-buta { position: absolute; bottom: 3%; width: min(62%, 220px); height: auto; }
+.kx-door--left .kx-door-buta { right: 8%; transform: scaleX(-1); }
+.kx-door--right .kx-door-buta { left: 8%; }
+.inv-cover--k.is-opening .kx-door--left { transform: translateX(-101%); }
+.inv-cover--k.is-opening .kx-door--right { transform: translateX(101%); }
+
+.kx-cover-plaque {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  width: min(100%, 380px);
+  padding: 58px 26px 30px;
+  border-radius: 200px 200px 18px 18px;
+  background: var(--k-field);
+  color: var(--k-ink);
+  box-shadow: 0 0 0 2px var(--k-gold), 0 0 0 5px var(--k-red), 0 0 0 6.5px var(--k-gold), 0 30px 60px -20px rgba(0, 0, 0, .6);
+  transition: opacity .35s ease, transform .5s var(--ease-out);
+}
+.inv-cover--k.is-opening .kx-cover-plaque { opacity: 0; transform: scale(.96); }
+.kx-cover-medallion { position: absolute; top: -42px; left: 50%; width: 84px; height: 84px; margin-left: -42px; shape-rendering: crispEdges; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35)); }
+.inv-cover--k .inv-cover-to { color: var(--k-ink); opacity: .8; }
+.kx-cover-names { color: var(--k-accent); font-family: var(--f-serif); font-style: italic; font-weight: 600; font-size: clamp(2.2rem, 10.5cqi, 3.4rem); line-height: .98; }
+.kx-cover-names.inv-names--long, .kx-cover-names.inv-names--xlong { font-size: clamp(1.6rem, 7.4cqi, 2.4rem); }
+.kx-cover-names .inv-amp { color: var(--k-gold); font-family: 'Marck Script', var(--f-serif); font-style: normal; }
+.inv-cover--k .inv-cover-cta { border-color: var(--k-gold); color: var(--k-accent); }
+.inv-cover--k .inv-cover-button:hover .inv-cover-cta { background: var(--k-accent); border-color: var(--k-accent); color: var(--k-field); }
+.inv-cover--k .inv-cover-hint { color: var(--k-ink); opacity: .7; }
+.inv-cover--k .inv-cover-button { gap: 0; }
+
+/* ---------- Shared sections in the collection ---------- */
+
+.inv-t-carpet .inv-section-title, .inv-t-palace .inv-section-title, .inv-t-garden .inv-section-title { color: var(--accent); font-style: italic; font-weight: 600; }
+.inv-t-buta .inv-section-title, .inv-t-asymmetric .inv-section-title, .inv-t-heritage .inv-section-title { color: var(--accent); font-style: italic; font-weight: 500; }
+.inv-t-carpet .inv-btn, .inv-t-buta .inv-btn, .inv-t-palace .inv-btn,
+.inv-t-asymmetric .inv-btn, .inv-t-garden .inv-btn, .inv-t-heritage .inv-btn { border-radius: 999px; }
+.inv-t-palace .inv-photo-frame, .inv-t-heritage .inv-photo-frame { border-radius: 999px 999px 6px 6px; border-color: var(--accent); }
+.inv-t-palace .inv-photo-frame img, .inv-t-heritage .inv-photo-frame img { border-radius: 999px 999px 3px 3px; }
+.inv-t-carpet .inv-photo-frame, .inv-t-garden .inv-photo-frame, .inv-t-buta .inv-photo-frame, .inv-t-asymmetric .inv-photo-frame { border-color: var(--accent); }
+.inv-t-carpet .inv-story-text::first-letter, .inv-t-garden .inv-story-text::first-letter {
+  float: left; margin: .06em .12em 0 0; color: var(--accent); font-size: 3.4em; line-height: .8;
+}
+
+/* Thumbnails: no drop shadows (they blur when scaled down). */
+.inv-mode-thumbnail .kx-card { box-shadow: none; }

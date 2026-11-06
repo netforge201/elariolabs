@@ -2,24 +2,32 @@
 // Safe to import from both server (API validation) and client code.
 
 export type Locale = 'az' | 'ru' | 'en';
-export type TemplateId = 'classic' | 'modern' | 'minimal';
+/**
+ * Every invitation design. The first three are the original designs; the rest
+ * are the Azerbaijani carpet & buta collection (see carpet-templates.tsx).
+ */
+export type TemplateId =
+  | 'classic' | 'modern' | 'minimal'
+  | 'carpet' | 'buta' | 'palace' | 'asymmetric' | 'garden' | 'heritage';
 type Localized = Record<Locale, string>;
 
 export function resolveLocale(value: string | null | undefined): Locale {
   return value === 'ru' || value === 'en' || value === 'az' ? value : 'az';
 }
 
-/** Legacy ids ("elegant" is the DB default) map onto the current designs. */
-export function resolveTemplate(template: string | null | undefined): TemplateId {
-  if (template === 'modern' || template === 'elegant') return 'modern';
-  if (template === 'minimal') return 'minimal';
-  return 'classic';
-}
-
-export const TEMPLATE_IDS: readonly TemplateId[] = ['classic', 'modern', 'minimal'];
+export const TEMPLATE_IDS: readonly TemplateId[] = [
+  'classic', 'modern', 'minimal',
+  'carpet', 'buta', 'palace', 'asymmetric', 'garden', 'heritage',
+];
 
 export function isTemplateId(value: unknown): value is TemplateId {
   return typeof value === 'string' && (TEMPLATE_IDS as readonly string[]).includes(value);
+}
+
+/** Legacy ids ("elegant" is the DB default) map onto the current designs. */
+export function resolveTemplate(template: string | null | undefined): TemplateId {
+  if (template === 'elegant') return 'modern';
+  return isTemplateId(template) ? template : 'classic';
 }
 
 // ---------------------------------------------------------------------------
@@ -102,7 +110,87 @@ export const TEMPLATES: TemplateMeta[] = [
     swatches: ['#f1ede4', '#2d302a', '#66745a'],
     usesPhoto: 'optional',
   },
+  // --- Azerbaijani carpet & buta collection -------------------------------
+  {
+    id: 'carpet',
+    name: { az: 'Xalça çərçivəsi', ru: 'Ковровая рамка', en: 'Carpet Frame' },
+    style: { az: 'Xalça naxışı', ru: 'Ковровый узор', en: 'Carpet border' },
+    description: {
+      az: 'Üç qat toxunma haşiyə, ulduzlu künclər, qarmaqlı göl medalyonları və künc yarım-gölləri — əsl xalça kimi.',
+      ru: 'Три тканые каймы, звёздные углы, крючковатые медальоны-гёль и угловые четверти гёля — как настоящий ковёр.',
+      en: 'Three woven borders, star corner blocks, hooked göl medallions and quarter-göl spandrels — like a real rug.',
+    },
+    swatches: ['#f4e9d3', '#1c2347', '#b3262e'],
+    usesPhoto: 'optional',
+  },
+  {
+    id: 'buta',
+    name: { az: 'Buta zərifliyi', ru: 'Элегантная бута', en: 'Buta Elegance' },
+    style: { az: 'Buta və çiçəklər', ru: 'Бута и цветы', en: 'Buta & florals' },
+    description: {
+      az: 'Tünd göy fonda çiçəkli buta və balalı buta, qızılı islimi budaqları ilə. Zərif, asimmetrik kompozisiya.',
+      ru: 'Цветочная бута и бута «с детьми» с золотыми ветвями ислими на тёмно-синем фоне. Изящная асимметрия.',
+      en: 'A floral buta and a balalı buta (with young butas) with golden islimi vines on deep navy.',
+    },
+    swatches: ['#131a3a', '#e9c77f', '#c0392b'],
+    usesPhoto: 'optional',
+  },
+  {
+    id: 'palace',
+    name: { az: 'Şərq sarayı', ru: 'Восточный дворец', en: 'Oriental Palace' },
+    style: { az: 'Tağ və xalça', ru: 'Арка и ковёр', en: 'Arch & carpet' },
+    description: {
+      az: 'Quba naxışlı sahədə krem rəngli şərq tağı, asma bəzək və göl medalyonları. Simmetrik və təntənəli.',
+      ru: 'Кремовая восточная арка в поле кубинской решётки, подвеска и медальоны-гёль. Симметрично и торжественно.',
+      en: 'A cream ogee arch in a Kuba lattice field, with a hanging pendant and göl medallions.',
+    },
+    swatches: ['#f6ecd8', '#a3202a', '#1f2a5a'],
+    usesPhoto: 'optional',
+  },
+  {
+    id: 'asymmetric',
+    name: { az: 'Ənənəvi asimmetriya', ru: 'Традиционная асимметрия', en: 'Traditional Asymmetric' },
+    style: { az: 'Cəsarətli', ru: 'Смелый', en: 'Bold' },
+    description: {
+      az: 'Tünd albalı fonda göl medalyonlu toxunma buta zolağı və iri çiçəkli buta. Cəsarətli kompozisiya.',
+      ru: 'Тканая полоса из мелких бут с медальонами и крупная цветочная бута на тёмно-бордовом фоне.',
+      en: 'A woven strip of tiny butas with göl medallions, and a large floral buta on deep burgundy.',
+    },
+    swatches: ['#4a0f17', '#e3bf6f', '#22306b'],
+    usesPhoto: 'optional',
+  },
+  {
+    id: 'garden',
+    name: { az: 'Buta bağı', ru: 'Сад буты', en: 'Buta Garden' },
+    style: { az: 'Yüngül', ru: 'Светлый', en: 'Light' },
+    description: {
+      az: 'Fil sümüyü fonda butalı künc budaqları, cüt buta tacı və palmet. Ənənəvi, lakin yüngül.',
+      ru: 'Угловые ветви с бутами, венец из парных бут и пальметта на цвете слоновой кости. Легко и традиционно.',
+      en: 'Corner sprays with butas, a buta-pair crown and a palmette crest on warm ivory. Light and airy.',
+    },
+    swatches: ['#fbf4e6', '#b3262e', '#1f2a5a'],
+    usesPhoto: 'optional',
+  },
+  {
+    id: 'heritage',
+    name: { az: 'Azərbaycan irsi', ru: 'Азербайджанское наследие', en: 'Azerbaijani Heritage' },
+    style: { az: 'Dəbdəbəli', ru: 'Роскошный', en: 'Luxurious' },
+    description: {
+      az: 'Şirvan qədəh haşiyəsi, ulduzlu sahə, ulduz göllü yaşıl tağ və toxunma butalar sırası.',
+      ru: 'Ширванская кайма «бокал и лист», звёздное поле, зелёная арка со звёздным гёлем и ряд тканых бут.',
+      en: 'A Shirvan wine-glass border, a star field and a green arch crowned by a star göl, with woven butas.',
+    },
+    swatches: ['#0f3326', '#d9b46a', '#b3262e'],
+    usesPhoto: 'optional',
+  },
 ];
+
+/** Designs from the Azerbaijani carpet & buta collection. */
+export const CARPET_TEMPLATES = ['carpet', 'buta', 'palace', 'asymmetric', 'garden', 'heritage'] as const;
+export type CarpetTemplateId = typeof CARPET_TEMPLATES[number];
+export function isCarpetTemplate(id: TemplateId): id is CarpetTemplateId {
+  return (CARPET_TEMPLATES as readonly string[]).includes(id);
+}
 
 export function templateMeta(id: string | null | undefined): TemplateMeta {
   const resolved = resolveTemplate(id);

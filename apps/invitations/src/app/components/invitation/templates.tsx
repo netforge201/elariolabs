@@ -3,6 +3,8 @@
 
 import type { InvitationModel } from './model';
 import { ChevronDown, Flourish, RoseCorner, Sprig } from './ornaments';
+import { isCarpetTemplate } from './catalog';
+import { KCover, KHero, K_OPENING_DURATION } from './carpet-templates';
 
 type HeroProps = { m: InvitationModel };
 
@@ -109,6 +111,7 @@ function MinimalHero({ m }: HeroProps) {
 }
 
 export function Hero({ m }: HeroProps) {
+  if (isCarpetTemplate(m.template)) return <KHero id={m.template} m={m} />;
   if (m.template === 'modern') return <ModernHero m={m} />;
   if (m.template === 'minimal') return <MinimalHero m={m} />;
   return <ClassicHero m={m} />;
@@ -189,10 +192,15 @@ function MinimalCover({ m, phase, hasMusic, focus, onOpen }: CoverProps) {
 }
 
 export function Cover(props: CoverProps) {
+  if (isCarpetTemplate(props.m.template)) return <KCover id={props.m.template} {...props} />;
   if (props.m.template === 'modern') return <ModernCover {...props} />;
   if (props.m.template === 'minimal') return <MinimalCover {...props} />;
   return <ClassicCover {...props} />;
 }
 
 /** How long each opening takes before the cover is removed (ms). */
-export const OPENING_DURATION = { classic: 1650, modern: 1250, minimal: 1000 } as const;
+export const OPENING_DURATION = {
+  classic: 1650, modern: 1250, minimal: 1000,
+  carpet: K_OPENING_DURATION, buta: K_OPENING_DURATION, palace: K_OPENING_DURATION,
+  asymmetric: K_OPENING_DURATION, garden: K_OPENING_DURATION, heritage: K_OPENING_DURATION,
+} as const;
