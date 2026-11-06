@@ -2,7 +2,23 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { generateSeatingProposals, type SeatingProposal } from '@/lib/seating-auto';
+import {
+  generateSeatingProposals,
+  type SeatingProposal,
+  type SeatingProposalIssueCode,
+} from '@/lib/seating-auto';
+import {
+  assignGuestToSeat,
+  assignGuestToTable,
+  locateSeat,
+  repairAssignments,
+  tableCapacity,
+  unassignGuest,
+  validateSeatingPlan,
+  type AssignResult,
+  type SeatingIssue,
+  type SeatingIssueCode,
+} from '@/lib/seating-logic';
 import {
   createEmptySeatingPlan,
   type SeatingAssignment,
@@ -21,6 +37,7 @@ import {
   RedoIcon,
   DuplicateIcon,
   MinusIcon,
+  CheckIcon,
 } from './icons';
 
 type Locale = 'az' | 'ru' | 'en';
@@ -78,6 +95,170 @@ const labels = {
     error: 'Dəyişiklikləri saxlamaq mümkün olmadı',
   },
 };
+
+/* Guest assignment, drag-and-drop, smart seating results and validation copy. */
+const assignCopy = {
+  en: {
+    search: 'Search guests or tables…', all: 'All', unassignedTab: 'Unassigned', assignedTab: 'Seated',
+    seat: 'seat', noMatch: 'No guests match your search.', dragHint: 'Drag a guest onto a table or a seat. Drag a seated guest here to unassign.',
+    unassign: 'Unassign', locate: 'Show on plan', dropHere: 'Drop here to unassign',
+    tableFull: (table: string) => `${table} is full. Increase its seats or choose another table.`,
+    seatOccupied: (guest: string) => `This seat is taken by ${guest}. Unassign them first or pick a free seat.`,
+    invalid: 'This seat no longer exists.', unknownGuest: 'This guest is no longer in your guest list.',
+    assigned: (guest: string, table: string, seat: number) => `${guest} → ${table}, seat ${seat}`,
+    unassigned: (guest: string) => `${guest} no longer has a seat`,
+    dropTable: (table: string, seat: number) => `${table} · seat ${seat}`,
+    dropFull: (table: string) => `${table} is full`,
+    dropTaken: 'Seat taken',
+    occupiedBy: (guest: string) => `Seat taken by ${guest}`,
+    validate: 'Check seating', validation: 'Seating check', validationIntro: 'Inspects the current plan, including unsaved changes.',
+    allGood: 'No problems found. Every guest has a valid seat.', errors: 'errors', warnings: 'warnings',
+    fix: 'Remove invalid assignments', fixDone: (n: number) => `${n} invalid assignment${n === 1 ? '' : 's'} removed`,
+    fixHint: 'Errors prevent saving. Removing invalid assignments keeps every valid seat and can be undone.',
+    show: 'Show', unknownName: 'Deleted guest',
+    keepExisting: 'Keep current assignments and only seat unassigned guests',
+    kept: 'kept', added: 'newly seated', unseatedList: 'Without a seat',
+    applied: (seated: number, total: number, added: number, left: number) =>
+      `Smart seating: ${seated}/${total} seated (${added} newly placed)${left ? `, ${left} still without a seat` : ''}.`,
+    titles: { 1: 'Balanced seating', 2: 'Group-focused seating', 3: 'Preference-focused seating' },
+  },
+  ru: {
+    search: 'Поиск гостей или столов…', all: 'Все', unassignedTab: 'Без места', assignedTab: 'Рассажены',
+    seat: 'место', noMatch: 'Гости не найдены.', dragHint: 'Перетащите гостя на стол или место. Перетащите рассаженного гостя сюда, чтобы освободить место.',
+    unassign: 'Освободить', locate: 'Показать на плане', dropHere: 'Отпустите, чтобы освободить место',
+    tableFull: (table: string) => `${table}: свободных мест нет. Увеличьте число мест или выберите другой стол.`,
+    seatOccupied: (guest: string) => `Это место занято: ${guest}. Сначала освободите его или выберите свободное.`,
+    invalid: 'Этого места больше нет.', unknownGuest: 'Этого гостя нет в списке гостей.',
+    assigned: (guest: string, table: string, seat: number) => `${guest} → ${table}, место ${seat}`,
+    unassigned: (guest: string) => `${guest}: место освобождено`,
+    dropTable: (table: string, seat: number) => `${table} · место ${seat}`,
+    dropFull: (table: string) => `${table}: мест нет`,
+    dropTaken: 'Место занято',
+    occupiedBy: (guest: string) => `Место занято: ${guest}`,
+    validate: 'Проверить рассадку', validation: 'Проверка рассадки', validationIntro: 'Проверяется текущий план, включая несохранённые изменения.',
+    allGood: 'Проблем не найдено. У каждого гостя корректное место.', errors: 'ошибок', warnings: 'предупреждений',
+    fix: 'Удалить некорректные назначения', fixDone: (n: number) => `Удалено некорректных назначений: ${n}`,
+    fixHint: 'Ошибки не позволяют сохранить план. Корректные места сохранятся, действие можно отменить.',
+    show: 'Показать', unknownName: 'Удалённый гость',
+    keepExisting: 'Сохранить текущую рассадку и рассадить только гостей без места',
+    kept: 'сохранено', added: 'рассажено заново', unseatedList: 'Без места',
+    applied: (seated: number, total: number, added: number, left: number) =>
+      `Умная рассадка: ${seated}/${total} рассажено (новых: ${added})${left ? `, без места: ${left}` : ''}.`,
+    titles: { 1: 'Сбалансированная', 2: 'По группам', 3: 'По предпочтениям' },
+  },
+  az: {
+    search: 'Qonaq və ya masa axtar…', all: 'Hamısı', unassignedTab: 'Yersiz', assignedTab: 'Yerləşdirilib',
+    seat: 'yer', noMatch: 'Qonaq tapılmadı.', dragHint: 'Qonağı masanın və ya yerin üzərinə sürüşdürün. Yerini boşaltmaq üçün yerləşdirilmiş qonağı bura sürüşdürün.',
+    unassign: 'Yeri boşalt', locate: 'Planda göstər', dropHere: 'Yeri boşaltmaq üçün buraxın',
+    tableFull: (table: string) => `${table} doludur. Yerlərin sayını artırın və ya başqa masa seçin.`,
+    seatOccupied: (guest: string) => `Bu yer ${guest} üçündür. Əvvəlcə yeri boşaldın və ya boş yer seçin.`,
+    invalid: 'Bu yer artıq mövcud deyil.', unknownGuest: 'Bu qonaq artıq siyahıda yoxdur.',
+    assigned: (guest: string, table: string, seat: number) => `${guest} → ${table}, yer ${seat}`,
+    unassigned: (guest: string) => `${guest} üçün yer boşaldıldı`,
+    dropTable: (table: string, seat: number) => `${table} · yer ${seat}`,
+    dropFull: (table: string) => `${table} doludur`,
+    dropTaken: 'Yer tutulub',
+    occupiedBy: (guest: string) => `Yer tutulub: ${guest}`,
+    validate: 'Yerləşdirməni yoxla', validation: 'Yerləşdirmənin yoxlanışı', validationIntro: 'Saxlanılmamış dəyişikliklər daxil olmaqla cari plan yoxlanılır.',
+    allGood: 'Problem tapılmadı. Hər qonağın düzgün yeri var.', errors: 'xəta', warnings: 'xəbərdarlıq',
+    fix: 'Yanlış təyinatları sil', fixDone: (n: number) => `${n} yanlış təyinat silindi`,
+    fixHint: 'Xətalar planı saxlamağa imkan vermir. Düzgün yerlər qalacaq, əməliyyatı geri almaq olar.',
+    show: 'Göstər', unknownName: 'Silinmiş qonaq',
+    keepExisting: 'Cari yerləşdirməni saxla, yalnız yersiz qonaqları yerləşdir',
+    kept: 'saxlanılıb', added: 'yeni yerləşdirilib', unseatedList: 'Yersiz',
+    applied: (seated: number, total: number, added: number, left: number) =>
+      `Ağıllı yerləşdirmə: ${seated}/${total} yerləşdirildi (yeni: ${added})${left ? `, yersiz: ${left}` : ''}.`,
+    titles: { 1: 'Balanslaşdırılmış', 2: 'Qruplara görə', 3: 'Tercihlərə görə' },
+  },
+};
+
+const issueCopy: Record<Locale, Record<SeatingIssueCode, (issue: SeatingIssue, table: string) => string>> = {
+  en: {
+    'malformed-seat': () => 'Assignment with an unreadable seat reference',
+    'missing-table': () => 'Seated at a table that no longer exists',
+    'seat-out-of-range': (issue, table) => `${table}: guests on seats beyond the table's capacity`,
+    'over-capacity': (issue, table) => `${table}: ${issue.count} guests for ${issue.limit} seats`,
+    'duplicate-seat': (issue, table) => `${table}: several guests share one seat`,
+    'duplicate-guest': () => 'Guest assigned to more than one seat',
+    'unknown-guest': () => 'Seat assigned to a guest who is no longer in the guest list',
+    'excluded-adjacent': (issue, table) => `${table}: "keep apart" guests sit next to each other`,
+    'required-split': () => '"Must sit together" guests are at different tables',
+    'insufficient-seats': issue => `${issue.count} guests but only ${issue.limit} seats`,
+    'unassigned-guest': issue => `${issue.guestIds.length} guest${issue.guestIds.length === 1 ? '' : 's'} without a seat`,
+  },
+  ru: {
+    'malformed-seat': () => 'Назначение с некорректной ссылкой на место',
+    'missing-table': () => 'Гость сидит за столом, которого больше нет',
+    'seat-out-of-range': (issue, table) => `${table}: гости на местах сверх вместимости стола`,
+    'over-capacity': (issue, table) => `${table}: ${issue.count} гостей на ${issue.limit} мест`,
+    'duplicate-seat': (issue, table) => `${table}: несколько гостей на одном месте`,
+    'duplicate-guest': () => 'Гость назначен на несколько мест',
+    'unknown-guest': () => 'Место назначено гостю, которого нет в списке',
+    'excluded-adjacent': (issue, table) => `${table}: гости «не сажать рядом» сидят рядом`,
+    'required-split': () => 'Гости «++» сидят за разными столами',
+    'insufficient-seats': issue => `${issue.count} гостей, но только ${issue.limit} мест`,
+    'unassigned-guest': issue => `Без места: ${issue.guestIds.length}`,
+  },
+  az: {
+    'malformed-seat': () => 'Yer istinadı yanlış olan təyinat',
+    'missing-table': () => 'Qonaq artıq mövcud olmayan masadadır',
+    'seat-out-of-range': (issue, table) => `${table}: masanın tutumundan artıq yerlərdə qonaqlar var`,
+    'over-capacity': (issue, table) => `${table}: ${issue.limit} yerə ${issue.count} qonaq`,
+    'duplicate-seat': (issue, table) => `${table}: bir yerdə bir neçə qonaq`,
+    'duplicate-guest': () => 'Qonaq bir neçə yerə təyin edilib',
+    'unknown-guest': () => 'Yer siyahıda olmayan qonağa təyin edilib',
+    'excluded-adjacent': (issue, table) => `${table}: "ayrı oturmalı" qonaqlar yan-yanadır`,
+    'required-split': () => '"++" qonaqlar fərqli masalardadır',
+    'insufficient-seats': issue => `${issue.count} qonaq, lakin cəmi ${issue.limit} yer`,
+    'unassigned-guest': issue => `Yersiz qonaqlar: ${issue.guestIds.length}`,
+  },
+};
+
+const proposalIssueCopy: Record<Locale, Record<SeatingProposalIssueCode, string>> = {
+  en: {
+    'group-too-large': '"Must sit together" group is larger than any table and was split',
+    'group-split': 'Group split across tables',
+    'not-contiguous': 'Group at one table, but not side by side',
+    'sides-mixed': "Bride's and groom's sides share a table so everyone gets a seat",
+    'excluded-conflict': 'Every free seat is next to a "keep apart" guest',
+    'no-seat': 'Not enough free seats',
+  },
+  ru: {
+    'group-too-large': 'Группа «++» больше любого стола и была разделена',
+    'group-split': 'Группа разделена между столами',
+    'not-contiguous': 'Группа за одним столом, но не рядом',
+    'sides-mixed': 'Стороны жениха и невесты за одним столом, чтобы рассадить всех',
+    'excluded-conflict': 'Все свободные места рядом с гостями «не сажать рядом»',
+    'no-seat': 'Недостаточно свободных мест',
+  },
+  az: {
+    'group-too-large': '"++" qrupu istənilən masadan böyükdür və bölündü',
+    'group-split': 'Qrup masalar arasında bölündü',
+    'not-contiguous': 'Qrup eyni masadadır, lakin yan-yana deyil',
+    'sides-mixed': 'Hamıya yer çatsın deyə gəlin və bəy tərəfi eyni masadadır',
+    'excluded-conflict': 'Bütün boş yerlər "ayrı oturmalı" qonaqların yanındadır',
+    'no-seat': 'Kifayət qədər boş yer yoxdur',
+  },
+};
+
+type DropTarget =
+  | { kind: 'seat'; seatId: string; tableId: string }
+  | { kind: 'table'; tableId: string }
+  | { kind: 'unassign' };
+
+type GuestDrag = {
+  guestId: string;
+  pointerId: number;
+  startX: number;
+  startY: number;
+  x: number;
+  y: number;
+  active: boolean;
+};
+
+function normalizeSearch(value: string) {
+  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase();
+}
 
 function uid() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
@@ -160,6 +341,14 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
   const [newGuestGroupName, setNewGuestGroupName] = useState('');
   const [autoProposals, setAutoProposals] = useState<SeatingProposal[]>([]);
   const [showAutoSeating, setShowAutoSeating] = useState(false);
+  const [keepExistingSeats, setKeepExistingSeats] = useState(true);
+  const [showValidation, setShowValidation] = useState(false);
+  const [guestSearch, setGuestSearch] = useState('');
+  const [guestFilter, setGuestFilter] = useState<'all' | 'unassigned' | 'assigned'>('all');
+  const [guestDrag, setGuestDrag] = useState<GuestDrag | null>(null);
+  const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+  const [notice, setNotice] = useState<{ tone: 'ok' | 'error'; text: string; id: number } | null>(null);
+  const guestSectionRef = useRef<HTMLElement>(null);
   const [zoom, setZoom] = useState(0.7);
   const [pan, setPan] = useState({ x: 40, y: 30 });
   const [saving, setSaving] = useState(false);
@@ -182,7 +371,11 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
   } | null>(null);
 
   const selectedObject = plan.objects.find(item => item.id === selectedId) ?? null;
-  const assignedIds = useMemo(() => new Set(plan.assignments.map(item => item.guestId)), [plan.assignments]);
+  // Only assignments that point at a real seat count as "seated" (stale ones are reported by validation).
+  const assignedIds = useMemo(
+    () => new Set(plan.assignments.filter(item => locateSeat(plan, item.seatId)).map(item => item.guestId)),
+    [plan],
+  );
   const unassigned = guests.filter(guest => !assignedIds.has(guest.id));
   const occupied = plan.assignments.length;
   const tableCount = plan.objects.filter(isTable).length;
@@ -196,8 +389,88 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
     setError('');
   }, [plan]);
 
-  function openAutoSeating() {
-    setAutoProposals(generateSeatingProposals(guests, plan));
+  const ac = assignCopy[locale];
+  const guestsById = useMemo(() => new Map(guests.map(guest => [guest.id, guest])), [guests]);
+  const guestName = useCallback((id: string) => guestsById.get(id)?.name ?? ac.unknownName, [guestsById, ac]);
+
+  /** Where each guest currently sits (only valid seats on existing tables). */
+  const guestLocations = useMemo(() => {
+    const map = new Map<string, { tableId: string; tableName: string; seatId: string; seatNumber: number }>();
+    for (const item of plan.assignments) {
+      if (map.has(item.guestId)) continue;
+      const location = locateSeat(plan, item.seatId);
+      if (!location) continue;
+      map.set(item.guestId, {
+        tableId: location.table.id,
+        tableName: location.table.name,
+        seatId: item.seatId,
+        seatNumber: location.index + 1,
+      });
+    }
+    return map;
+  }, [plan]);
+
+  const validationIssues = useMemo(() => validateSeatingPlan(plan, guests), [plan, guests]);
+  const validationErrors = validationIssues.filter(issue => issue.severity === 'error');
+
+  const showNotice = useCallback((tone: 'ok' | 'error', text: string) => {
+    setNotice({ tone, text, id: Date.now() });
+  }, []);
+
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), notice.tone === 'error' ? 5000 : 3000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  function assignFailureText(result: Extract<AssignResult, { ok: false }>, tableId?: string, seatId?: string) {
+    if (result.reason === 'table-full') {
+      return ac.tableFull(plan.objects.find(item => item.id === tableId)?.name ?? '');
+    }
+    if (result.reason === 'seat-occupied') {
+      const occupant = plan.assignments.find(item => item.seatId === seatId);
+      return ac.seatOccupied(occupant ? guestName(occupant.guestId) : '');
+    }
+    if (result.reason === 'unknown-guest') return ac.unknownGuest;
+    return ac.invalid;
+  }
+
+  /** Commits an assignment change through the normal undoable plan update. */
+  function commitAssignment(result: AssignResult, guestId: string, target: { tableId?: string; seatId?: string }) {
+    if (!result.ok) {
+      showNotice('error', assignFailureText(result, target.tableId, target.seatId));
+      return false;
+    }
+    if (!result.changed) return true;
+    updatePlan(result.plan);
+    const location = locateSeat(result.plan, result.seatId);
+    if (location) {
+      showNotice('ok', ac.assigned(guestName(guestId), location.table.name, location.index + 1));
+      setSelectedId(location.table.id);
+      setSelectedIds([location.table.id]);
+      setSelectedSeat(result.seatId);
+    }
+    return true;
+  }
+
+  function unassignGuestById(guestId: string) {
+    if (!plan.assignments.some(item => item.guestId === guestId)) return;
+    const seatId = plan.assignments.find(item => item.guestId === guestId)?.seatId;
+    updatePlan(unassignGuest(plan, guestId));
+    if (seatId && selectedSeat === seatId) setSelectedSeat(null);
+    showNotice('ok', ac.unassigned(guestName(guestId)));
+  }
+
+  function locateGuest(guestId: string) {
+    const location = guestLocations.get(guestId);
+    if (!location) return;
+    setSelectedId(location.tableId);
+    setSelectedIds([location.tableId]);
+    setSelectedSeat(location.seatId);
+  }
+
+  function openAutoSeating(keepExisting = keepExistingSeats) {
+    setAutoProposals(generateSeatingProposals(guests, plan, { keepExisting }));
     setShowAutoSeating(true);
   }
 
@@ -205,6 +478,182 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
     updatePlan({ ...plan, assignments: proposal.assignments });
     setShowAutoSeating(false);
     setAutoProposals([]);
+    showNotice(
+      proposal.unseated.length ? 'error' : 'ok',
+      ac.applied(proposal.seated, guests.length, proposal.added, proposal.unseated.length),
+    );
+  }
+
+  function fixInvalidAssignments() {
+    const { plan: repaired, removed } = repairAssignments(plan, guests);
+    if (!removed) return;
+    updatePlan(repaired);
+    showNotice('ok', ac.fixDone(removed));
+  }
+
+  function focusIssue(issue: SeatingIssue) {
+    const tableId = issue.tableId ?? (issue.guestIds.length ? guestLocations.get(issue.guestIds[0])?.tableId : undefined);
+    if (tableId && plan.objects.some(item => item.id === tableId)) {
+      setSelectedId(tableId);
+      setSelectedIds([tableId]);
+      setSelectedSeat(issue.seatIds.find(seatId => locateSeat(plan, seatId)) ?? null);
+      setShowValidation(false);
+    } else if (issue.code === 'unassigned-guest') {
+      setGuestFilter('unassigned');
+      setGuestSearch('');
+      setShowValidation(false);
+    }
+  }
+
+  /* ---------------- Guest drag-and-drop ---------------- */
+
+  /** Converts a screen point into venue coordinates (honours zoom, pan and SVG scaling). */
+  function clientToVenue(clientX: number, clientY: number) {
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!matrix) return null;
+    const p = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+    return { x: (p.x - pan.x) / zoom, y: (p.y - pan.y) / zoom };
+  }
+
+  function findDropTarget(clientX: number, clientY: number): DropTarget | null {
+    const section = guestSectionRef.current?.getBoundingClientRect();
+    if (section && clientX >= section.left && clientX <= section.right && clientY >= section.top && clientY <= section.bottom) {
+      return { kind: 'unassign' };
+    }
+
+    const svg = svgRef.current;
+    if (!svg) return null;
+    const rect = svg.getBoundingClientRect();
+    if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return null;
+
+    const p = clientToVenue(clientX, clientY);
+    if (!p) return null;
+
+    const screenScale = zoom * (rect.width / 1200);
+    const seatRadius = Math.max(14, 14 / screenScale);
+    const tables = plan.objects.filter(isTable);
+
+    // Seats first (they are drawn on top of tables).
+    let bestSeat: { seatId: string; tableId: string; distance: number } | null = null;
+    for (const table of tables) {
+      for (let index = 0; index < tableCapacity(table); index++) {
+        const s = seatPoint(table, index);
+        const d = Math.hypot(s.x - p.x, s.y - p.y);
+        if (d <= seatRadius && (!bestSeat || d < bestSeat.distance)) {
+          bestSeat = { seatId: `${table.id}-seat-${index}`, tableId: table.id, distance: d };
+        }
+      }
+    }
+    if (bestSeat) return { kind: 'seat', seatId: bestSeat.seatId, tableId: bestSeat.tableId };
+
+    // Then table bodies (rotation-aware; top-most table wins), with a margin for the seat ring.
+    for (let i = tables.length - 1; i >= 0; i--) {
+      const table = tables[i];
+      const cx = table.x + table.width / 2;
+      const cy = table.y + table.height / 2;
+      const angle = (-table.rotation * Math.PI) / 180;
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      const lx = dx * Math.cos(angle) - dy * Math.sin(angle);
+      const ly = dx * Math.sin(angle) + dy * Math.cos(angle);
+      const margin = 24;
+      if (Math.abs(lx) <= table.width / 2 + margin && Math.abs(ly) <= table.height / 2 + margin) {
+        return { kind: 'table', tableId: table.id };
+      }
+    }
+    return null;
+  }
+
+  function startGuestDrag(event: ReactPointerEvent<Element>, guestId: string) {
+    if (event.button !== 0 && event.pointerType === 'mouse') return;
+    if (!guestsById.has(guestId)) return;
+    setGuestDrag({
+      guestId,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      x: event.clientX,
+      y: event.clientY,
+      active: false,
+    });
+  }
+
+  function dropGuest(guestId: string, target: DropTarget | null) {
+    if (!target) return;
+    if (target.kind === 'unassign') {
+      unassignGuestById(guestId);
+      return;
+    }
+    if (target.kind === 'seat') {
+      commitAssignment(assignGuestToSeat(plan, guestId, target.seatId, guests), guestId, target);
+      return;
+    }
+    commitAssignment(assignGuestToTable(plan, guestId, target.tableId, guests), guestId, target);
+  }
+
+  // Latest handlers for the window listeners below (they need current plan/zoom/pan).
+  const guestDragHandlers = useRef<{ move: (e: PointerEvent) => void; end: (e: PointerEvent, cancel: boolean) => void } | null>(null);
+  useEffect(() => {
+    guestDragHandlers.current = {
+      move(event) {
+        if (!guestDrag || event.pointerId !== guestDrag.pointerId) return;
+        const moved = Math.hypot(event.clientX - guestDrag.startX, event.clientY - guestDrag.startY);
+        const active = guestDrag.active || moved > 5;
+        setGuestDrag({ ...guestDrag, x: event.clientX, y: event.clientY, active });
+        if (active) {
+          const target = findDropTarget(event.clientX, event.clientY);
+          const assigned = plan.assignments.some(item => item.guestId === guestDrag.guestId);
+          setDropTarget(target?.kind === 'unassign' && !assigned ? null : target);
+        }
+      },
+      end(event, cancel) {
+        if (!guestDrag || event.pointerId !== guestDrag.pointerId) return;
+        if (guestDrag.active && !cancel) {
+          dropGuest(guestDrag.guestId, findDropTarget(event.clientX, event.clientY));
+        }
+        setGuestDrag(null);
+        setDropTarget(null);
+      },
+    };
+  });
+
+  const guestDragging = guestDrag !== null;
+  useEffect(() => {
+    if (!guestDragging) return;
+    const move = (event: PointerEvent) => guestDragHandlers.current?.move(event);
+    const up = (event: PointerEvent) => guestDragHandlers.current?.end(event, false);
+    const cancel = (event: PointerEvent) => guestDragHandlers.current?.end(event, true);
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setGuestDrag(null); setDropTarget(null); }
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', cancel);
+    window.addEventListener('keydown', key);
+    document.body.classList.add('sp-guest-dragging');
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
+      window.removeEventListener('keydown', key);
+      document.body.classList.remove('sp-guest-dragging');
+    };
+  }, [guestDragging]);
+
+  /** Text + tone shown on the drag ghost for the current drop target. */
+  function dropPreview(): { text: string; ok: boolean } | null {
+    if (!guestDrag?.active || !dropTarget) return null;
+    if (dropTarget.kind === 'unassign') return { text: ac.dropHere, ok: true };
+    const table = plan.objects.find(item => item.id === dropTarget.tableId);
+    if (!table) return null;
+    if (dropTarget.kind === 'seat') {
+      const occupant = plan.assignments.find(item => item.seatId === dropTarget.seatId);
+      if (occupant && occupant.guestId !== guestDrag.guestId) return { text: ac.occupiedBy(guestName(occupant.guestId)), ok: false };
+      return { text: ac.dropTable(table.name, (locateSeat(plan, dropTarget.seatId)?.index ?? 0) + 1), ok: true };
+    }
+    const result = assignGuestToTable(plan, guestDrag.guestId, table.id);
+    if (!result.ok) return { text: ac.dropFull(table.name), ok: false };
+    return { text: ac.dropTable(table.name, (locateSeat(result.plan, result.seatId)?.index ?? 0) + 1), ok: true };
   }
 
   function addObject(type: SeatingObjectType) {
@@ -288,10 +737,13 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
 
   function assignGuest() {
     if (!selectedSeat || !selectedGuest) return;
-    const assignments = plan.assignments.filter(item => item.seatId !== selectedSeat && item.guestId !== selectedGuest);
-    assignments.push({ seatId: selectedSeat, guestId: selectedGuest });
-    updatePlan({ ...plan, assignments });
-    setSelectedGuest('');
+    // Never overwrite a seat that already belongs to another guest.
+    const done = commitAssignment(
+      assignGuestToSeat(plan, selectedGuest, selectedSeat, guests),
+      selectedGuest,
+      { seatId: selectedSeat },
+    );
+    if (done) setSelectedGuest('');
   }
 
   function unassignSeat() {
@@ -806,7 +1258,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
     ? plan.assignments
         .filter(item => item.seatId.startsWith(`${selectedObject.id}-seat-`))
         .map(item => {
-          const match = item.seatId.match(/-seat-(\\d+)$/);
+          const match = item.seatId.match(/-seat-(\d+)$/);
           return {
             ...item,
             seatNumber: match ? Number(match[1]) + 1 : 0,
@@ -849,8 +1301,16 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
             <button key={type} onClick={() => addObject(type)}>{objectLabel(type, t)}</button>
           ))}
           <div className="sp-tool-divider" />
-          <button className="sp-auto-trigger flex items-center justify-center gap-1.5" onClick={openAutoSeating} disabled={!guests.length || !plan.objects.some(isTable)}>
+          <button className="sp-auto-trigger flex items-center justify-center gap-1.5" onClick={() => openAutoSeating()} disabled={!guests.length || !plan.objects.some(isTable)}>
             <SparklesIcon className="w-4 h-4 inline-block text-amber-300" /> {locale === 'ru' ? 'Умная рассадка' : locale === 'az' ? 'Ağıllı yerləşdirmə' : 'Smart Seating'}
+          </button>
+          <button type="button" className="sp-validate-trigger" onClick={() => setShowValidation(true)}>
+            <span>{ac.validate}</span>
+            {validationErrors.length > 0
+              ? <span className="sp-validate-badge error">{validationErrors.length}</span>
+              : validationIssues.length > 0
+                ? <span className="sp-validate-badge">{validationIssues.length}</span>
+                : <span className="sp-validate-badge ok"><CheckIcon className="w-3 h-3" /></span>}
           </button>
           <div className="sp-tool-divider" />
           <button onClick={undo} disabled={!past.length} className="flex items-center gap-1.5"><UndoIcon className="w-3.5 h-3.5 inline-block" /> {t.undo}</button>
@@ -1131,7 +1591,11 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                   const guest = guests.find(item => item.id === guestId);
                   const active = selectedSeat === seatId;
                   return (
-                    <g key={seatId} className="sp-seat" onPointerDown={event => event.stopPropagation()}
+                    <g key={seatId} className="sp-seat" onPointerDown={event => {
+                      event.stopPropagation();
+                      // Occupied seat: the guest can be dragged to another seat/table or back to the list.
+                      if (guest) startGuestDrag(event, guest.id);
+                    }}
                       onClick={event => { event.stopPropagation(); setSelectedId(table.id); setSelectedSeat(seatId); }}>
                       <circle cx={p.x} cy={p.y} r={active ? 13 : 10}
                         fill={guest ? '#9c8290' : '#fff'} stroke={active ? '#5d4352' : '#a99aa0'} strokeWidth={active ? 3 : 1.5} />
@@ -1141,6 +1605,33 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                   );
                 })
               )}
+
+              {guestDrag?.active && dropTarget && dropTarget.kind !== 'unassign' && (() => {
+                // Drag feedback layer only; it sits above the existing table/seat rendering.
+                const table = plan.objects.find(item => item.id === dropTarget.tableId);
+                if (!table) return null;
+                const preview = dropPreview();
+                const color = preview?.ok === false ? '#b4574a' : '#5f8a6c';
+                if (dropTarget.kind === 'seat') {
+                  const index = locateSeat(plan, dropTarget.seatId)?.index ?? 0;
+                  const p = seatPoint(table, index);
+                  return (
+                    <circle cx={p.x} cy={p.y} r={17} fill="none" stroke={color} strokeWidth="3"
+                      strokeDasharray="5 3" pointerEvents="none" className="sp-drop-ring" />
+                  );
+                }
+                const cx = table.x + table.width / 2;
+                const cy = table.y + table.height / 2;
+                return (
+                  <rect
+                    x={table.x - 36} y={table.y - 36} width={table.width + 72} height={table.height + 72}
+                    rx={table.type === 'rect-table' ? 14 : Math.min(table.width, table.height) / 2 + 36}
+                    transform={`rotate(${table.rotation} ${cx} ${cy})`}
+                    fill={color} fillOpacity=".06" stroke={color} strokeWidth="3" strokeDasharray="9 5"
+                    pointerEvents="none" className="sp-drop-ring"
+                  />
+                );
+              })()}
             </g>
           </svg>
 
@@ -1268,25 +1759,128 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
             </section>
           )}
 
-          <section className="sp-guest-section">
+          <section
+            ref={guestSectionRef}
+            className={dropTarget?.kind === 'unassign' ? 'sp-guest-section sp-drop-active' : 'sp-guest-section'}
+          >
             <span className="sp-panel-label">{t.guests.toUpperCase()}</span>
             <p className="sp-muted">{selectedSeat ? t.selectedSeat : t.selectSeat}</p>
-            {selectedSeat && (
-              <>
-                <select value={selectedGuest} onChange={event => setSelectedGuest(event.target.value)}>
-                  <option value="">{t.unassigned}</option>
-                  {unassigned.map(guest => <option key={guest.id} value={guest.id}>{guest.name}</option>)}
-                </select>
-                <button className="sp-primary sp-wide" onClick={assignGuest} disabled={!selectedGuest}>{t.assign}</button>
-                {assignmentBySeat.has(selectedSeat) && (
-                  <button className="sp-secondary sp-wide" onClick={unassignSeat}>{t.removeGuest}</button>
-                )}
-              </>
-            )}
-            <div className="sp-unassigned-list">
-              <strong>{t.unassigned} · {unassigned.length}</strong>
-              {unassigned.slice(0, 12).map(guest => <span key={guest.id}>{guest.name}</span>)}
-              {!unassigned.length && <span>{t.noGuests}</span>}
+            {selectedSeat && (() => {
+              const occupantId = assignmentBySeat.get(selectedSeat);
+              const location = locateSeat(plan, selectedSeat);
+              return (
+                <>
+                  {location && (
+                    <p className="sp-seat-status">
+                      <strong>{location.table.name} · {ac.seat} {location.index + 1}</strong>
+                      <span>{occupantId ? guestName(occupantId) : t.unassigned}</span>
+                    </p>
+                  )}
+                  {!occupantId && (
+                    <>
+                      <select value={selectedGuest} onChange={event => setSelectedGuest(event.target.value)}>
+                        <option value="">{t.unassigned}</option>
+                        {unassigned.map(guest => <option key={guest.id} value={guest.id}>{guest.name}</option>)}
+                      </select>
+                      <button className="sp-primary sp-wide" onClick={assignGuest} disabled={!selectedGuest}>{t.assign}</button>
+                    </>
+                  )}
+                  {occupantId && (
+                    <button className="sp-secondary sp-wide" onClick={unassignSeat}>{t.removeGuest}</button>
+                  )}
+                </>
+              );
+            })()}
+
+            <div className="sp-guest-browser">
+              <input
+                type="search"
+                className="sp-guest-search"
+                value={guestSearch}
+                placeholder={ac.search}
+                aria-label={ac.search}
+                onChange={event => setGuestSearch(event.target.value)}
+              />
+              <div className="sp-guest-filters" role="tablist">
+                {([
+                  ['all', ac.all, guests.length],
+                  ['unassigned', ac.unassignedTab, guests.filter(guest => !guestLocations.has(guest.id)).length],
+                  ['assigned', ac.assignedTab, guests.filter(guest => guestLocations.has(guest.id)).length],
+                ] as const).map(([value, label, count]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={guestFilter === value}
+                    className={guestFilter === value ? 'active' : ''}
+                    onClick={() => setGuestFilter(value)}
+                  >
+                    {label} <span>{count}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="sp-muted">{dropTarget?.kind === 'unassign' ? ac.dropHere : ac.dragHint}</p>
+              {(() => {
+                const query = normalizeSearch(guestSearch.trim());
+                const visible = guests.filter(guest => {
+                  const location = guestLocations.get(guest.id);
+                  if (guestFilter === 'assigned' && !location) return false;
+                  if (guestFilter === 'unassigned' && location) return false;
+                  if (!query) return true;
+                  return normalizeSearch(guest.name).includes(query) ||
+                    (location ? normalizeSearch(location.tableName).includes(query) : false);
+                });
+                if (!guests.length) return <p className="sp-muted">{t.noGuests}</p>;
+                if (!visible.length) return <p className="sp-muted">{ac.noMatch}</p>;
+                return (
+                  <ul className="sp-guest-list">
+                    {visible.map(guest => {
+                      const location = guestLocations.get(guest.id);
+                      const dragging = guestDrag?.active && guestDrag.guestId === guest.id;
+                      const active = location && location.seatId === selectedSeat;
+                      return (
+                        <li
+                          key={guest.id}
+                          className={[
+                            'sp-guest-row',
+                            location ? 'assigned' : 'unassigned',
+                            dragging ? 'dragging' : '',
+                            active ? 'active' : '',
+                          ].filter(Boolean).join(' ')}
+                          onPointerDown={event => {
+                            if ((event.target as Element).closest('button')) return;
+                            event.preventDefault();
+                            startGuestDrag(event, guest.id);
+                          }}
+                          onClick={event => {
+                            if ((event.target as Element).closest('button')) return;
+                            if (location) locateGuest(guest.id);
+                            else if (selectedSeat && !assignmentBySeat.has(selectedSeat)) {
+                              commitAssignment(assignGuestToSeat(plan, guest.id, selectedSeat, guests), guest.id, { seatId: selectedSeat });
+                            }
+                          }}
+                          title={location ? ac.locate : undefined}
+                        >
+                          <span className="sp-guest-grip" aria-hidden="true" />
+                          <span className="sp-guest-name">{guest.name}</span>
+                          <span className={location ? 'sp-guest-status assigned' : 'sp-guest-status'}>
+                            {location ? `${location.tableName} · ${location.seatNumber}` : t.unassigned}
+                          </span>
+                          {location && (
+                            <button
+                              type="button"
+                              className="sp-table-guest-remove"
+                              title={ac.unassign}
+                              aria-label={`${ac.unassign}: ${guest.name}`}
+                              onClick={() => unassignGuestById(guest.id)}
+                            >×</button>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                );
+              })()}
             </div>
 
             <div className="sp-guest-profile">
@@ -1481,27 +2075,48 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
               <span>{guests.length} {locale === 'ru' ? 'гостей' : locale === 'az' ? 'qonaq' : 'guests'}</span>
               <span>{plan.objects.filter(isTable).reduce((sum, item) => sum + (item.capacity ?? 8), 0)} {locale === 'ru' ? 'мест' : locale === 'az' ? 'yer' : 'seats'}</span>
             </div>
+            <label className="sp-auto-keep">
+              <input
+                type="checkbox"
+                checked={keepExistingSeats}
+                onChange={event => {
+                  setKeepExistingSeats(event.target.checked);
+                  openAutoSeating(event.target.checked);
+                }}
+              />
+              {ac.keepExisting}
+            </label>
             <div className="sp-auto-cards">
               {autoProposals.map((proposal, index) => (
                 <article className="sp-auto-card" key={proposal.id}>
                   <div className="sp-auto-card-top">
                     <span className="sp-auto-number">0{index + 1}</span>
                     <div>
-                      <h3>{locale === 'ru'
-                        ? ['Сбалансированная', 'По группам', 'По предпочтениям'][index]
-                        : locale === 'az'
-                          ? ['Balanslaşdırılmış', 'Qruplara görə', 'Tercihlərə görə'][index]
-                          : proposal.title}</h3>
+                      <h3>{ac.titles[proposal.variant]}</h3>
                       <span className="sp-auto-score">{locale === 'ru' ? 'Оценка' : locale === 'az' ? 'Qiymət' : 'Score'}: {proposal.score}</span>
                     </div>
                   </div>
                   <div className="sp-auto-stats">
                     <strong>{proposal.seated} / {guests.length}</strong>
                     <span>{locale === 'ru' ? 'рассажено' : locale === 'az' ? 'yerləşdirilib' : 'seated'}</span>
+                    <span>{proposal.kept} {ac.kept} · {proposal.added} {ac.added}</span>
                   </div>
                   {proposal.unseated.length > 0
                     ? <p className="sp-auto-warning">{proposal.unseated.length} {locale === 'ru' ? 'гостей без места' : locale === 'az' ? 'qonaq üçün yer yoxdur' : 'guests without seats'}</p>
                     : <p className="sp-auto-ok">{locale === 'ru' ? 'Все гости получили места' : locale === 'az' ? 'Bütün qonaqlara yer ayrılıb' : 'Everyone has a seat'}</p>}
+                  {proposal.issues.length > 0 && (
+                    <ul className="sp-auto-issues">
+                      {proposal.issues.map(issue => (
+                        <li key={issue.code + issue.guestIds.join()}>
+                          <span>{proposalIssueCopy[locale][issue.code]}</span>
+                          <small>
+                            {issue.guestIds.slice(0, 4).map(guestName).join(', ')}
+                            {issue.guestIds.length > 4 ? ` +${issue.guestIds.length - 4}` : ''}
+                          </small>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   <button type="button" className="sp-primary sp-wide" onClick={() => applyAutoSeating(proposal)}>
                     {locale === 'ru' ? 'Применить вариант' : locale === 'az' ? 'Variantı tətbiq et' : 'Apply proposal'}
                   </button>
@@ -1510,10 +2125,86 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
             </div>
             <footer className="sp-auto-footer">
               <span>{locale === 'ru' ? 'Можно отменить через Undo.' : locale === 'az' ? 'Geri al ilə ləğv edə bilərsiniz.' : 'You can undo this change.'}</span>
-              <button type="button" className="sp-secondary" onClick={openAutoSeating}>{locale === 'ru' ? 'Пересчитать' : locale === 'az' ? 'Yenidən hesabla' : 'Regenerate'}</button>
+              <button type="button" className="sp-secondary" onClick={() => openAutoSeating()}>{locale === 'ru' ? 'Пересчитать' : locale === 'az' ? 'Yenidən hesabla' : 'Regenerate'}</button>
             </footer>
           </section>
         </div>
+      )}
+
+      {showValidation && (
+        <div className="sp-auto-overlay" onMouseDown={event => {
+          if (event.target === event.currentTarget) setShowValidation(false);
+        }}>
+          <section className="sp-auto-dialog sp-validation-dialog" role="dialog" aria-modal="true" aria-label={ac.validation}>
+            <header className="sp-auto-header">
+              <div>
+                <span className="sp-panel-label">ELARIO / SEATING CHECK</span>
+                <h2>{ac.validation}</h2>
+                <p>{ac.validationIntro}</p>
+              </div>
+              <button type="button" className="sp-auto-close" onClick={() => setShowValidation(false)}>×</button>
+            </header>
+            <div className="sp-auto-summary">
+              <span>{guestLocations.size} / {guests.length} {locale === 'ru' ? 'рассажено' : locale === 'az' ? 'yerləşdirilib' : 'seated'}</span>
+              <span>{validationErrors.length} {ac.errors}</span>
+              <span>{validationIssues.length - validationErrors.length} {ac.warnings}</span>
+            </div>
+            {validationIssues.length === 0 ? (
+              <p className="sp-auto-ok">{ac.allGood}</p>
+            ) : (
+              <ul className="sp-validation-list">
+                {validationIssues.map((issue, index) => {
+                  const table = issue.tableId ? plan.objects.find(item => item.id === issue.tableId)?.name ?? '' : '';
+                  const canFocus = Boolean(
+                    (issue.tableId && plan.objects.some(item => item.id === issue.tableId)) ||
+                    (issue.guestIds.length && guestLocations.has(issue.guestIds[0])) ||
+                    issue.code === 'unassigned-guest',
+                  );
+                  return (
+                    <li key={`${issue.code}-${index}`} className={`sp-validation-item ${issue.severity}`}>
+                      <div>
+                        <strong>{issueCopy[locale][issue.code](issue, table)}</strong>
+                        {issue.guestIds.length > 0 && (
+                          <span>
+                            {issue.guestIds.slice(0, 6).map(guestName).join(', ')}
+                            {issue.guestIds.length > 6 ? ` +${issue.guestIds.length - 6}` : ''}
+                          </span>
+                        )}
+                      </div>
+                      {canFocus && (
+                        <button type="button" className="sp-secondary" onClick={() => focusIssue(issue)}>{ac.show}</button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {validationErrors.length > 0 && (
+              <footer className="sp-auto-footer">
+                <span>{ac.fixHint}</span>
+                <button type="button" className="sp-primary" onClick={fixInvalidAssignments}>{ac.fix}</button>
+              </footer>
+            )}
+          </section>
+        </div>
+      )}
+
+      {guestDrag?.active && (() => {
+        const preview = dropPreview();
+        return (
+          <div
+            className={preview ? (preview.ok ? 'sp-drag-ghost ok' : 'sp-drag-ghost blocked') : 'sp-drag-ghost'}
+            style={{ left: guestDrag.x, top: guestDrag.y }}
+            aria-hidden="true"
+          >
+            <strong>{guestName(guestDrag.guestId)}</strong>
+            {preview && <span>{preview.text}</span>}
+          </div>
+        );
+      })()}
+
+      {notice && (
+        <p key={notice.id} className={`sp-notice ${notice.tone}`} role="status">{notice.text}</p>
       )}
 
       {error && <p className="sp-error">{error}</p>}

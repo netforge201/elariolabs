@@ -5,15 +5,41 @@ import type {
   SeatingObject,
   GuestSeatingProfile,
 } from './seating-types';
+import { isTableObject, tableCapacity } from './seating-logic';
+
+export type SeatingProposalIssueCode =
+  | 'group-too-large'   // a "++" group is larger than the biggest table
+  | 'group-split'       // a "++" group had to be split across tables
+  | 'not-contiguous'    // a "++" group sits at one table but not side by side
+  | 'sides-mixed'       // bride/groom side guests share a table (to avoid leaving them unseated)
+  | 'excluded-conflict' // free seats exist, but each one is next to a "keep apart" guest
+  | 'no-seat';          // there are more guests than free seats
+
+export type SeatingProposalIssue = {
+  code: SeatingProposalIssueCode;
+  guestIds: string[];
+};
 
 export type SeatingProposal = {
   id: string;
+  variant: 1 | 2 | 3;
   title: string;
   assignments: SeatingAssignment[];
+  /** 0–100: share of guests seated, minus soft-constraint compromises */
   score: number;
+  /** total guests seated in this proposal (kept + newly placed) */
   seated: number;
+  /** existing assignments preserved untouched */
+  kept: number;
+  /** guests newly placed by this proposal */
+  added: number;
   unseated: string[];
-  warnings: string[];
+  issues: SeatingProposalIssue[];
+};
+
+export type SeatingProposalOptions = {
+  /** Keep current valid assignments and only seat unassigned guests (default: true). */
+  keepExisting?: boolean;
 };
 
 type Seat = {
@@ -23,11 +49,23 @@ type Seat = {
   capacity: number;
 };
 
-type Placement = {
-  tableId: string;
-  seats: Seat[];
-  guests: SeatingGuest[];
-  score: number;
+type Weights = {
+  group: number;
+  side: number;
+  preferred: number;
+  fit: number;
+};
+
+const VARIANT_WEIGHTS: Record<1 | 2 | 3, Weights> = {
+  1: { group: 60, side: 15, preferred: 500, fit: 250 },     // balanced
+  2: { group: 220, side: 50, preferred: 250, fit: 900 },    // keep groups together
+  3: { group: 25, side: 8, preferred: 1600, fit: 120 },     // honour preferred neighbours
+};
+
+const TITLES: Record<1 | 2 | 3, string> = {
+  1: 'Balanced seating',
+  2: 'Group-focused seating',
+  3: 'Preference-focused seating',
 };
 
 const DEFAULT_PROFILE: GuestSeatingProfile = {
@@ -39,10 +77,6 @@ const DEFAULT_PROFILE: GuestSeatingProfile = {
   isVip: false,
   accessibility: false,
 };
-
-function isTable(object: SeatingObject) {
-  return ['round-table', 'rect-table', 'oval-table'].includes(object.type);
-}
 
 function distance(a: SeatingObject, b: SeatingObject) {
   return Math.hypot(
@@ -75,8 +109,9 @@ function hasRelation(
 }
 
 function makeSeats(objects: SeatingObject[]): Seat[] {
-  return objects.filter(isTable).flatMap(table => {
-    const capacity = Math.max(1, Math.min(40, table.capacity ?? 8));
+  return objects.filter(isTableObject).flatMap(table => {
+    // Same capacity rule the editor and the API use (capacity ?? 8).
+    const capacity = tableCapacity(table);
     return Array.from({ length: capacity }, (_, index) => ({
       id: `${table.id}-seat-${index}`,
       tableId: table.id,
@@ -87,10 +122,11 @@ function makeSeats(objects: SeatingObject[]): Seat[] {
 }
 
 function areAdjacent(a: number, b: number, capacity: number) {
-  if (capacity < 2) return false;
+  if (capacity < 2 || a === b) return false;
   return (a + 1) % capacity === b || (b + 1) % capacity === a;
 }
 
+/** Connected components of the "must sit together" (++) relation. */
 function getComponents(guests: SeatingGuest[], plan: SeatingPlanV2) {
   const byId = new Map(guests.map(g => [g.id, g]));
   const visited = new Set<string>();
@@ -123,118 +159,19 @@ function getComponents(guests: SeatingGuest[], plan: SeatingPlanV2) {
   return components;
 }
 
-function getTablePriority(
-  table: SeatingObject,
-  guests: SeatingGuest[],
-  objects: SeatingObject[],
-  plan: SeatingPlanV2,
-) {
-  let score = 0;
-
-  for (const guest of guests) {
-    const profile = getProfile(plan, guest.id);
-
-    if (profile.accessibility) {
-      const entrances = objects.filter(
-        item => item.type === 'entrance' || item.type === 'door',
-      );
-      if (entrances.length) {
-        const nearest = Math.min(...entrances.map(item => distance(table, item)));
-        score += Math.max(0, 30 - nearest / 30);
-      }
-    }
+/** Dominant named group of a component ('other' when none). */
+function groupKey(component: SeatingGuest[], plan: SeatingPlanV2) {
+  const counts = new Map<string, number>();
+  for (const guest of component) {
+    const group = getProfile(plan, guest.id).group;
+    if (group && group !== 'other') counts.set(group, (counts.get(group) ?? 0) + 1);
   }
-
-  return score;
-}
-
-function sidesCompatible(
-  guests: SeatingGuest[],
-  existing: SeatingGuest[],
-  plan: SeatingPlanV2,
-) {
-  const all = [...guests, ...existing];
-  const sides = new Set(
-    all.map(g => getProfile(plan, g.id).side).filter(s => s !== 'shared'),
-  );
-  return sides.size <= 1;
-}
-
-function excludedAdjacencyValid(
-  guests: SeatingGuest[],
-  seats: Seat[],
-  existing: SeatingGuest[],
-  existingSeats: Seat[],
-  plan: SeatingPlanV2,
-) {
-  for (let i = 0; i < guests.length; i++) {
-    for (let j = i + 1; j < guests.length; j++) {
-      if (
-        areAdjacent(seats[i].index, seats[j].index, seats[i].capacity) &&
-        hasRelation(plan, guests[i].id, guests[j].id, 'excludedNeighbors')
-      ) return false;
-    }
-
-    for (let j = 0; j < existing.length; j++) {
-      if (
-        areAdjacent(seats[i].index, existingSeats[j].index, seats[i].capacity) &&
-        hasRelation(plan, guests[i].id, existing[j].id, 'excludedNeighbors')
-      ) return false;
-    }
+  let best = 'other';
+  let bestCount = 0;
+  for (const [group, count] of counts) {
+    if (count > bestCount) { best = group; bestCount = count; }
   }
-
-  return true;
-}
-
-function preferredScore(
-  guests: SeatingGuest[],
-  tableId: string,
-  assigned: Map<string, string>,
-  plan: SeatingPlanV2,
-) {
-  let score = 0;
-
-  for (const guest of guests) {
-    for (const [otherId, otherTable] of assigned) {
-      if (!hasRelation(plan, guest.id, otherId, 'preferredNeighbors')) continue;
-      score += otherTable === tableId ? 500 : -100;
-    }
-  }
-
-  return score;
-}
-
-function groupScore(
-  guests: SeatingGuest[],
-  tableId: string,
-  assigned: Map<string, string>,
-  allGuests: Map<string, SeatingGuest>,
-  plan: SeatingPlanV2,
-) {
-  let score = 0;
-
-  for (const guest of guests) {
-    const profile = getProfile(plan, guest.id);
-
-    for (const [otherId, otherTable] of assigned) {
-      if (otherTable !== tableId) continue;
-
-      const other = allGuests.get(otherId);
-      if (!other) continue;
-
-      const otherProfile = getProfile(plan, otherId);
-
-      if (profile.group !== 'other' && profile.group === otherProfile.group) {
-        score += 30;
-      }
-
-      if (profile.side !== 'shared' && profile.side === otherProfile.side) {
-        score += 10;
-      }
-    }
-  }
-
-  return score;
+  return best;
 }
 
 function getOrders(group: SeatingGuest[], variant: number): SeatingGuest[][] {
@@ -245,10 +182,12 @@ function getOrders(group: SeatingGuest[], variant: number): SeatingGuest[][] {
   );
 
   const orders: SeatingGuest[][] = [];
+  const seen = new Set<string>();
   const add = (order: SeatingGuest[]) => {
-    if (!orders.some(existing => existing.map(g => g.id).join('|') === order.map(g => g.id).join('|'))) {
-      orders.push(order);
-    }
+    const key = order.map(g => g.id).join('|');
+    if (seen.has(key)) return;
+    seen.add(key);
+    orders.push(order);
   };
 
   add(sorted);
@@ -260,15 +199,9 @@ function getOrders(group: SeatingGuest[], variant: number): SeatingGuest[][] {
     add([...reversed.slice(i), ...reversed.slice(0, i)]);
   }
 
-  if (group.length <= 7) {
-    let count = 0;
+  if (group.length <= 6) {
     const permute = (remaining: SeatingGuest[], current: SeatingGuest[]) => {
-      if (count >= 3000) return;
-      if (!remaining.length) {
-        add(current);
-        count++;
-        return;
-      }
+      if (!remaining.length) { add(current); return; }
       for (let i = 0; i < remaining.length; i++) {
         permute(
           [...remaining.slice(0, i), ...remaining.slice(i + 1)],
@@ -282,24 +215,9 @@ function getOrders(group: SeatingGuest[], variant: number): SeatingGuest[][] {
   return orders;
 }
 
-
-function compactnessPenalty(
-  tableId: string,
-  capacity: number,
-  seats: Seat[],
-  occupied: Set<string>,
-  newSeats: Seat[],
-) {
-  const indexes = new Set<number>();
-
-  for (const seat of seats) {
-    if (seat.tableId === tableId && occupied.has(seat.id)) {
-      indexes.add(seat.index);
-    }
-  }
-
-  for (const seat of newSeats) indexes.add(seat.index);
-
+/** Empty seats trapped between occupied seats at one table (excluding the single largest gap). */
+function compactnessPenalty(capacity: number, occupiedIndexes: number[], newIndexes: number[]) {
+  const indexes = new Set([...occupiedIndexes, ...newIndexes]);
   if (indexes.size <= 1) return 0;
 
   const sorted = [...indexes].sort((a, b) => a - b);
@@ -311,250 +229,408 @@ function compactnessPenalty(
     gaps.push((next - current - 1 + capacity) % capacity);
   }
 
-  const largestOuterGap = Math.max(...gaps);
-  const unnecessaryEmptySeats =
-    gaps.reduce((sum, gap) => sum + gap, 0) - largestOuterGap;
-
-  return unnecessaryEmptySeats;
+  return gaps.reduce((sum, gap) => sum + gap, 0) - Math.max(...gaps);
 }
 
-function findPlacement(
-  group: SeatingGuest[],
-  variant: number,
-  seats: Seat[],
-  objects: SeatingObject[],
-  plan: SeatingPlanV2,
-  assigned: Map<string, string>,
-  occupied: Set<string>,
-  assignedTables: Map<string, string>,
-  allGuests: Map<string, SeatingGuest>,
-): Placement | null {
-  const tables = objects.filter(isTable);
-  let best: Placement | null = null;
+type State = {
+  seatGuest: Map<string, string>;   // seatId -> guestId
+  guestSeat: Map<string, Seat>;     // guestId -> seat
+};
 
-  for (const table of tables) {
-    const tableSeats = seats
-      .filter(s => s.tableId === table.id)
-      .sort((a, b) => a.index - b.index);
+type Candidate = {
+  tableId: string;
+  seats: Seat[];
+  score: number;
+  sidesMixed: boolean;
+};
 
-    const capacity = tableSeats.length;
-    if (group.length > capacity) continue;
+type PassMode = 'strict' | 'mixed-sides' | 'scattered';
 
-    const existingEntries = [...assigned.entries()]
-      .filter(([seatId]) => seats.find(s => s.id === seatId)?.tableId === table.id);
+class Planner {
+  private readonly seats: Seat[];
+  private readonly seatsByTable = new Map<string, Seat[]>();
+  private readonly tables: SeatingObject[];
+  private readonly stageDistance = new Map<string, number>();
+  private readonly accessibilityBonus = new Map<string, number>();
+  private readonly guestsById: Map<string, SeatingGuest>;
+  readonly state: State = { seatGuest: new Map(), guestSeat: new Map() };
 
-    const existingGuests = existingEntries
-      .map(([, id]) => allGuests.get(id))
-      .filter((g): g is SeatingGuest => Boolean(g));
+  constructor(
+    private readonly plan: SeatingPlanV2,
+    guests: SeatingGuest[],
+    private readonly variant: 1 | 2 | 3,
+    private readonly weights: Weights,
+  ) {
+    this.guestsById = new Map(guests.map(g => [g.id, g]));
+    this.tables = plan.objects.filter(isTableObject);
+    this.seats = makeSeats(plan.objects);
+    for (const seat of this.seats) {
+      const list = this.seatsByTable.get(seat.tableId) ?? [];
+      list.push(seat);
+      this.seatsByTable.set(seat.tableId, list);
+    }
 
-    const existingSeats = existingEntries
-      .map(([seatId]) => seats.find(s => s.id === seatId))
-      .filter((s): s is Seat => Boolean(s));
-
-    if (!sidesCompatible(group, existingGuests, plan)) continue;
-
-    for (const order of getOrders(group, variant)) {
-      for (let start = 0; start < capacity; start++) {
-        const block = Array.from(
-          { length: group.length },
-          (_, i) => tableSeats[(start + i) % capacity],
-        );
-
-        if (block.some(s => occupied.has(s.id))) continue;
-
-        if (!excludedAdjacencyValid(
-          order, block, existingGuests, existingSeats, plan,
-        )) continue;
-
-        const gaps = compactnessPenalty(
-          table.id,
-          capacity,
-          seats,
-          occupied,
-          block,
-        );
-
-        const vipCount = order.filter(g => getProfile(plan, g.id).isVip).length;
-        const stages = objects.filter(item => item.type === 'stage');
-        const nearestStage = stages.length
-          ? Math.min(...stages.map(stage => distance(table, stage)))
-          : 0;
-
-        // VIP — главный критерий выбора стола: чем ближе к сцене, тем лучше.
-        const vipPriority = vipCount > 0
-          ? -nearestStage * 100000 * vipCount
-          : 0;
-
-        const score =
-          vipPriority +
-          getTablePriority(table, order, objects, plan) +
-          preferredScore(order, table.id, assignedTables, plan) +
-          groupScore(order, table.id, assignedTables, allGuests, plan) -
-          gaps * 10000 +
-          ((hash(`${table.id}:${start}:${order.map(g => g.id).join(':')}:${variant}`) % 1000) / 100000);
-
-        if (!best || score > best.score) {
-          best = { tableId: table.id, seats: block, guests: order, score };
-        }
-      }
+    const stages = plan.objects.filter(item => item.type === 'stage');
+    const entrances = plan.objects.filter(item => item.type === 'entrance' || item.type === 'door');
+    for (const table of this.tables) {
+      this.stageDistance.set(table.id, stages.length
+        ? Math.min(...stages.map(stage => distance(table, stage))) : 0);
+      this.accessibilityBonus.set(table.id, entrances.length
+        ? Math.max(0, 30 - Math.min(...entrances.map(item => distance(table, item))) / 30) : 0);
     }
   }
 
-  return best;
+  get maxCapacity() {
+    return Math.max(0, ...this.tables.map(tableCapacity));
+  }
+
+  get freeSeatCount() {
+    return this.seats.length - this.state.seatGuest.size;
+  }
+
+  seat(guestId: string, seat: Seat) {
+    this.state.seatGuest.set(seat.id, guestId);
+    this.state.guestSeat.set(guestId, seat);
+  }
+
+  /** Keeps a current assignment when it points at a real, free seat. */
+  keep(assignment: SeatingAssignment) {
+    if (!this.guestsById.has(assignment.guestId)) return false;
+    if (this.state.guestSeat.has(assignment.guestId)) return false;
+    if (this.state.seatGuest.has(assignment.seatId)) return false;
+    const seat = this.seats.find(item => item.id === assignment.seatId);
+    if (!seat) return false;
+    this.seat(assignment.guestId, seat);
+    return true;
+  }
+
+  private occupantsAt(tableId: string) {
+    const seats = this.seatsByTable.get(tableId) ?? [];
+    const result: { guestId: string; seat: Seat }[] = [];
+    for (const seat of seats) {
+      const guestId = this.state.seatGuest.get(seat.id);
+      if (guestId) result.push({ guestId, seat });
+    }
+    return result;
+  }
+
+  private sidesCompatible(guestIds: string[], occupants: string[]) {
+    const sides = new Set(
+      [...guestIds, ...occupants].map(id => getProfile(this.plan, id).side).filter(s => s !== 'shared'),
+    );
+    return sides.size <= 1;
+  }
+
+  private excludedValid(order: SeatingGuest[], block: Seat[], occupants: { guestId: string; seat: Seat }[]) {
+    for (let i = 0; i < order.length; i++) {
+      for (let j = i + 1; j < order.length; j++) {
+        if (areAdjacent(block[i].index, block[j].index, block[i].capacity) &&
+          hasRelation(this.plan, order[i].id, order[j].id, 'excludedNeighbors')) return false;
+      }
+      for (const occupant of occupants) {
+        if (areAdjacent(block[i].index, occupant.seat.index, block[i].capacity) &&
+          hasRelation(this.plan, order[i].id, occupant.guestId, 'excludedNeighbors')) return false;
+      }
+    }
+    return true;
+  }
+
+  /** Order-independent quality of putting `group` on `block` at `table`. */
+  private scoreBlock(
+    group: SeatingGuest[],
+    table: SeatingObject,
+    block: Seat[],
+    occupants: { guestId: string; seat: Seat }[],
+    remainingInGroup: number,
+    key: string,
+    groupTables: Set<string>,
+    sidesMixed: boolean,
+    anchorTableId?: string,
+  ) {
+    const w = this.weights;
+    let score = 0;
+
+    // VIPs: closest table to the stage is the main criterion (unchanged behaviour).
+    const vipCount = group.filter(g => getProfile(this.plan, g.id).isVip).length;
+    if (vipCount) score -= (this.stageDistance.get(table.id) ?? 0) * 100000 * vipCount;
+
+    // Accessibility: near an entrance/door.
+    const accessCount = group.filter(g => getProfile(this.plan, g.id).accessibility).length;
+    score += (this.accessibilityBonus.get(table.id) ?? 0) * accessCount;
+
+    // Relationships with guests who are already seated anywhere.
+    for (const guest of group) {
+      const profile = getProfile(this.plan, guest.id);
+      for (const otherId of profile.preferredNeighbors) {
+        const seat = this.state.guestSeat.get(otherId);
+        if (seat) score += seat.tableId === table.id ? w.preferred : -w.preferred / 5;
+      }
+      for (const otherId of profile.requiredNeighbors) {
+        const seat = this.state.guestSeat.get(otherId);
+        if (!seat) continue;
+        score += seat.tableId === table.id ? 5000 : -1000;
+        if (seat.tableId === table.id && block.some(b => areAdjacent(b.index, seat.index, b.capacity))) score += 1500;
+      }
+    }
+
+    // Group cohesion with the people already at this table.
+    let groupMatesHere = 0;
+    for (const occupant of occupants) {
+      const other = getProfile(this.plan, occupant.guestId);
+      for (const guest of group) {
+        const profile = getProfile(this.plan, guest.id);
+        if (profile.group !== 'other' && profile.group === other.group) {
+          score += w.group;
+          groupMatesHere++;
+        } else if (profile.group !== 'other' && other.group !== 'other') {
+          score -= w.group / 3; // mixing two different named groups
+        }
+        if (profile.side !== 'shared' && profile.side === other.side) score += w.side;
+      }
+    }
+
+    // Named groups: start at a table with room for the rest of the group, and
+    // afterwards prefer tables where the group already sits.
+    if (key !== 'other') {
+      const freeAfter = (this.seatsByTable.get(table.id)?.length ?? 0) - occupants.length - block.length;
+      if (!groupTables.size) {
+        score += freeAfter >= remainingInGroup ? w.fit : -w.fit / 2;
+      } else if (!groupTables.has(table.id)) {
+        score -= w.fit * 2;
+      } else if (groupMatesHere === 0) {
+        score += w.group;
+      }
+    }
+
+    // Splitting a group: stay near the members that were already placed.
+    if (anchorTableId) score += anchorTableId === table.id ? 8000 : 0;
+
+    if (sidesMixed) score -= 20000;
+
+    const gaps = compactnessPenalty(
+      tableCapacity(table),
+      occupants.map(o => o.seat.index),
+      block.map(b => b.index),
+    );
+    score -= gaps * 10000;
+
+    score += (hash(`${table.id}:${block[0]?.index}:${this.variant}`) % 1000) / 100000;
+    return score;
+  }
+
+  /**
+   * Best placement for `group` at a single table under the given pass mode.
+   * Returns the chosen seats aligned with the returned guest order.
+   */
+  findPlacement(
+    group: SeatingGuest[],
+    mode: PassMode,
+    remainingInGroup: number,
+    key: string,
+    anchorTableId?: string,
+  ): { tableId: string; seats: Seat[]; order: SeatingGuest[]; sidesMixed: boolean } | null {
+    const candidates: Candidate[] = [];
+    const ids = group.map(g => g.id);
+    const groupTables = new Set<string>();
+    if (key !== 'other') {
+      for (const [guestId, seat] of this.state.guestSeat) {
+        if (getProfile(this.plan, guestId).group === key) groupTables.add(seat.tableId);
+      }
+    }
+
+    for (const table of this.tables) {
+      const tableSeats = this.seatsByTable.get(table.id) ?? [];
+      const capacity = tableSeats.length;
+      const occupants = this.occupantsAt(table.id);
+      if (capacity - occupants.length < group.length) continue;
+
+      const compatible = this.sidesCompatible(ids, occupants.map(o => o.guestId));
+      if (mode === 'strict' && !compatible) continue;
+
+      const blocks: Seat[][] = [];
+      if (mode === 'scattered') {
+        // Free seats at this table, nearest to each other, starting at each free seat.
+        const free = tableSeats.filter(s => !this.state.seatGuest.has(s.id));
+        for (let start = 0; start < free.length; start++) {
+          blocks.push(Array.from({ length: group.length }, (_, i) => free[(start + i) % free.length]));
+        }
+      } else {
+        for (let start = 0; start < capacity; start++) {
+          const block = Array.from({ length: group.length }, (_, i) => tableSeats[(start + i) % capacity]);
+          if (block.some(s => this.state.seatGuest.has(s.id))) continue;
+          blocks.push(block);
+        }
+      }
+
+      for (const block of blocks) {
+        candidates.push({
+          tableId: table.id,
+          seats: block,
+          sidesMixed: !compatible,
+          score: this.scoreBlock(group, table, block, occupants, remainingInGroup, key, groupTables, !compatible, anchorTableId),
+        });
+      }
+    }
+
+    candidates.sort((a, b) => b.score - a.score);
+    const orders = getOrders(group, this.variant);
+
+    for (const candidate of candidates) {
+      const occupants = this.occupantsAt(candidate.tableId);
+      for (const order of orders) {
+        if (this.excludedValid(order, candidate.seats, occupants)) {
+          return { tableId: candidate.tableId, seats: candidate.seats, order, sidesMixed: candidate.sidesMixed };
+        }
+      }
+    }
+
+    return null;
+  }
 }
 
 function generateProposal(
   guests: SeatingGuest[],
   plan: SeatingPlanV2,
-  variant: number,
+  variant: 1 | 2 | 3,
+  keepExisting: boolean,
 ): SeatingProposal {
-  const seats = makeSeats(plan.objects);
-  const components = getComponents(guests, plan);
-  const allGuests = new Map(guests.map(g => [g.id, g]));
-  const assigned = new Map<string, string>();
-  const assignedTables = new Map<string, string>();
-  const occupied = new Set<string>();
-  const warnings: string[] = [];
+  const planner = new Planner(plan, guests, variant, VARIANT_WEIGHTS[variant]);
+  const issues: SeatingProposalIssue[] = [];
 
-  const orderedComponents = [...components].sort((a, b) => {
-    const vipCount = (group: SeatingGuest[]) =>
-      group.filter(g => getProfile(plan, g.id).isVip).length;
+  let kept = 0;
+  if (keepExisting) {
+    for (const assignment of plan.assignments) {
+      if (planner.keep(assignment)) kept++;
+    }
+  }
 
-    const vipDifference = vipCount(b) - vipCount(a);
-    if (vipDifference !== 0) return vipDifference;
+  const toPlace = guests.filter(g => !planner.state.guestSeat.has(g.id));
+  const components = getComponents(toPlace, plan);
 
+  // Remaining (unplaced) members per named group — used to keep groups together.
+  const remainingByGroup = new Map<string, number>();
+  const keys = new Map<SeatingGuest[], string>();
+  for (const component of components) {
+    const key = groupKey(component, plan);
+    keys.set(component, key);
+    remainingByGroup.set(key, (remainingByGroup.get(key) ?? 0) + component.length);
+  }
+
+  const vipCount = (group: SeatingGuest[]) => group.filter(g => getProfile(plan, g.id).isVip).length;
+  const priority = (group: SeatingGuest[]) => group.reduce((sum, g) => {
+    const p = getProfile(plan, g.id);
+    return sum + (p.accessibility ? 8 : 0) + p.preferredNeighbors.length;
+  }, 0);
+
+  // VIPs first, then whole named groups one after another (largest first),
+  // larger "++" components before singles inside a group.
+  const ordered = [...components].sort((a, b) => {
+    const vip = vipCount(b) - vipCount(a);
+    if (vip) return vip;
+    const ka = keys.get(a)!;
+    const kb = keys.get(b)!;
+    if (ka !== kb) {
+      if (ka === 'other') return 1;
+      if (kb === 'other') return -1;
+      const size = (remainingByGroup.get(kb) ?? 0) - (remainingByGroup.get(ka) ?? 0);
+      if (size) return size;
+      return ka < kb ? -1 : 1;
+    }
     if (a.length !== b.length) return b.length - a.length;
-
-    const priority = (group: SeatingGuest[]) => group.reduce((sum, g) => {
-      const p = getProfile(plan, g.id);
-      return sum + (p.accessibility ? 8 : 0) + p.preferredNeighbors.length;
-    }, 0);
-
-    return priority(b) - priority(a);
+    const p = priority(b) - priority(a);
+    if (p) return p;
+    return hash(`${a[0].id}:${variant}`) - hash(`${b[0].id}:${variant}`);
   });
 
-  for (const component of orderedComponents) {
-    const placement = findPlacement(
-      component,
-      variant,
-      seats,
-      plan.objects,
-      plan,
-      assigned,
-      occupied,
-      assignedTables,
-      allGuests,
-    );
+  const mixedSides = new Set<string>();
 
-    if (!placement) {
-      const names = component.map(g => g.name).join(', ');
-      const capacity = Math.max(0, ...plan.objects.filter(isTable).map(t => t.capacity ?? 8));
+  const place = (
+    group: SeatingGuest[],
+    key: string,
+    modes: PassMode[],
+    anchorTableId?: string,
+  ) => {
+    const remaining = Math.max(0, (remainingByGroup.get(key) ?? 0) - group.length);
+    for (const mode of modes) {
+      const placement = planner.findPlacement(group, mode, remaining, key, anchorTableId);
+      if (!placement) continue;
+      placement.order.forEach((guest, index) => planner.seat(guest.id, placement.seats[index]));
+      if (placement.sidesMixed) group.forEach(g => mixedSides.add(g.id));
+      return { mode, tableId: placement.tableId };
+    }
+    return null;
+  };
 
-      if (component.length > capacity) {
-        warnings.push(`Группа ++ не помещается за один стол: ${names}`);
-      } else {
-        warnings.push(`Не удалось разместить группу целиком: ${names}`);
+  for (const component of ordered) {
+    const key = keys.get(component)!;
+
+    if (component.length > 1 && component.length > planner.maxCapacity) {
+      issues.push({ code: 'group-too-large', guestIds: component.map(g => g.id) });
+    } else {
+      const result = place(component, key, ['strict', 'mixed-sides', 'scattered']);
+      if (result) {
+        if (result.mode === 'scattered' && component.length > 1) {
+          issues.push({ code: 'not-contiguous', guestIds: component.map(g => g.id) });
+        }
+        remainingByGroup.set(key, (remainingByGroup.get(key) ?? 0) - component.length);
+        continue;
       }
-      continue;
     }
 
-    placement.guests.forEach((guest, index) => {
-      const seat = placement.seats[index];
-      assigned.set(seat.id, guest.id);
-      assignedTables.set(guest.id, placement.tableId);
-      occupied.add(seat.id);
-    });
-  }
-
-  const assignments = Array.from(assigned, ([seatId, guestId]) => ({
-    seatId,
-    guestId,
-  }));
-
-  const unseated = guests
-    .filter(g => !assignedTables.has(g.id))
-    .map(g => g.id);
-
-  // Проверяем, что каждая связанная группа ++ находится за одним столом
-  // и занимает непрерывный блок мест.
-  for (const component of components) {
-    const placed = component.filter(g => assignedTables.has(g.id));
-    if (placed.length !== component.length) continue;
-
-    const tableIds = new Set(placed.map(g => assignedTables.get(g.id)));
-    if (tableIds.size !== 1) {
-      warnings.push(`Группа ++ разделена между столами: ${component.map(g => g.name).join(', ')}`);
-      continue;
+    // Could not keep the component at one table: seat members one by one,
+    // preferring the table where the previous member went.
+    let anchor: string | undefined;
+    let placedAny = false;
+    for (const guest of component) {
+      const result = place([guest], key, ['strict', 'mixed-sides'], anchor);
+      if (result) {
+        anchor = anchor ?? result.tableId;
+        placedAny = true;
+      }
+      remainingByGroup.set(key, (remainingByGroup.get(key) ?? 0) - 1);
     }
-
-    const indexes = placed
-      .map(g => {
-        const seatId = assignments.find(a => a.guestId === g.id)?.seatId;
-        return seats.find(s => s.id === seatId)?.index;
-      })
-      .filter((n): n is number => n !== undefined)
-      .sort((a, b) => a - b);
-
-    const capacity = seats.find(s => s.tableId === [...tableIds][0])?.capacity ?? 0;
-    const contiguous = indexes.length === 1 ||
-      indexes.every((value, i) =>
-        i === 0 || value === indexes[i - 1] + 1
-      ) ||
-      (indexes[0] === 0 && indexes[indexes.length - 1] === capacity - 1);
-
-    if (!contiguous) {
-      warnings.push(`Группа ++ не занимает последовательные места: ${component.map(g => g.name).join(', ')}`);
+    if (placedAny && component.length > 1) {
+      issues.push({ code: 'group-split', guestIds: component.map(g => g.id) });
     }
   }
 
-  // Проверяем запрет соседства и разделение сторон.
-  for (let i = 0; i < guests.length; i++) {
-    for (let j = i + 1; j < guests.length; j++) {
-      const a = guests[i];
-      const b = guests[j];
-      const seatAId = assignments.find(x => x.guestId === a.id)?.seatId;
-      const seatBId = assignments.find(x => x.guestId === b.id)?.seatId;
-      if (!seatAId || !seatBId) continue;
+  if (mixedSides.size) issues.push({ code: 'sides-mixed', guestIds: [...mixedSides] });
 
-      const seatA = seats.find(s => s.id === seatAId);
-      const seatB = seats.find(s => s.id === seatBId);
-      if (!seatA || !seatB || seatA.tableId !== seatB.tableId) continue;
-
-      if (
-        areAdjacent(seatA.index, seatB.index, seatA.capacity) &&
-        hasRelation(plan, a.id, b.id, 'excludedNeighbors')
-      ) {
-        warnings.push(`Не выполнено -: ${a.name} / ${b.name}`);
-      }
-
-      const sideA = getProfile(plan, a.id).side;
-      const sideB = getProfile(plan, b.id).side;
-      if (sideA !== 'shared' && sideB !== 'shared' && sideA !== sideB) {
-        warnings.push(`Стороны жениха и невесты оказались за одним столом: ${a.name} / ${b.name}`);
-      }
-    }
-  }
-
+  const unseated = guests.filter(g => !planner.state.guestSeat.has(g.id)).map(g => g.id);
   if (unseated.length) {
-    warnings.push(`Не удалось рассадить: ${unseated.map(id => allGuests.get(id)?.name ?? id).join(', ')}`);
+    // Guests left over while seats were still free could only be blocked by "keep apart" rules.
+    const blocked = planner.freeSeatCount > 0;
+    issues.push({ code: blocked ? 'excluded-conflict' : 'no-seat', guestIds: unseated });
   }
+
+  const assignments = Array.from(planner.state.seatGuest, ([seatId, guestId]) => ({ seatId, guestId }));
+  const seated = assignments.length;
+  const compromises = issues.filter(issue =>
+    issue.code === 'group-split' || issue.code === 'not-contiguous' || issue.code === 'sides-mixed',
+  ).length;
+  const score = Math.max(0, Math.round((100 * seated) / Math.max(1, guests.length)) - compromises * 3);
 
   return {
     id: `proposal-${variant}`,
-    title: ['Balanced seating', 'Group-focused seating', 'Preference-focused seating'][variant - 1],
+    variant,
+    title: TITLES[variant],
     assignments,
-    score: assignments.length * 1000,
-    seated: assignments.length,
+    score,
+    seated,
+    kept,
+    added: seated - kept,
     unseated,
-    warnings: [...new Set(warnings)],
+    issues,
   };
 }
 
 export function generateSeatingProposals(
   guests: SeatingGuest[],
   plan: SeatingPlanV2,
+  options: SeatingProposalOptions = {},
 ): SeatingProposal[] {
-  return [1, 2, 3]
-    .map(variant => generateProposal(guests, plan, variant))
-    .sort((a, b) => b.seated - a.seated || b.score - a.score);
+  const keepExisting = options.keepExisting !== false;
+  return ([1, 2, 3] as const)
+    .map(variant => generateProposal(guests, plan, variant, keepExisting))
+    .sort((a, b) => b.seated - a.seated || b.score - a.score || a.variant - b.variant);
 }

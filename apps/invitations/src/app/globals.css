@@ -4395,3 +4395,107 @@ button, a {
 
 /* Invitation templates and the studio editor are styled in
    components/invitation/invitation.css and components/studio.css. */
+
+/* SEATING: guest assignment, drag-and-drop, validation */
+.sp-validate-trigger {
+  display: flex !important; align-items: center; justify-content: space-between; gap: 6px;
+  border: 1px solid var(--sp-line) !important;
+}
+.sp-validate-badge {
+  display: inline-grid; min-width: 18px; height: 18px; padding: 0 5px; place-items: center;
+  border-radius: 9px; background: #f2ece6; color: #8a6d4d; font-size: 9px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.sp-validate-badge.error { background: #f7e3df; color: #a24c3e; }
+.sp-validate-badge.ok { background: #e6efe8; color: #557a5f; }
+
+.sp-seat-status {
+  display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 8px 9px;
+  border-radius: 7px; background: #f8f4f6; font-size: 10px; color: #6f6168;
+}
+.sp-seat-status strong { color: #493943; font-size: 11px; font-weight: 600; }
+
+.sp-guest-browser { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; min-width: 0; }
+.sp-guest-search {
+  width: 100%; min-width: 0; height: 33px; padding: 0 9px; border: 1px solid var(--sp-line);
+  border-radius: 6px; background: white; color: #403a35; font-size: 11px; outline: none;
+}
+.sp-guest-search:focus { border-color: #b5a2aa; box-shadow: 0 0 0 3px rgba(181,162,170,.15); }
+.sp-guest-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 7px; background: #f4f1ee; }
+.sp-guest-filters button {
+  min-width: 0; padding: 5px 2px; border-radius: 5px; color: #7d736d; font-size: 9px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sp-guest-filters button span { color: #a89d97; font-variant-numeric: tabular-nums; }
+.sp-guest-filters button.active { background: white; color: #403a35; box-shadow: 0 1px 2px rgba(60,40,50,.08); }
+.sp-guest-filters button.active span { color: #87566f; }
+
+.sp-guest-list {
+  display: flex; flex-direction: column; gap: 4px; max-height: 340px; overflow-y: auto;
+  margin: 0; padding: 0 2px 0 0; list-style: none;
+}
+.sp-guest-row {
+  display: flex; align-items: center; gap: 7px; min-width: 0; min-height: 32px; padding: 4px 4px 4px 6px;
+  border: 1px solid transparent; border-radius: 7px; background: #f7f5f3;
+  cursor: grab; user-select: none; -webkit-user-select: none;
+}
+.sp-guest-row:hover { border-color: #e4d9de; background: #fbf8f9; }
+.sp-guest-row.active { border-color: #c9b2be; background: #f6eef2; }
+.sp-guest-row.dragging { opacity: .45; }
+.sp-guest-grip {
+  flex: 0 0 6px; width: 6px; height: 14px; touch-action: none;
+  background-image: radial-gradient(circle, #b9aca5 1px, transparent 1.3px);
+  background-size: 3px 4px;
+}
+.sp-guest-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; color: #4d4540; }
+.sp-guest-status {
+  flex: 0 1 auto; max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 2px 6px; border-radius: 10px; background: #f3e6df; color: #a0694e; font-size: 8.5px;
+}
+.sp-guest-status.assigned { background: #e7efe9; color: #557a5f; }
+.sp-guest-row .sp-table-guest-remove { flex: 0 0 22px; width: 22px; height: 22px; font-size: 15px; }
+
+.sp-guest-section.sp-drop-active { outline: 2px dashed #5f8a6c; outline-offset: 4px; border-radius: 8px; background: #f5faf6; }
+body.sp-guest-dragging, body.sp-guest-dragging * { cursor: grabbing !important; user-select: none !important; -webkit-user-select: none !important; }
+
+.sp-drag-ghost {
+  position: fixed; z-index: 1100; pointer-events: none; transform: translate(12px, 12px);
+  display: flex; flex-direction: column; gap: 2px; max-width: 240px; padding: 7px 10px;
+  border: 1px solid #ddd0d6; border-radius: 9px; background: white; color: #403a35;
+  box-shadow: 0 10px 28px rgba(40,25,34,.18); font-size: 11px;
+}
+.sp-drag-ghost strong { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-drag-ghost span { font-size: 10px; color: #7d736d; }
+.sp-drag-ghost.ok { border-color: #a9c6b1; }
+.sp-drag-ghost.ok span { color: #4f7a5b; }
+.sp-drag-ghost.blocked { border-color: #e2b4aa; }
+.sp-drag-ghost.blocked span { color: #a24c3e; }
+
+.sp-notice {
+  position: fixed; left: 50%; bottom: 24px; z-index: 1050; transform: translateX(-50%);
+  max-width: min(520px, calc(100vw - 32px)); margin: 0; padding: 10px 16px; border-radius: 10px;
+  background: #393430; color: white; font-size: 12px; line-height: 1.45;
+  box-shadow: 0 12px 32px rgba(40,25,34,.22);
+}
+.sp-notice.error { background: #8f4639; }
+
+.sp-auto-keep { display: flex; align-items: center; gap: 8px; margin: -6px 0 18px; color: #6f6168; font-size: 13px; cursor: pointer; }
+.sp-auto-keep input { width: 16px; height: 16px; accent-color: #87566f; }
+.sp-auto-issues { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.sp-auto-issues li { display: flex; flex-direction: column; gap: 2px; padding: 7px 9px; border-radius: 8px; background: #fbf4f1; color: #8d5444; font-size: 11.5px; line-height: 1.4; }
+.sp-auto-issues small { color: #9a8a84; font-size: 10.5px; }
+
+.sp-validation-list { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.sp-validation-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 12px 14px; border: 1px solid #efe6e2; border-left-width: 4px; border-radius: 10px; background: white;
+}
+.sp-validation-item.error { border-left-color: #b4574a; background: #fffaf9; }
+.sp-validation-item.warning { border-left-color: #c99a5b; }
+.sp-validation-item > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sp-validation-item strong { color: #40343b; font-size: 13px; font-weight: 600; }
+.sp-validation-item span { color: #81747b; font-size: 12px; overflow-wrap: anywhere; }
+.sp-validation-item .sp-secondary { flex: 0 0 auto; }
+@media (max-width: 760px) {
+  .sp-validation-item { align-items: flex-start; flex-direction: column; }
+}
