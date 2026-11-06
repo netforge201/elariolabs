@@ -53,19 +53,13 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
     return () => music().stop(INVITATION_OWNER);
   }, [isThumb]);
 
-  // Load the uploaded file / YouTube player ahead of the guest's tap, so it
-  // can start immediately (nothing plays until that tap).
+  // Load the uploaded file ahead of the guest's tap, so it can start
+  // immediately (nothing plays until that tap).
   useEffect(() => {
     if (isThumb || !source || source.kind === 'track') return;
     music().prepare(source);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on the source identity
   }, [sourceKey, isThumb]);
-
-  // Interface text of the YouTube card follows the invitation language.
-  useEffect(() => {
-    if (isThumb) return;
-    music().setLabels({ close: m.t.videoClose, tapToPlay: m.t.videoTap, unavailable: m.t.videoUnavailable });
-  }, [m.t, isThumb]);
 
   // In the studio the music can change while it is playing: follow it.
   useEffect(() => {

@@ -8,9 +8,9 @@ import {
 } from './icons';
 import InvitationView, { type InvitationData } from './invitation/invitation-view';
 import {
-  AUDIO_ACCEPT, DEFAULT_TRACK, DEFAULT_VOLUME, MAX_AUDIO_BYTES, MUSIC_NONE, MUSIC_UPLOAD, MUSIC_YOUTUBE, TEMPLATES, TRACKS,
-  displayName, musicSourceKey, parseYouTubeId, resolveMusic, resolveTemplate, youtubeThumbnail,
-  type Locale, type MusicChoice, type MusicSource, type TemplateId, type TrackId, type UploadedMusic, type YoutubeMusic,
+  AUDIO_ACCEPT, DEFAULT_TRACK, DEFAULT_VOLUME, MAX_AUDIO_BYTES, MUSIC_NONE, MUSIC_UPLOAD, TEMPLATES, TRACKS,
+  displayName, musicSourceKey, resolveMusic, resolveTemplate,
+  type Locale, type MusicChoice, type MusicSource, type TemplateId, type TrackId, type UploadedMusic,
 } from './invitation/catalog';
 import { copy as invitationCopy } from './invitation/copy';
 import { music, useFileProgress, useMusicSnapshot } from './invitation/music-engine';
@@ -32,7 +32,6 @@ type Wedding = {
   coverImage?: string | null;
   music?: string | null;
   musicUpload?: UploadedMusic | null;
-  musicYoutube?: YoutubeMusic | null;
   musicVolume?: number | null;
   isPublished: boolean;
 };
@@ -52,9 +51,8 @@ type FormState = {
   template: TemplateId;
   coverImage: string | null;
   music: MusicChoice;
-  /** Kept even while another source is selected, so switching back is instant. */
+  /** Kept even while a built-in track is selected, so switching back is instant. */
   musicUpload: UploadedMusic | null;
-  musicYoutube: YoutubeMusic | null;
   musicVolume: number;
 };
 
@@ -83,7 +81,7 @@ const dict = {
     musicTitle: 'Background music', musicHint: 'Music starts when a guest taps to open the invitation — browsers never allow sound before that tap. Guests can pause it at any time.',
     noMusic: 'No music', noMusicSub: 'The invitation opens silently',
     listen: 'Listen', stop: 'Stop', musicSource: 'All tracks are generated in the browser — no files, nothing to license.',
-    tabBuiltin: 'Built-in', tabUpload: 'Your file', tabYoutube: 'YouTube', musicSourceLabel: 'Music source',
+    tabBuiltin: 'Built-in', tabUpload: 'Your file', musicSourceLabel: 'Music source',
     activeNow: 'On the invitation:', activeNone: 'No music',
     audioUpload: 'Upload an audio file', audioUploadSub: 'MP3, M4A, AAC, WAV or OGG · up to 10 MB',
     uploading: 'Uploading…', uploadedOk: 'Uploaded. Save to put it on your invitation.',
@@ -95,16 +93,6 @@ const dict = {
     },
     safariWarn: 'OGG, WebM and FLAC do not play on iPhone or Safari. MP3 or M4A works everywhere.',
     useThis: 'Use this music', inUse: 'In use', removeMusic: 'Remove', seek: 'Playback position',
-    ytLabel: 'YouTube link', ytPlaceholder: 'https://www.youtube.com/watch?v=…', ytAdd: 'Add', ytChecking: 'Checking…', cancel: 'Cancel',
-    ytErr: {
-      invalid: 'This is not a YouTube video link. Paste a link like youtube.com/watch?v=…, youtu.be/… or youtube.com/shorts/….',
-      embed: 'The owner of this video does not allow it to be played on other sites. Please try another video.',
-      missing: 'This video was not found or is private.',
-      failed: 'Could not check the link. Please try again.',
-    },
-    ytAdded: 'Added. Save to put it on your invitation.',
-    ytUnverified: 'Added. YouTube could not be reached to check the video, so it will be checked when it plays.',
-    ytNote: "Plays in YouTube's own player. While it plays, guests see a small video card (YouTube requires the player to stay visible). Some videos, often official music videos, don't allow embedding.",
     volume: 'Volume',
     preview: 'Live preview', mobile: 'Phone', desktop: 'Desktop', replay: 'Replay opening',
     sample: 'Sample names shown until you enter yours.',
@@ -137,7 +125,7 @@ const dict = {
     musicTitle: 'Фоновая музыка', musicHint: 'Музыка включается, когда гость нажимает «Открыть приглашение» — браузеры не разрешают звук до этого нажатия. Гость может выключить её в любой момент.',
     noMusic: 'Без музыки', noMusicSub: 'Приглашение откроется в тишине',
     listen: 'Слушать', stop: 'Стоп', musicSource: 'Все мелодии создаются прямо в браузере — без файлов и лицензий.',
-    tabBuiltin: 'Готовые', tabUpload: 'Свой файл', tabYoutube: 'YouTube', musicSourceLabel: 'Источник музыки',
+    tabBuiltin: 'Готовые', tabUpload: 'Свой файл', musicSourceLabel: 'Источник музыки',
     activeNow: 'В приглашении:', activeNone: 'Без музыки',
     audioUpload: 'Загрузите аудиофайл', audioUploadSub: 'MP3, M4A, AAC, WAV или OGG · до 10 МБ',
     uploading: 'Загрузка…', uploadedOk: 'Загружено. Сохраните, чтобы музыка появилась в приглашении.',
@@ -149,16 +137,6 @@ const dict = {
     },
     safariWarn: 'OGG, WebM и FLAC не воспроизводятся на iPhone и в Safari. MP3 или M4A работают везде.',
     useThis: 'Выбрать эту музыку', inUse: 'Выбрано', removeMusic: 'Удалить', seek: 'Позиция воспроизведения',
-    ytLabel: 'Ссылка на YouTube', ytPlaceholder: 'https://www.youtube.com/watch?v=…', ytAdd: 'Добавить', ytChecking: 'Проверка…', cancel: 'Отмена',
-    ytErr: {
-      invalid: 'Это не ссылка на видео YouTube. Вставьте ссылку вида youtube.com/watch?v=…, youtu.be/… или youtube.com/shorts/….',
-      embed: 'Автор видео запретил его воспроизведение на других сайтах. Выберите другое видео.',
-      missing: 'Видео не найдено или скрыто.',
-      failed: 'Не удалось проверить ссылку. Попробуйте ещё раз.',
-    },
-    ytAdded: 'Добавлено. Сохраните, чтобы музыка появилась в приглашении.',
-    ytUnverified: 'Добавлено. YouTube сейчас недоступен для проверки — видео проверится при воспроизведении.',
-    ytNote: 'Играет во встроенном плеере YouTube. Пока звучит музыка, гости видят небольшую карточку с видео — YouTube требует, чтобы плеер был виден. Некоторые видео (часто официальные клипы) запрещают встраивание.',
     volume: 'Громкость',
     preview: 'Предпросмотр', mobile: 'Телефон', desktop: 'Компьютер', replay: 'Повторить открытие',
     sample: 'Пока вы не ввели имена, показаны примерные.',
@@ -191,7 +169,7 @@ const dict = {
     musicTitle: 'Fon musiqisi', musicHint: 'Musiqi qonaq «Dəvətnaməni açın» düyməsinə toxunanda başlayır — brauzerlər bu toxunuşdan əvvəl səsə icazə vermir. Qonaq istənilən an onu dayandıra bilər.',
     noMusic: 'Musiqisiz', noMusicSub: 'Dəvətnamə səssiz açılır',
     listen: 'Dinlə', stop: 'Dayandır', musicSource: 'Bütün melodiyalar birbaşa brauzerdə yaradılır — fayl və lisenziya tələb olunmur.',
-    tabBuiltin: 'Hazır', tabUpload: 'Öz faylınız', tabYoutube: 'YouTube', musicSourceLabel: 'Musiqi mənbəyi',
+    tabBuiltin: 'Hazır', tabUpload: 'Öz faylınız', musicSourceLabel: 'Musiqi mənbəyi',
     activeNow: 'Dəvətnamədə:', activeNone: 'Musiqisiz',
     audioUpload: 'Audio fayl yükləyin', audioUploadSub: 'MP3, M4A, AAC, WAV və ya OGG · 10 MB-a qədər',
     uploading: 'Yüklənir…', uploadedOk: 'Yükləndi. Dəvətnamədə görünməsi üçün yadda saxlayın.',
@@ -203,16 +181,6 @@ const dict = {
     },
     safariWarn: 'OGG, WebM və FLAC iPhone və Safari-də oynamır. MP3 və ya M4A hər yerdə işləyir.',
     useThis: 'Bu musiqini seç', inUse: 'Seçilib', removeMusic: 'Sil', seek: 'Oxutma mövqeyi',
-    ytLabel: 'YouTube linki', ytPlaceholder: 'https://www.youtube.com/watch?v=…', ytAdd: 'Əlavə et', ytChecking: 'Yoxlanılır…', cancel: 'Ləğv et',
-    ytErr: {
-      invalid: 'Bu YouTube video linki deyil. youtube.com/watch?v=…, youtu.be/… və ya youtube.com/shorts/… kimi link daxil edin.',
-      embed: 'Videonun sahibi onun başqa saytlarda oynadılmasına icazə vermir. Başqa video seçin.',
-      missing: 'Video tapılmadı və ya gizlidir.',
-      failed: 'Linki yoxlamaq alınmadı. Yenidən cəhd edin.',
-    },
-    ytAdded: 'Əlavə edildi. Dəvətnamədə görünməsi üçün yadda saxlayın.',
-    ytUnverified: 'Əlavə edildi. YouTube-a indi qoşulmaq mümkün olmadı — video oynadılanda yoxlanılacaq.',
-    ytNote: 'YouTube-un öz pleyerində oynayır. Musiqi çalanda qonaqlar kiçik video kartı görür — YouTube pleyerin görünən qalmasını tələb edir. Bəzi videolar (adətən rəsmi kliplər) yerləşdirməyə icazə vermir.',
     volume: 'Səs səviyyəsi',
     preview: 'Canlı önbaxış', mobile: 'Telefon', desktop: 'Kompüter', replay: 'Açılışı təkrarla',
     sample: 'Adları daxil edənə qədər nümunə adlar göstərilir.',
@@ -285,7 +253,6 @@ function initialForm(w: Wedding | null): FormState {
     // Existing invitations keep their saved (or legacy) track; new ones start on the 6/8 serenade.
     music: w ? resolveMusic(w.music) : DEFAULT_TRACK,
     musicUpload: w?.musicUpload ?? null,
-    musicYoutube: w?.musicYoutube ?? null,
     musicVolume: typeof w?.musicVolume === 'number' ? w.musicVolume : DEFAULT_VOLUME,
   };
 }
@@ -438,7 +405,6 @@ export default function WeddingEditor({
     coverImage: form.coverImage,
     music: form.music,
     musicUpload: form.musicUpload,
-    musicYoutube: form.musicYoutube,
     musicVolume: form.musicVolume,
   }), [form, wedding?.slug, wedding?.timezone]);
 
@@ -972,13 +938,11 @@ export default function WeddingEditor({
 
 // ---------------------------------------------------------------------------
 
-type MusicTab = 'builtin' | 'upload' | 'youtube';
-const tabFor = (choice: MusicChoice): MusicTab =>
-  choice === MUSIC_UPLOAD ? 'upload' : choice === MUSIC_YOUTUBE ? 'youtube' : 'builtin';
+type MusicTab = 'builtin' | 'upload';
+const tabFor = (choice: MusicChoice): MusicTab => (choice === MUSIC_UPLOAD ? 'upload' : 'builtin');
 
 type Dict = (typeof dict)['en'];
 type AudioErrorCode = keyof Dict['audioErr'];
-type YoutubeErrorCode = keyof Dict['ytErr'];
 
 /** Formats that Safari / iOS cannot play, so the couple gets a heads-up. */
 const NOT_ON_SAFARI = /\.(ogg|oga|opus|webm|flac)$/i;
@@ -1034,7 +998,6 @@ function MusicPicker({ form, onPatch, locale, t }: {
 
   const activeLabel = form.music === MUSIC_NONE ? t.activeNone
     : form.music === MUSIC_UPLOAD ? displayName(form.musicUpload?.name ?? '')
-    : form.music === MUSIC_YOUTUBE ? form.musicYoutube?.title ?? 'YouTube'
     : TRACKS.find(track => track.id === form.music)?.title[locale] ?? '';
 
   function setVolume(percent: number) {
@@ -1043,7 +1006,7 @@ function MusicPicker({ form, onPatch, locale, t }: {
     if (music().getSnapshot().owner === PICKER_OWNER) music().setVolume(volume);
   }
 
-  const tabs: [MusicTab, string][] = [['builtin', t.tabBuiltin], ['upload', t.tabUpload], ['youtube', t.tabYoutube]];
+  const tabs: [MusicTab, string][] = [['builtin', t.tabBuiltin], ['upload', t.tabUpload]];
 
   return (
     <fieldset className="st-group">
@@ -1103,10 +1066,6 @@ function MusicPicker({ form, onPatch, locale, t }: {
 
       {tab === 'upload' && (
         <UploadPanel form={form} onPatch={onPatch} t={t} previewing={previewing} togglePreview={togglePreview} />
-      )}
-
-      {tab === 'youtube' && (
-        <YoutubePanel form={form} onPatch={onPatch} t={t} previewing={previewing} togglePreview={togglePreview} />
       )}
 
       {form.music !== MUSIC_NONE && (
@@ -1235,101 +1194,4 @@ function fileFailed(source: MusicSource | null) {
   if (!source) return false;
   const s = music().getSnapshot();
   return s.key === musicSourceKey(source) && s.status === 'error';
-}
-
-function YoutubePanel({ form, onPatch, t, previewing, togglePreview }: PanelProps) {
-  const video = form.musicYoutube;
-  const [editing, setEditing] = useState(!video);
-  const [url, setUrl] = useState('');
-  const [checking, setChecking] = useState(false);
-  const [error, setError] = useState<YoutubeErrorCode | null>(null);
-  const [notice, setNotice] = useState<'added' | 'unverified' | null>(null);
-  const source: MusicSource | null = video ? { kind: 'youtube', videoId: video.videoId, title: video.title } : null;
-  const playing = source ? previewing(source) : false;
-  const inUse = form.music === MUSIC_YOUTUBE;
-
-  async function add(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null); setNotice(null);
-    const id = parseYouTubeId(url);
-    if (!id) { setError('invalid'); return; }
-    setChecking(true);
-    try {
-      const response = await fetch(`/api/music/youtube?url=${encodeURIComponent(url)}`);
-      const body = await response.json().catch(() => ({})) as { video?: YoutubeMusic; verified?: boolean; code?: string };
-      if (!response.ok || !body.video) {
-        setError(body.code === 'embed' || body.code === 'missing' || body.code === 'invalid' ? body.code : 'failed');
-        return;
-      }
-      if (video) music().stop(PICKER_OWNER);
-      onPatch({ musicYoutube: body.video, music: MUSIC_YOUTUBE });
-      setNotice(body.verified ? 'added' : 'unverified');
-      setEditing(false);
-      setUrl('');
-    } catch {
-      setError('failed');
-    } finally {
-      setChecking(false);
-    }
-  }
-
-  function remove() {
-    if (source && previewing(source)) music().stop(PICKER_OWNER);
-    setNotice(null);
-    setEditing(true);
-    onPatch({ musicYoutube: null, ...(inUse && { music: DEFAULT_TRACK }) });
-  }
-
-  return (
-    <div className="st-mpanel">
-      {video && !editing && (
-        <div className={`st-mcard ${inUse ? 'is-selected' : ''}`}>
-          <div className="st-mcard-head st-mcard-head--video">
-            {/* eslint-disable-next-line @next/next/no-img-element -- YouTube's own thumbnail host */}
-            <img className="st-mthumb" src={youtubeThumbnail(video.videoId)} alt="" loading="lazy" />
-            <span className="st-mcard-text">
-              <strong title={video.title ?? undefined}>{video.title ?? 'YouTube'}</strong>
-              <small>{video.author ?? `youtu.be/${video.videoId}`}</small>
-            </span>
-            {inUse && <span className="st-mbadge"><CheckIcon className="w-3 h-3" aria-hidden="true" />{t.inUse}</span>}
-          </div>
-          <div className="st-mactions">
-            <button type="button" className={`st-track-play ${playing ? 'is-on' : ''}`} aria-pressed={playing}
-              onClick={() => source && togglePreview(source)}>
-              {playing ? <PauseIcon className="w-3.5 h-3.5" aria-hidden="true" /> : <PlayIcon className="w-3.5 h-3.5" aria-hidden="true" />}
-              <span>{playing ? t.stop : t.listen}</span>
-            </button>
-            {!inUse && (
-              <button type="button" className="st-btn st-btn--small st-btn--primary" onClick={() => onPatch({ music: MUSIC_YOUTUBE })}>{t.useThis}</button>
-            )}
-            <button type="button" className="st-btn st-btn--small" onClick={() => { setEditing(true); setNotice(null); }}>{t.replace}</button>
-            <button type="button" className="st-btn st-btn--small st-btn--danger" onClick={remove}>{t.removeMusic}</button>
-          </div>
-        </div>
-      )}
-      {(editing || !video) && (
-        <form className="st-myt-form" onSubmit={add} noValidate>
-          <label className="st-field">
-            <span>{t.ytLabel}</span>
-            <input type="url" inputMode="url" autoComplete="off" spellCheck={false} placeholder={t.ytPlaceholder}
-              value={url} onChange={e => { setUrl(e.target.value); setError(null); }}
-              aria-invalid={error ? true : undefined} disabled={checking} />
-          </label>
-          <div className="st-mactions">
-            <button type="submit" className="st-btn st-btn--small st-btn--primary" disabled={checking || !url.trim()}>
-              {checking ? t.ytChecking : t.ytAdd}
-            </button>
-            {video && (
-              <button type="button" className="st-btn st-btn--small" onClick={() => { setEditing(false); setError(null); setUrl(''); }}>{t.cancel}</button>
-            )}
-          </div>
-        </form>
-      )}
-      {error && <p className="st-merror" role="alert">{t.ytErr[error]}</p>}
-      {notice && !error && (
-        <p className="st-mok" role="status"><CheckIcon className="w-3.5 h-3.5" aria-hidden="true" />{notice === 'added' ? t.ytAdded : t.ytUnverified}</p>
-      )}
-      <small className="st-hint">{t.ytNote}</small>
-    </div>
-  );
 }

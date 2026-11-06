@@ -1,6 +1,6 @@
 import {
   DEFAULT_VOLUME, resolveLocale, resolveMusic, resolveMusicSource, resolveTemplate,
-  type Locale, type MusicChoice, type MusicSource, type TemplateId, type UploadedMusic, type YoutubeMusic,
+  type Locale, type MusicChoice, type MusicSource, type TemplateId, type UploadedMusic,
 } from './catalog';
 import { copy, formatTableLabel, type Copy } from './copy';
 import { dayKey, formatDateParts, type DateParts } from './event-time';
@@ -22,7 +22,6 @@ export type InvitationData = {
   coverImage?: string | null;
   music?: string | null;
   musicUpload?: UploadedMusic | null;
-  musicYoutube?: YoutubeMusic | null;
   musicVolume?: number | null;
 };
 
@@ -82,7 +81,7 @@ export function buildModel(data: InvitationData, guest?: GuestInfo | null): Invi
     t,
     template: resolveTemplate(data.template),
     music,
-    musicSource: resolveMusicSource(music, data.musicUpload, data.musicYoutube),
+    musicSource: resolveMusicSource(music, data.musicUpload),
     musicVolume: typeof data.musicVolume === 'number' ? Math.max(0, Math.min(1, data.musicVolume)) : DEFAULT_VOLUME,
     names,
     initials: [initial(names[0]), initial(names[1])],

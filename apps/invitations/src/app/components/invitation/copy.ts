@@ -34,9 +34,6 @@ export const copy = {
     musicError: 'Bu brauzer musiqini dəstəkləmir',
     musicUnavailable: 'Musiqini yükləmək mümkün olmadı',
     musicTap: 'Musiqini başlatmaq üçün toxunun',
-    videoClose: 'Videonu bağla',
-    videoTap: 'Musiqini başlatmaq üçün videodakı ▶ düyməsinə toxunun',
-    videoUnavailable: 'Bu video burada oynadıla bilmir',
     scroll: 'Aşağı sürüşdürün',
   },
   ru: {
@@ -72,9 +69,6 @@ export const copy = {
     musicError: 'Браузер не поддерживает музыку',
     musicUnavailable: 'Не удалось загрузить музыку',
     musicTap: 'Нажмите, чтобы включить музыку',
-    videoClose: 'Закрыть видео',
-    videoTap: 'Нажмите ▶ на видео, чтобы включить музыку',
-    videoUnavailable: 'Это видео нельзя воспроизвести здесь',
     scroll: 'Листайте вниз',
   },
   en: {
@@ -110,9 +104,6 @@ export const copy = {
     musicError: 'Music is not supported in this browser',
     musicUnavailable: 'The music could not be loaded',
     musicTap: 'Tap to start the music',
-    videoClose: 'Close video',
-    videoTap: 'Tap ▶ on the video to start the music',
-    videoUnavailable: 'This video cannot be played here',
     scroll: 'Scroll down',
   },
 } satisfies Record<Locale, Record<string, string | string[]>>;

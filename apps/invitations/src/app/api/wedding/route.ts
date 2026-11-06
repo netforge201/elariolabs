@@ -3,7 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { MUSIC_CHOICES, MUSIC_UPLOAD, MUSIC_YOUTUBE, readMusicSettings } from '@/app/components/invitation/catalog';
+import { MUSIC_CHOICES, MUSIC_UPLOAD, readMusicSettings } from '@/app/components/invitation/catalog';
 import { pruneMusicFiles } from '@/lib/music-files';
 
 export const dynamic = 'force-dynamic';
@@ -23,18 +23,13 @@ const weddingSchema = z.object({
   music: z.string().refine(value => MUSIC_CHOICES.includes(value), 'Unknown music track').nullable().optional(),
   // Only the id is trusted from the client; name/type/size come from the stored file.
   musicUpload: z.object({ id: z.string().uuid() }).nullable().optional(),
-  musicYoutube: z.object({
-    videoId: z.string().regex(/^[A-Za-z0-9_-]{11}$/),
-    title: z.string().max(300).nullable().optional(),
-    author: z.string().max(200).nullable().optional(),
-  }).nullable().optional(),
   musicVolume: z.number().min(0).max(1).optional(),
   isPublished: z.boolean().optional(),
 });
 
 const updateSchema = weddingSchema.partial().strict();
 
-type MusicInput = Pick<z.infer<typeof weddingSchema>, 'music' | 'musicUpload' | 'musicYoutube' | 'musicVolume'>;
+type MusicInput = Pick<z.infer<typeof weddingSchema>, 'music' | 'musicUpload' | 'musicVolume'>;
 type Theme = Record<string, unknown>;
 
 function themeOf(value: unknown): Theme {
@@ -57,11 +52,8 @@ function themeFields(theme: Theme) {
 async function applyMusic(theme: Theme, data: MusicInput, accountId: string): Promise<string | null> {
   if (data.music !== undefined) theme.music = data.music;
   if (data.musicVolume !== undefined) theme.musicVolume = data.musicVolume;
-  if (data.musicYoutube !== undefined) {
-    theme.musicYoutube = data.musicYoutube
-      ? { videoId: data.musicYoutube.videoId, title: data.musicYoutube.title ?? null, author: data.musicYoutube.author ?? null }
-      : null;
-  }
+  // Left over from the removed YouTube option.
+  delete theme.musicYoutube;
   if (data.musicUpload !== undefined) {
     if (!data.musicUpload) {
       theme.musicUpload = null;
@@ -75,11 +67,10 @@ async function applyMusic(theme: Theme, data: MusicInput, accountId: string): Pr
     }
   }
   if (theme.music === MUSIC_UPLOAD && !theme.musicUpload) return 'Upload an audio file before selecting it.';
-  if (theme.music === MUSIC_YOUTUBE && !theme.musicYoutube) return 'Add a YouTube link before selecting it.';
   return null;
 }
 
-const MUSIC_KEYS = ['music', 'musicUpload', 'musicYoutube', 'musicVolume'] as const;
+const MUSIC_KEYS = ['music', 'musicUpload', 'musicVolume'] as const;
 
 
 

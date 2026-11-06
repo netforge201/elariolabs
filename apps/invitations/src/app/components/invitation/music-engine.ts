@@ -4,8 +4,7 @@
 //
 // - Built-in tracks are generated live with the Web Audio API.
 // - A couple's uploaded file plays through one shared <audio> element.
-// - A YouTube video plays through YouTube's embedded player (youtube-player.ts).
-// - One controller for the whole page owns all three, so the invitation, the
+// - One controller for the whole page owns both, so the invitation, the
 //   editor preview and the music picker can never play on top of each other.
 // - Playback only ever starts from a user gesture (play()/toggle() are called
 //   from click handlers); nothing here tries to get around autoplay rules.
@@ -14,7 +13,6 @@
 
 import { useCallback, useSyncExternalStore } from 'react';
 import { musicFileUrl, musicSourceKey, type MusicSource, type TrackId } from './catalog';
-import { YouTubeDock, type YouTubeLabels } from './youtube-player';
 import { SIX_EIGHT } from './compositions-6-8';
 
 // ---------------------------------------------------------------------------
@@ -443,9 +441,6 @@ const toSource = (input: SourceInput): MusicSource => (typeof input === 'string'
 const VOLUME = 0.7;
 const IDLE: MusicSnapshot = { status: 'idle', key: null, kind: null, trackId: null, owner: null };
 const ACTIVE: MusicStatus[] = ['starting', 'playing', 'paused', 'blocked'];
-const DEFAULT_LABELS: YouTubeLabels = {
-  close: 'Close video', tapToPlay: 'Tap ▶ on the video to start the music', unavailable: 'This video cannot be played here',
-};
 
 class MusicController {
   private ctx: AudioContext | null = null;
@@ -453,10 +448,8 @@ class MusicController {
   private reverb: AudioNode | null = null;
   private sequencer: Sequencer | null = null;
   private audio: HTMLAudioElement | null = null;
-  private youtube: YouTubeDock | null = null;
   private source: MusicSource | null = null;
   private volume = 1;
-  private labels = DEFAULT_LABELS;
   private suspendTimer: number | null = null;
   private resumeOnVisible = false;
   private snapshot: MusicSnapshot = IDLE;
@@ -636,38 +629,13 @@ class MusicController {
     try { audio.currentTime = Math.max(0, seconds); } catch { /* not seekable yet */ }
   }
 
-  // ----- YouTube -----
-
-  private ensureYouTube(): YouTubeDock {
-    if (this.youtube) return this.youtube;
-    const mine = () => this.source?.kind === 'youtube' && this.snapshot.kind === 'youtube' && this.snapshot.status !== 'idle';
-    this.youtube = new YouTubeDock(event => {
-      if (event === 'closed') { this.stop(); return; }
-      if (!mine()) return;
-      if (event === 'playing') this.set({ status: 'playing' });
-      else if (event === 'paused') this.set({ status: 'paused' });
-      else if (event === 'buffering' && this.snapshot.status !== 'paused') this.set({ status: 'starting' });
-      else if (event === 'blocked') this.set({ status: 'blocked' });
-      else if (event === 'error') this.set({ status: 'error' });
-    }, this.labels);
-    document.addEventListener('visibilitychange', this.onVisibility);
-    return this.youtube;
-  }
-
   // ----- public API -----
-
-  /** Interface text for the YouTube card, in the invitation's language. */
-  setLabels(labels: YouTubeLabels) {
-    this.labels = labels;
-    this.youtube?.setLabels(labels);
-  }
 
   /** 0–1. Applies immediately to whatever is playing. */
   setVolume(volume: number) {
     this.volume = Math.max(0, Math.min(1, volume));
     if (this.sequencer && this.snapshot.status === 'playing') this.fadeMaster(VOLUME * this.volume, 0.15);
     if (this.audio) this.audio.volume = this.volume;
-    this.youtube?.setVolume(this.volume);
   }
 
   /**
@@ -678,7 +646,6 @@ class MusicController {
     const source = toSource(input);
     const busy = (kind: MusicSource['kind']) => this.snapshot.kind === kind && ACTIVE.includes(this.snapshot.status);
     if (source.kind === 'file' && !busy('file')) this.setFile(source.id);
-    if (source.kind === 'youtube' && !busy('youtube')) this.ensureYouTube().load(source.videoId, source.title);
   }
 
   /** Must be called from a user gesture (tap/click) the first time. */
@@ -691,18 +658,12 @@ class MusicController {
     // Only one source may sound at a time.
     if (source.kind !== 'track' || !same) this.stopTrack();
     if (this.audio && (source.kind !== 'file' || !same)) this.audio.pause();
-    if (this.youtube && source.kind !== 'youtube') this.youtube.stop();
 
     this.source = source;
     this.set({ status: 'starting', key, kind: source.kind, trackId: source.kind === 'track' ? source.id : null, owner });
 
     if (source.kind === 'file') {
       this.playFile(source, key);
-    } else if (source.kind === 'youtube') {
-      const yt = this.ensureYouTube();
-      if (!same) yt.load(source.videoId, source.title);
-      yt.setVolume(this.volume);
-      yt.play();
     } else {
       await this.playTrack(source.id, key, same);
     }
@@ -716,8 +677,6 @@ class MusicController {
       this.suspendSoon(() => this.snapshot.status === 'paused');
     } else if (kind === 'file') {
       this.audio?.pause();
-    } else if (kind === 'youtube') {
-      this.youtube?.pause();
     }
     this.set({ status: 'paused' });
   }
@@ -738,7 +697,6 @@ class MusicController {
       this.audio.pause();
       try { this.audio.currentTime = 0; } catch { /* not loaded */ }
     }
-    this.youtube?.stop();
     this.source = null;
     this.set(IDLE);
   }
