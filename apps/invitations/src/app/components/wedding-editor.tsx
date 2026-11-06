@@ -152,7 +152,7 @@ const dict = {
 
 const guestDict = {
   en: {
-    repliesTitle: 'Replies', repliesSub: 'Answers guests sent from the invitation. Refresh the page to see new ones.', repliesEmpty: 'No replies yet.', attending: 'Attending', declined: 'Declined', people: 'Guests in total', yes: 'Coming', no: 'Not coming',
+    repliesTitle: 'Confirmations', repliesSub: 'Guests who confirmed from the invitation. Refresh the page to see new ones.', repliesEmpty: 'No confirmations yet.', confirmed: 'Confirmations', people: 'Guests in total', persons: (n: number) => `${n} ${n === 1 ? 'guest' : 'guests'}`,
     title: 'Personal invitations', sub: 'A unique link for each guest or family — it greets them by name and shows their table.',
     placeholder: 'e.g. The Aliyev family', create: 'Create link', created: 'Personal link created', copied: 'Link copied',
     copy: 'Copy', remove: 'Delete', confirm: 'Delete this invitation?', empty: 'No personal invitations yet.',
@@ -162,7 +162,7 @@ const guestDict = {
     imported: (a: number, b: number) => `Imported: ${a}. Duplicates skipped: ${b}.`, guestName: 'Guest name',
   },
   ru: {
-    repliesTitle: 'Ответы гостей', repliesSub: 'Ответы, отправленные из приглашения. Обновите страницу, чтобы увидеть новые.', repliesEmpty: 'Ответов пока нет.', attending: 'Придут', declined: 'Не смогут', people: 'Всего гостей', yes: 'Придёт', no: 'Не придёт',
+    repliesTitle: 'Подтверждения гостей', repliesSub: 'Гости, подтвердившие присутствие в приглашении. Обновите страницу, чтобы увидеть новые.', repliesEmpty: 'Подтверждений пока нет.', confirmed: 'Подтверждений', people: 'Всего гостей', persons: (n: number) => `Гостей: ${n}`,
     title: 'Именные приглашения', sub: 'Отдельная ссылка для каждого гостя или семьи — с обращением по имени и номером стола.',
     placeholder: 'Например: Семья Алиевых', create: 'Создать ссылку', created: 'Персональная ссылка создана', copied: 'Ссылка скопирована',
     copy: 'Копировать', remove: 'Удалить', confirm: 'Удалить это приглашение?', empty: 'Пока нет именных приглашений.',
@@ -172,7 +172,7 @@ const guestDict = {
     imported: (a: number, b: number) => `Импортировано: ${a}. Пропущено дубликатов: ${b}.`, guestName: 'Имя гостя',
   },
   az: {
-    repliesTitle: 'Qonaq cavabları', repliesSub: 'Dəvətnamədən göndərilən cavablar. Yenilərini görmək üçün səhifəni yeniləyin.', repliesEmpty: 'Hələ cavab yoxdur.', attending: 'Gələcək', declined: 'Gələ bilməyəcək', people: 'Ümumi qonaq sayı', yes: 'Gələcək', no: 'Gəlməyəcək',
+    repliesTitle: 'Qonaq təsdiqləri', repliesSub: 'Dəvətnamədə iştirakını təsdiqləyən qonaqlar. Yenilərini görmək üçün səhifəni yeniləyin.', repliesEmpty: 'Hələ təsdiq yoxdur.', confirmed: 'Təsdiqlər', people: 'Ümumi qonaq sayı', persons: (n: number) => `${n} nəfər`,
     title: 'Adlı dəvətnamələr', sub: 'Hər qonaq və ya ailə üçün ayrıca keçid — adla müraciət və masa nömrəsi ilə.',
     placeholder: 'Məsələn: Əliyevlər ailəsi', create: 'Keçid yarat', created: 'Şəxsi keçid yaradıldı', copied: 'Keçid kopyalandı',
     copy: 'Kopyala', remove: 'Sil', confirm: 'Bu dəvətnamə silinsin?', empty: 'Hələ adlı dəvətnamə yoxdur.',
@@ -569,6 +569,7 @@ export default function WeddingEditor({
     : t.untitled;
   const steps: Step[] = ['details', 'content', 'design', 'music'];
   const canPublish = wedding?.isPublished || missing.length === 0;
+  const confirmations = rsvps.filter(r => r.attending);
 
   return (
     <div className="st">
@@ -819,25 +820,22 @@ export default function WeddingEditor({
               <p>{g.repliesSub}</p>
             </div>
           </header>
-          {rsvps.length === 0 ? (
+          {confirmations.length === 0 ? (
             <p className="st-hint">{g.repliesEmpty}</p>
           ) : (
             <>
               <dl className="st-stats">
-                <div><dt>{g.attending}</dt><dd>{rsvps.filter(r => r.attending).length}</dd></div>
-                <div><dt>{g.people}</dt><dd>{rsvps.filter(r => r.attending).reduce((sum, r) => sum + r.guestsCount, 0)}</dd></div>
-                <div><dt>{g.declined}</dt><dd>{rsvps.filter(r => !r.attending).length}</dd></div>
+                <div><dt>{g.confirmed}</dt><dd>{confirmations.length}</dd></div>
+                <div><dt>{g.people}</dt><dd>{confirmations.reduce((sum, r) => sum + r.guestsCount, 0)}</dd></div>
               </dl>
               <ul className="st-guest-list">
-                {[...rsvps].sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '')).map((r, i) => (
+                {[...confirmations].sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '')).map((r, i) => (
                   <li key={`${r.guestName}-${i}`} className="st-reply">
                     <div>
                       <strong>{r.guestName}</strong>
                       {r.message && <small>“{r.message}”</small>}
                     </div>
-                    <span className={`st-pill ${r.attending ? 'is-live' : ''}`}>
-                      {r.attending ? `${g.yes} · ${r.guestsCount}` : g.no}
-                    </span>
+                    <span className="st-pill is-live">{g.persons(r.guestsCount)}</span>
                   </li>
                 ))}
               </ul>

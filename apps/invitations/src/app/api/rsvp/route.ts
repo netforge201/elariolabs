@@ -8,7 +8,8 @@ const rsvpSchema = z.object({
   weddingSlug: z.string().min(1),
   guestName: z.string().trim().min(1).max(100),
   guestSlug: z.string().optional(),
-  attending: z.boolean(),
+  // The invitation no longer offers a decline option; every reply is a confirmation.
+  attending: z.boolean().default(true),
   guestsCount: z.number().int().min(1).max(10).default(1),
   message: z.string().max(500).optional(),
 });

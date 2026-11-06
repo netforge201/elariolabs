@@ -277,7 +277,6 @@ export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
           weddingSlug: m.slug,
           guestName: name.trim(),
           guestSlug: m.guest?.slug,
-          attending: true,
           guestsCount: count,
           message: wishes.trim() || undefined,
         }),
