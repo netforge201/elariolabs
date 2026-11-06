@@ -276,15 +276,3 @@
 @media (prefers-reduced-motion: reduce) {
   .st *, .st *::before, .st *::after { animation: none !important; transition: none !important; }
 }
-
-/* Replies */
-.st-replies { display: grid; gap: 16px; }
-.st-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; border: 1px solid var(--st-line); border-radius: 12px; }
-.st-stats > div { padding: 14px 16px; }
-.st-stats > div + div { border-left: 1px solid var(--st-line); }
-.st-stats dt { color: var(--st-muted); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-.st-stats dd { margin: 4px 0 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 30px; font-weight: 500; line-height: 1; }
-.st-reply { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--st-line); }
-.st-reply strong { display: block; font-size: 14px; overflow-wrap: anywhere; }
-.st-reply small { display: block; margin-top: 3px; color: var(--st-muted); font-size: 12.5px; line-height: 1.5; overflow-wrap: anywhere; }
-@media (max-width: 560px) { .st-stats dd { font-size: 24px; } .st-stats > div { padding: 12px; } }

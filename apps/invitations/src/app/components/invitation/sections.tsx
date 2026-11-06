@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import Reveal from '../reveal';
 import {
   AppleIcon, CalendarIcon, CheckIcon, CopyIcon, GoogleCalendarIcon, MapPinIcon, TablePlateIcon,
@@ -227,114 +227,6 @@ export function Story({ m }: SectionProps) {
       <section aria-labelledby={headingId}>
         <SectionHeading id={headingId}>{m.t.ourStory}</SectionHeading>
         <p className="inv-story-text">{m.story}</p>
-      </section>
-    </Reveal>
-  );
-}
-
-// ---------------------------------------------------------------------------
-
-type Saved = { guestsCount: number; name: string };
-
-function storageKey(m: InvitationModel) {
-  return `inv-rsvp:${m.slug}:${m.guest?.slug ?? ''}`;
-}
-
-export function Rsvp({ m, preview }: SectionProps & { preview: boolean }) {
-  const headingId = useId();
-  const [name, setName] = useState(m.guest?.name ?? '');
-  const [count, setCount] = useState(1);
-  const [wishes, setWishes] = useState('');
-  const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (preview || !m.slug) return;
-    try {
-      const raw = window.localStorage.getItem(storageKey(m));
-      if (!raw) return;
-      const saved = JSON.parse(raw) as Saved;
-      setCount(saved.guestsCount || 1);
-      if (saved.name) setName(saved.name);
-      setStatus('done');
-    } catch { /* storage unavailable */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview, m.slug, m.guest?.slug]);
-
-  if (!m.slug && !preview) return null;
-
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    if (preview) return;
-    if (!name.trim()) { setError(m.t.rsvpNameRequired); return; }
-    setStatus('sending');
-    setError('');
-    try {
-      const response = await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weddingSlug: m.slug,
-          guestName: name.trim(),
-          guestSlug: m.guest?.slug,
-          guestsCount: count,
-          message: wishes.trim() || undefined,
-        }),
-      });
-      if (!response.ok) throw new Error();
-      try {
-        window.localStorage.setItem(storageKey(m), JSON.stringify({ guestsCount: count, name: name.trim() } satisfies Saved));
-      } catch { /* storage unavailable */ }
-      setStatus('done');
-    } catch {
-      setStatus('error');
-      setError(m.t.rsvpError);
-    }
-  }
-
-  return (
-    <Reveal className="inv-section inv-rsvp">
-      <section aria-labelledby={headingId}>
-        <SectionHeading id={headingId}>{m.t.rsvpTitle}</SectionHeading>
-
-        {status === 'done' ? (
-          <div className="inv-rsvp-done" role="status">
-            <span className="inv-rsvp-done-mark" aria-hidden="true"><CheckIcon className="inv-btn-icon" /></span>
-            <p className="inv-rsvp-done-title">{m.t.rsvpThanksYes}</p>
-            <p className="inv-detail-sub">{m.t.rsvpThanksSub}</p>
-            <button type="button" className="inv-link-btn" onClick={() => setStatus('idle')}>{m.t.changeAnswer}</button>
-          </div>
-        ) : (
-          <form className="inv-rsvp-form" onSubmit={submit} noValidate>
-            <p className="inv-rsvp-sub">{m.t.rsvpSubtitle}</p>
-
-            <label className="inv-field">
-              <span className="inv-label">{m.t.yourName}</span>
-              <input value={name} onChange={e => setName(e.target.value)} maxLength={100} autoComplete="name" required />
-            </label>
-
-            <div className="inv-field">
-              <span className="inv-label" id={`${headingId}-count`}>{m.t.guestsCount}</span>
-              <div className="inv-stepper" role="group" aria-labelledby={`${headingId}-count`}>
-                <button type="button" onClick={() => setCount(c => Math.max(1, c - 1))} disabled={count <= 1} aria-label={m.t.fewer}>−</button>
-                <output aria-live="polite">{count}</output>
-                <button type="button" onClick={() => setCount(c => Math.min(10, c + 1))} disabled={count >= 10} aria-label={m.t.more}>+</button>
-              </div>
-            </div>
-
-            <label className="inv-field">
-              <span className="inv-label">{m.t.wishes} <small>({m.t.optional})</small></span>
-              <textarea value={wishes} onChange={e => setWishes(e.target.value)} maxLength={500} rows={3} />
-            </label>
-
-            {error && <p className="inv-rsvp-error" role="alert">{error}</p>}
-
-            <button type="submit" className="inv-btn inv-btn--primary" disabled={preview || status === 'sending'}>
-              {status === 'sending' ? m.t.sending : m.t.sendRsvp}
-            </button>
-            {preview && <p className="inv-rsvp-note">{m.t.rsvpPreview}</p>}
-          </form>
-        )}
       </section>
     </Reveal>
   );

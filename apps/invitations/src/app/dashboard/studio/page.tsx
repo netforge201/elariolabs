@@ -30,13 +30,6 @@ export default async function StudioPage() {
     >
       <WeddingEditor
         locale={locale}
-        rsvps={Array.isArray(theme.rsvps) ? (theme.rsvps as Record<string, unknown>[]).map(r => ({
-          guestName: String(r.guestName ?? ''),
-          attending: r.attending === true,
-          guestsCount: typeof r.guestsCount === 'number' ? r.guestsCount : 1,
-          message: typeof r.message === 'string' ? r.message : '',
-          updatedAt: typeof r.updatedAt === 'string' ? r.updatedAt : null,
-        })) : []}
         accountName={account.name}
         accountEmail={account.email}
         initialWedding={wedding ? {

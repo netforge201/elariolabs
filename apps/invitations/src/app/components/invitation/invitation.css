@@ -645,12 +645,6 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 .inv-btn:active { transform: scale(.98); }
 .inv-btn.is-done { border-color: var(--accent); color: var(--accent-ink); }
 .inv-btn-icon { width: 15px; height: 15px; flex: none; }
-.inv-btn--primary {
-  width: 100%; min-height: 54px;
-  border-color: var(--primary); background: var(--primary); color: var(--primary-ink);
-  font-size: 11.5px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase;
-}
-.inv-btn--primary:hover { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 86%, var(--accent)); }
 .inv-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
 .inv-calendar-actions { display: grid; justify-items: center; gap: 4px; margin-top: 48px; padding-top: 34px; border-top: 1px solid var(--line); }
@@ -679,34 +673,6 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
   float: left; margin: .06em .12em 0 0;
   color: var(--accent); font-size: 3.7em; line-height: .78;
 }
-
-/* RSVP */
-.inv-rsvp-form { display: grid; gap: 20px; max-width: 470px; margin: 0 auto; text-align: left; }
-.inv-rsvp-sub { margin: -10px 0 4px; color: var(--muted); text-align: center; }
-.inv-field { display: grid; gap: 8px; }
-.inv-field input,
-.inv-field textarea {
-  width: 100%; min-height: 50px; padding: 12px 14px;
-  border: 1px solid var(--line-strong); border-radius: var(--radius);
-  background: var(--field); color: var(--ink);
-  font-family: var(--f-sans); font-size: 16px; line-height: 1.5;
-  transition: border-color .2s ease, box-shadow .2s ease;
-}
-.inv-t-classic .inv-field input, .inv-t-classic .inv-field textarea { border-radius: 10px; }
-.inv-field textarea { resize: vertical; min-height: 96px; }
-.inv-field input:focus, .inv-field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
-.inv-stepper { display: inline-flex; align-items: center; justify-self: start; border: 1px solid var(--line-strong); border-radius: var(--radius); }
-.inv-t-classic .inv-stepper { border-radius: 999px; }
-.inv-stepper button { width: 48px; height: 48px; border: 0; background: none; color: var(--ink); font-size: 1.3rem; cursor: pointer; border-radius: inherit; }
-.inv-stepper button:disabled { opacity: .3; cursor: not-allowed; }
-.inv-stepper output { min-width: 44px; font-family: var(--display); font-size: 1.4rem; text-align: center; font-variant-numeric: tabular-nums; }
-.inv-rsvp-error { margin: 0; color: #a23b3b; font-size: .9rem; }
-.inv-t-modern .inv-rsvp-error { color: #f3a093; }
-.inv-rsvp-note { margin: -6px 0 0; color: var(--muted); font-size: .82rem; text-align: center; }
-.inv-rsvp-done { display: grid; justify-items: center; gap: 12px; max-width: 440px; margin: 0 auto; }
-.inv-rsvp-done-mark { display: grid; place-items: center; width: 54px; height: 54px; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent-ink); }
-.inv-rsvp-done-title { margin: 0; font-family: var(--display); font-size: clamp(1.5rem, 6cqi, 1.9rem); line-height: 1.2; text-wrap: balance; }
-.inv-link-btn { margin-top: 6px; padding: 8px 4px; border: 0; background: none; color: var(--accent-ink); font: inherit; font-size: .9rem; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
 
 /* Closing */
 .inv-closing { padding: clamp(84px, 18cqi, 150px) 0 clamp(110px, 20cqi, 160px); text-align: center; }
@@ -752,10 +718,6 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 .inv-t-minimal .inv-count-cell:first-child { padding-left: 0; }
 .inv-t-minimal .inv-countdown { text-align: left; }
 .inv-t-minimal .inv-story-text { margin: 0; }
-.inv-t-minimal .inv-rsvp-form,
-.inv-t-minimal .inv-rsvp-done { margin: 0; }
-.inv-t-minimal .inv-rsvp-sub { text-align: left; }
-.inv-t-minimal .inv-rsvp-done { justify-items: start; }
 .inv-t-minimal .inv-closing { text-align: left; border-top: 1px solid var(--line); margin-top: clamp(64px, 14cqi, 110px); }
 .inv-t-minimal .inv-closing-text { margin-left: 0; }
 @container inv (min-width: 860px) {

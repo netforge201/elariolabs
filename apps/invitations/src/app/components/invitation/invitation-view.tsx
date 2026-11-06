@@ -4,7 +4,7 @@ import './invitation.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildModel, type GuestInfo, type InvitationData } from './model';
 import { Cover, Hero, OPENING_DURATION } from './templates';
-import { Closing, Countdown, Details, Intro, Photo, Rsvp, Story } from './sections';
+import { Closing, Countdown, Details, Intro, Photo, Story } from './sections';
 import MusicControl, { INVITATION_OWNER } from './music-control';
 import { music } from './music-engine';
 
@@ -17,7 +17,7 @@ export type { InvitationData, GuestInfo } from './model';
  *
  * - live:      full page; cover and music control are fixed to the viewport.
  * - preview:   rendered inside the studio device frame; overlays are contained,
- *              RSVP/calendar actions are inert so nothing is written.
+ *              calendar actions are inert.
  * - thumbnail: hero only, static, not focusable.
  */
 export default function InvitationView({ data, guest, mode = 'live' }: {
@@ -85,7 +85,6 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
               <Details m={m} preview={preview} />
               <Countdown m={m} />
               <Story m={m} />
-              <Rsvp m={m} preview={preview} />
               <Closing m={m} />
             </>
           )}

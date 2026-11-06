@@ -1,5 +1,5 @@
 // Template-specific compositions: the opening cover and the hero of each design.
-// Shared sections (details, RSVP, …) live in sections.tsx and are themed via CSS.
+// Shared sections (details, countdown, story, …) live in sections.tsx and are themed via CSS.
 
 import type { InvitationModel } from './model';
 import { ChevronDown, Flourish, RoseCorner, Sprig } from './ornaments';
