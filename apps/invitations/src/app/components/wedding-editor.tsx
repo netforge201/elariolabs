@@ -1,23 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import './studio.css';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-  ArrowLeftIcon,
-  ArrowUpRightIcon,
-  CheckIcon,
-  DesktopIcon,
-  MobileIcon,
-  TemplateOrnament,
-  PhotoIcon,
-  UploadIcon,
-  FloralCorner,
-  BotanicalLineArt,
-  HeartOutlineIcon,
-  CalendarIcon,
-  ClockIcon,
-  MapPinIcon,
+  ArrowLeftIcon, ArrowUpRightIcon, CheckIcon, CopyIcon, DesktopIcon, MobileIcon, PauseIcon, PhotoIcon, PlayIcon, UploadIcon,
 } from './icons';
+import InvitationView, { type InvitationData } from './invitation/invitation-view';
+import {
+  MUSIC_NONE, TEMPLATES, TRACKS, resolveMusic, resolveTemplate,
+  type Locale, type MusicChoice, type TemplateId, type TrackId,
+} from './invitation/catalog';
+import { copy as invitationCopy } from './invitation/copy';
+import { music, useMusicSnapshot } from './invitation/music-engine';
 
 type Wedding = {
   id: string;
@@ -32,18 +27,14 @@ type Wedding = {
   story: string | null;
   locale: string;
   template: string;
+  timezone?: string;
   coverImage?: string | null;
+  music?: string | null;
   isPublished: boolean;
 };
 
-type Locale = 'az' | 'ru' | 'en';
-
-type Guest = {
-  id: string;
-  name: string;
-  slug: string;
-  createdAt: string;
-};
+type Guest = { id: string; name: string; slug: string; createdAt: string };
+export type RsvpEntry = { guestName: string; attending: boolean; guestsCount: number; message: string; updatedAt: string | null };
 
 type FormState = {
   partnerOne: string;
@@ -55,202 +46,247 @@ type FormState = {
   welcomeText: string;
   story: string;
   locale: Locale;
-  template: string;
+  template: TemplateId;
   coverImage: string | null;
+  music: MusicChoice;
 };
 
-const templateTexts: Record<Locale, Record<string, { name: string; variant: string; desc: string }>> = {
-  ru: {
-    classic: { name: 'Шаблон 1 (Классический)', variant: 'А. Кремовый', desc: 'Элегантный и романтичный дизайн с цветочными уголками, монограммой и падающими лепестками' },
-    modern: { name: 'Шаблон 2 (Современный)', variant: 'А. Фотографический', desc: 'Выразительный дизайн с фото пары, крупной типографикой и парящими золотыми частицами' },
-    minimal: { name: 'Шаблон 3 (Минималистичный)', variant: 'С. Линейный', desc: 'Чистый дизайн с акцентом на типографику и изящную ботаническую line-art иллюстрацию' },
-  },
-  az: {
-    classic: { name: 'Şablon 1 (Klassik)', variant: 'A. Krem', desc: 'Çiçək küncləri, monoqram və düşən ləçəklərlə zərif və romantik dizayn' },
-    modern: { name: 'Şablon 2 (Müasir)', variant: 'A. Fotoqrafik', desc: 'Cütlüyün şəkli, iri tipoqrafiya və süzülən qızılı hissəciklərlə təsirli dizayn' },
-    minimal: { name: 'Şablon 3 (Minimalist)', variant: 'C. Xətti', desc: 'Tipoqrafiyaya və zərif botanik line-art illüstrasiyaya vurğu edən sadə dizayn' },
-  },
-  en: {
-    classic: { name: 'Template 1 (Classic)', variant: 'A. Cream', desc: 'An elegant, romantic design with floral corners, a monogram and falling petals' },
-    modern: { name: 'Template 2 (Modern)', variant: 'A. Photographic', desc: 'A bold design with a photo of the couple, large typography and floating golden particles' },
-    minimal: { name: 'Template 3 (Minimalist)', variant: 'C. Linear', desc: 'A clean design focused on typography and a delicate botanical line-art illustration' },
-  },
-};
-
-const templates = [{ id: 'classic' }, { id: 'modern' }, { id: 'minimal' }];
+type Step = 'details' | 'content' | 'design' | 'music';
+type Device = 'mobile' | 'desktop';
 
 const dict = {
   en: {
-    dashboard: 'Wedding studio', back: 'Dashboard', save: 'Save changes', saving: 'Saving...',
-    saved: 'Changes saved', error: 'Could not save changes', publish: 'Publish invitation',
-    unpublish: 'Unpublish', published: 'Published', draft: 'Draft', preview: 'Live preview',
-    desktop: 'Desktop', mobile: 'Mobile', details: 'Wedding details', names: 'The couple',
-    date: 'Wedding date', time: 'Start time', venue: 'Venue', venueName: 'Venue name',
-    address: 'Address', content: 'Invitation content', welcome: 'Welcome message',
-    story: 'Our story', language: 'Invitation language', design: 'Choose your design',
-    designHint: 'Select a design to see it instantly in the preview.',
-    first: 'First name', second: 'Second name', copy: 'Copy link', open: 'Open invitation',
-    link: 'Your invitation link', required: 'Enter both names before saving.',
-    intro: 'Together with our families', invitation: 'We invite you to celebrate our special day',
-    dateLabel: 'THE DATE', timeLabel: 'THE TIME', venueLabel: 'THE PLACE',
-    countdown: 'Counting down to our day', footer: 'We look forward to celebrating with you',
-    noDate: 'Your wedding date', noVenue: 'Your wedding venue', noWelcome: 'A beautiful beginning to our story.',
-    languageAZ: 'Azerbaijani', languageRU: 'Russian', languageEN: 'English',
-    sectionDesign: 'Design', sectionContent: 'Content', sectionDetails: 'Details',
-    account: 'Account', signout: 'Sign out',
+    studio: 'Invitation studio', back: 'Dashboard', untitled: 'Your invitation',
+    save: 'Save', saving: 'Saving…', saved: 'Saved', unsaved: 'Unsaved changes', savedMsg: 'Changes saved',
+    error: 'Could not save changes', publish: 'Publish', unpublish: 'Unpublish', published: 'Published', draft: 'Draft',
+    publishedMsg: 'Your invitation is live', unpublishedMsg: 'Invitation unpublished',
+    steps: { details: 'Details', content: 'Words & photo', design: 'Design', music: 'Music' },
+    names: 'The couple', first: 'First partner', second: 'Second partner',
+    when: 'Date & time', date: 'Wedding date', time: 'Start time',
+    where: 'Venue', venueName: 'Venue name', address: 'Address', addressHint: 'Guests can open it in maps or copy it.',
+    language: 'Invitation language', languageHint: 'All invitation text, dates and buttons use this language.',
+    languages: { az: 'Azerbaijani', ru: 'Russian', en: 'English' },
+    welcome: 'Welcome message', welcomeHint: 'Leave empty to use the default text shown in the preview.',
+    story: 'Your story', storyHint: 'Optional. Appears as its own section — line breaks are kept.',
+    photo: 'Couple photo', photoHint: 'The full-screen hero of Cinema; an arched portrait in Ivory and Linen.',
+    upload: 'Upload a photo', uploadSub: 'JPG, PNG or WebP · resized automatically', replace: 'Replace', remove: 'Remove',
+    photoUrl: 'Or paste an image link', photoError: 'Please choose an image file.',
+    designTitle: 'Choose a design', designHint: 'Each design has its own opening, typography and palette. Thumbnails use your details.',
+    selected: 'Selected', withPhoto: 'Best with a photo',
+    musicTitle: 'Background music', musicHint: 'Music starts when a guest taps to open the invitation — browsers never allow sound before that tap. Guests can pause it at any time.',
+    noMusic: 'No music', noMusicSub: 'The invitation opens silently',
+    listen: 'Listen', stop: 'Stop', musicSource: 'All tracks are generated in the browser — no files, nothing to license.',
+    preview: 'Live preview', mobile: 'Phone', desktop: 'Desktop', replay: 'Replay opening',
+    sample: 'Sample names shown until you enter yours.',
+    required: 'Enter both names before saving.',
+    readyTitle: 'Ready to publish', missingTitle: 'To publish, add:',
+    missing: { names: 'both names', date: 'date', time: 'start time', venue: 'venue name' },
+    link: 'Invitation link', copy: 'Copy link', copied: 'Link copied', open: 'Open',
+    notLive: 'Not visible to guests until published.',
+    edit: 'Edit', show: 'Preview',
+    leave: 'You have unsaved changes.',
   },
   ru: {
-    dashboard: 'Студия приглашений', back: 'К кабинету', save: 'Сохранить', saving: 'Сохранение...',
-    saved: 'Изменения сохранены', error: 'Не удалось сохранить изменения', publish: 'Опубликовать',
-    unpublish: 'Снять с публикации', published: 'Опубликовано', draft: 'Черновик', preview: 'Предпросмотр',
-    desktop: 'Компьютер', mobile: 'Телефон', details: 'Детали свадьбы', names: 'Молодожёны',
-    date: 'Дата свадьбы', time: 'Время начала', venue: 'Место проведения', venueName: 'Название площадки',
-    address: 'Адрес', content: 'Содержание приглашения', welcome: 'Приветственное сообщение',
-    story: 'Наша история', language: 'Язык приглашения', design: 'Выберите дизайн',
-    designHint: 'Выберите дизайн — он сразу появится в предпросмотре.',
-    first: 'Первое имя', second: 'Второе имя', copy: 'Копировать ссылку', open: 'Открыть приглашение',
-    link: 'Ссылка на приглашение', required: 'Введите оба имени.',
-    intro: 'Вместе с нашими семьями', invitation: 'Приглашаем вас разделить наш особенный день',
-    dateLabel: 'ДАТА', timeLabel: 'ВРЕМЯ', venueLabel: 'МЕСТО',
-    countdown: 'До нашего дня осталось', footer: 'Будем рады разделить этот день с вами',
-    noDate: 'Дата вашей свадьбы', noVenue: 'Место проведения свадьбы', noWelcome: 'Начало нашей прекрасной истории.',
-    languageAZ: 'Азербайджанский', languageRU: 'Русский', languageEN: 'Английский',
-    sectionDesign: 'Дизайн', sectionContent: 'Содержание', sectionDetails: 'Детали',
-    account: 'Аккаунт', signout: 'Выйти',
+    studio: 'Студия приглашений', back: 'Кабинет', untitled: 'Ваше приглашение',
+    save: 'Сохранить', saving: 'Сохранение…', saved: 'Сохранено', unsaved: 'Есть изменения', savedMsg: 'Изменения сохранены',
+    error: 'Не удалось сохранить изменения', publish: 'Опубликовать', unpublish: 'Снять с публикации', published: 'Опубликовано', draft: 'Черновик',
+    publishedMsg: 'Приглашение опубликовано', unpublishedMsg: 'Приглашение снято с публикации',
+    steps: { details: 'Детали', content: 'Текст и фото', design: 'Дизайн', music: 'Музыка' },
+    names: 'Пара', first: 'Первый партнёр', second: 'Второй партнёр',
+    when: 'Дата и время', date: 'Дата свадьбы', time: 'Время начала',
+    where: 'Место', venueName: 'Название площадки', address: 'Адрес', addressHint: 'Гости смогут открыть его на карте или скопировать.',
+    language: 'Язык приглашения', languageHint: 'Весь текст, даты и кнопки приглашения будут на этом языке.',
+    languages: { az: 'Азербайджанский', ru: 'Русский', en: 'Английский' },
+    welcome: 'Приветствие', welcomeHint: 'Оставьте пустым, чтобы использовать текст по умолчанию из предпросмотра.',
+    story: 'Ваша история', storyHint: 'Необязательно. Появится отдельным разделом, переносы строк сохраняются.',
+    photo: 'Фото пары', photoHint: 'Полноэкранный фон в «Синема»; портрет в арке в «Слоновой кости» и «Льне».',
+    upload: 'Загрузить фото', uploadSub: 'JPG, PNG или WebP · размер оптимизируется', replace: 'Заменить', remove: 'Удалить',
+    photoUrl: 'Или вставьте ссылку на изображение', photoError: 'Выберите файл изображения.',
+    designTitle: 'Выберите дизайн', designHint: 'У каждого дизайна своё открытие, типографика и палитра. Миниатюры показывают ваши данные.',
+    selected: 'Выбрано', withPhoto: 'Лучше с фото',
+    musicTitle: 'Фоновая музыка', musicHint: 'Музыка включается, когда гость нажимает «Открыть приглашение» — браузеры не разрешают звук до этого нажатия. Гость может выключить её в любой момент.',
+    noMusic: 'Без музыки', noMusicSub: 'Приглашение откроется в тишине',
+    listen: 'Слушать', stop: 'Стоп', musicSource: 'Все мелодии создаются прямо в браузере — без файлов и лицензий.',
+    preview: 'Предпросмотр', mobile: 'Телефон', desktop: 'Компьютер', replay: 'Повторить открытие',
+    sample: 'Пока вы не ввели имена, показаны примерные.',
+    required: 'Введите оба имени.',
+    readyTitle: 'Готово к публикации', missingTitle: 'Для публикации добавьте:',
+    missing: { names: 'оба имени', date: 'дату', time: 'время начала', venue: 'название площадки' },
+    link: 'Ссылка на приглашение', copy: 'Копировать', copied: 'Ссылка скопирована', open: 'Открыть',
+    notLive: 'Гости не увидят приглашение до публикации.',
+    edit: 'Редактор', show: 'Просмотр',
+    leave: 'Есть несохранённые изменения.',
   },
   az: {
-    dashboard: 'Dəvətnamə studiyası', back: 'Kabinetə qayıt', save: 'Yadda saxla', saving: 'Saxlanılır...',
-    saved: 'Dəyişikliklər saxlanıldı', error: 'Saxlamaq mümkün olmadı', publish: 'Dərc et',
-    unpublish: 'Dərcdən götür', published: 'Dərc edilib', draft: 'Qaralama', preview: 'Canlı önbaxış',
-    desktop: 'Kompüter', mobile: 'Telefon', details: 'Toy məlumatları', names: 'Cütlük',
-    date: 'Toy tarixi', time: 'Başlama vaxtı', venue: 'Məkan', venueName: 'Məkanın adı',
-    address: 'Ünvan', content: 'Dəvətnamənin məzmunu', welcome: 'Salamlama mesajı',
-    story: 'Bizim hekayəmiz', language: 'Dəvətnamənin dili', design: 'Dizayn seçin',
-    designHint: 'Dizayn seçin və nəticəni dərhal önbaxışda görün.',
-    first: 'Birinci ad', second: 'İkinci ad', copy: 'Keçidi kopyala', open: 'Dəvətnaməni aç',
-    link: 'Dəvətnamə keçidi', required: 'Hər iki adı daxil edin.',
-    intro: 'Ailələrimizin iştirakı ilə', invitation: 'Sizi özəl günümüzü qeyd etməyə dəvət edirik',
-    dateLabel: 'TARİX', timeLabel: 'SAAT', venueLabel: 'MƏKAN',
-    countdown: 'Bu günə qalan vaxt', footer: 'Bu günü sizinlə bölüşməkdən məmnun olarıq',
-    noDate: 'Toy tarixiniz', noVenue: 'Toy məkanınız', noWelcome: 'Gözəl hekayəmizin başlanğıcı.',
-    languageAZ: 'Azərbaycan dili', languageRU: 'Rus dili', languageEN: 'İngilis dili',
-    sectionDesign: 'Dizayn', sectionContent: 'Məzmun', sectionDetails: 'Məlumatlar',
-    account: 'Hesab', signout: 'Çıxış',
+    studio: 'Dəvətnamə studiyası', back: 'Kabinet', untitled: 'Dəvətnaməniz',
+    save: 'Yadda saxla', saving: 'Saxlanılır…', saved: 'Saxlanılıb', unsaved: 'Dəyişikliklər var', savedMsg: 'Dəyişikliklər saxlanıldı',
+    error: 'Saxlamaq mümkün olmadı', publish: 'Dərc et', unpublish: 'Dərcdən götür', published: 'Dərc edilib', draft: 'Qaralama',
+    publishedMsg: 'Dəvətnamə dərc edildi', unpublishedMsg: 'Dəvətnamə dərcdən götürüldü',
+    steps: { details: 'Məlumatlar', content: 'Mətn və foto', design: 'Dizayn', music: 'Musiqi' },
+    names: 'Cütlük', first: 'Birinci tərəf', second: 'İkinci tərəf',
+    when: 'Tarix və saat', date: 'Toy tarixi', time: 'Başlama vaxtı',
+    where: 'Məkan', venueName: 'Məkanın adı', address: 'Ünvan', addressHint: 'Qonaqlar onu xəritədə aça və ya kopyalaya bilər.',
+    language: 'Dəvətnamənin dili', languageHint: 'Dəvətnamənin bütün mətni, tarixləri və düymələri bu dildə olacaq.',
+    languages: { az: 'Azərbaycan dili', ru: 'Rus dili', en: 'İngilis dili' },
+    welcome: 'Salamlama mətni', welcomeHint: 'Boş saxlasanız, önbaxışdakı standart mətn istifadə olunacaq.',
+    story: 'Sizin hekayəniz', storyHint: 'İstəyə bağlı. Ayrıca bölmə kimi görünür, sətir keçidləri saxlanılır.',
+    photo: 'Cütlüyün şəkli', photoHint: '«Kino»da tam ekran fon, «Fil sümüyü» və «Kətan»da tağlı portret.',
+    upload: 'Şəkil yükləyin', uploadSub: 'JPG, PNG və ya WebP · ölçü avtomatik optimallaşdırılır', replace: 'Dəyiş', remove: 'Sil',
+    photoUrl: 'Və ya şəkil linkini yapışdırın', photoError: 'Şəkil faylı seçin.',
+    designTitle: 'Dizayn seçin', designHint: 'Hər dizaynın öz açılışı, tipoqrafiyası və rəngləri var. Miniatürlər sizin məlumatlarınızla göstərilir.',
+    selected: 'Seçilib', withPhoto: 'Şəkillə daha gözəl',
+    musicTitle: 'Fon musiqisi', musicHint: 'Musiqi qonaq «Dəvətnaməni açın» düyməsinə toxunanda başlayır — brauzerlər bu toxunuşdan əvvəl səsə icazə vermir. Qonaq istənilən an onu dayandıra bilər.',
+    noMusic: 'Musiqisiz', noMusicSub: 'Dəvətnamə səssiz açılır',
+    listen: 'Dinlə', stop: 'Dayandır', musicSource: 'Bütün melodiyalar birbaşa brauzerdə yaradılır — fayl və lisenziya tələb olunmur.',
+    preview: 'Canlı önbaxış', mobile: 'Telefon', desktop: 'Kompüter', replay: 'Açılışı təkrarla',
+    sample: 'Adları daxil edənə qədər nümunə adlar göstərilir.',
+    required: 'Hər iki adı daxil edin.',
+    readyTitle: 'Dərc etməyə hazırdır', missingTitle: 'Dərc etmək üçün əlavə edin:',
+    missing: { names: 'hər iki ad', date: 'tarix', time: 'başlama vaxtı', venue: 'məkanın adı' },
+    link: 'Dəvətnamə keçidi', copy: 'Kopyala', copied: 'Keçid kopyalandı', open: 'Aç',
+    notLive: 'Dərc edilənə qədər qonaqlar görmür.',
+    edit: 'Redaktə', show: 'Önbaxış',
+    leave: 'Saxlanılmamış dəyişikliklər var.',
   },
 };
 
-function dateLabel(value: string, locale: Locale) {
-  if (!value) return locale === 'ru' ? 'Дата будет объявлена' : locale === 'az' ? 'Tarix təyin ediləcək' : 'Date to be announced';
-  const d = new Date(`${value}T12:00:00`);
-  return new Intl.DateTimeFormat(locale === 'az' ? 'az-AZ' : locale === 'ru' ? 'ru-RU' : 'en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  }).format(d);
+const guestDict = {
+  en: {
+    repliesTitle: 'Replies', repliesSub: 'Answers guests sent from the invitation. Refresh the page to see new ones.', repliesEmpty: 'No replies yet.', attending: 'Attending', declined: 'Declined', people: 'Guests in total', yes: 'Coming', no: 'Not coming',
+    title: 'Personal invitations', sub: 'A unique link for each guest or family — it greets them by name and shows their table.',
+    placeholder: 'e.g. The Aliyev family', create: 'Create link', created: 'Personal link created', copied: 'Link copied',
+    copy: 'Copy', remove: 'Delete', confirm: 'Delete this invitation?', empty: 'No personal invitations yet.',
+    importTitle: 'Bulk import', importSub: 'CSV, Excel, Word, TXT or PDF · up to 10 MB', choose: 'Choose file', processing: 'Processing…',
+    found: (n: number) => `Found ${n} names. Review the list before importing.`, detected: (n: number) => `Detected: ${n}`,
+    clear: 'Clear', confirmImport: 'Confirm import',
+    imported: (a: number, b: number) => `Imported: ${a}. Duplicates skipped: ${b}.`, guestName: 'Guest name',
+  },
+  ru: {
+    repliesTitle: 'Ответы гостей', repliesSub: 'Ответы, отправленные из приглашения. Обновите страницу, чтобы увидеть новые.', repliesEmpty: 'Ответов пока нет.', attending: 'Придут', declined: 'Не смогут', people: 'Всего гостей', yes: 'Придёт', no: 'Не придёт',
+    title: 'Именные приглашения', sub: 'Отдельная ссылка для каждого гостя или семьи — с обращением по имени и номером стола.',
+    placeholder: 'Например: Семья Алиевых', create: 'Создать ссылку', created: 'Персональная ссылка создана', copied: 'Ссылка скопирована',
+    copy: 'Копировать', remove: 'Удалить', confirm: 'Удалить это приглашение?', empty: 'Пока нет именных приглашений.',
+    importTitle: 'Массовый импорт', importSub: 'CSV, Excel, Word, TXT или PDF · до 10 МБ', choose: 'Выбрать файл', processing: 'Обработка…',
+    found: (n: number) => `Распознано имён: ${n}. Проверьте список перед импортом.`, detected: (n: number) => `Распознано: ${n}`,
+    clear: 'Очистить', confirmImport: 'Подтвердить импорт',
+    imported: (a: number, b: number) => `Импортировано: ${a}. Пропущено дубликатов: ${b}.`, guestName: 'Имя гостя',
+  },
+  az: {
+    repliesTitle: 'Qonaq cavabları', repliesSub: 'Dəvətnamədən göndərilən cavablar. Yenilərini görmək üçün səhifəni yeniləyin.', repliesEmpty: 'Hələ cavab yoxdur.', attending: 'Gələcək', declined: 'Gələ bilməyəcək', people: 'Ümumi qonaq sayı', yes: 'Gələcək', no: 'Gəlməyəcək',
+    title: 'Adlı dəvətnamələr', sub: 'Hər qonaq və ya ailə üçün ayrıca keçid — adla müraciət və masa nömrəsi ilə.',
+    placeholder: 'Məsələn: Əliyevlər ailəsi', create: 'Keçid yarat', created: 'Şəxsi keçid yaradıldı', copied: 'Keçid kopyalandı',
+    copy: 'Kopyala', remove: 'Sil', confirm: 'Bu dəvətnamə silinsin?', empty: 'Hələ adlı dəvətnamə yoxdur.',
+    importTitle: 'Kütləvi idxal', importSub: 'CSV, Excel, Word, TXT və ya PDF · maksimum 10 MB', choose: 'Fayl seç', processing: 'Emal edilir…',
+    found: (n: number) => `Tapılan adlar: ${n}. İdxaldan əvvəl siyahını yoxlayın.`, detected: (n: number) => `Tapılan: ${n}`,
+    clear: 'Təmizlə', confirmImport: 'İdxalı təsdiqlə',
+    imported: (a: number, b: number) => `İdxal edildi: ${a}. Təkrar olduğu üçün buraxıldı: ${b}.`, guestName: 'Qonağın adı',
+  },
+};
+
+const SAMPLE_NAMES: Record<Locale, [string, string]> = {
+  az: ['Leyla', 'Elvin'],
+  ru: ['Анна', 'Михаил'],
+  en: ['Emma', 'James'],
+};
+
+const DEVICES: Record<Device, { width: number; height: number }> = {
+  mobile: { width: 390, height: 780 },
+  desktop: { width: 1280, height: 800 },
+};
+
+const PICKER_OWNER = 'studio-picker';
+
+function initialForm(w: Wedding | null): FormState {
+  return {
+    partnerOne: w?.partnerOne ?? '',
+    partnerTwo: w?.partnerTwo ?? '',
+    eventDate: w?.eventDate?.slice(0, 10) ?? '',
+    eventTime: w?.eventTime ?? '',
+    venueName: w?.venueName ?? '',
+    venueAddress: w?.venueAddress ?? '',
+    welcomeText: w?.welcomeText ?? '',
+    story: w?.story ?? '',
+    locale: w?.locale === 'ru' || w?.locale === 'en' ? w.locale : 'az',
+    template: resolveTemplate(w?.template ?? 'classic'),
+    coverImage: w?.coverImage ?? null,
+    music: resolveMusic(w?.music),
+  };
 }
 
-function Preview({ form, mode }: { form: FormState; mode: 'desktop' | 'mobile' }) {
-  const names = [form.partnerOne || 'Alex', form.partnerTwo || 'Sam'];
-  const venue = form.venueName || (form.locale === 'ru' ? 'Место проведения' : form.locale === 'az' ? 'Toy məkanı' : 'Venue');
-  const activeTemplate = form.template === 'modern' || form.template === 'elegant' ? 'modern' : form.template === 'minimal' ? 'minimal' : 'classic';
-  const photoBg = form.coverImage || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80';
-  const initOne = (names[0] || 'A').trim().charAt(0).toUpperCase();
-  const initTwo = (names[1] || 'S').trim().charAt(0).toUpperCase();
+// ---------------------------------------------------------------------------
+// Preview frame: lays the invitation out at real device size, then scales it.
+// ---------------------------------------------------------------------------
 
-  const sub = form.locale === 'ru' ? 'ПРИГЛАШЕНИЕ НА СВАДЬБУ' : form.locale === 'az' ? 'TOY DƏVƏTNAMƏSİ' : 'WEDDING INVITATION';
-  const andWord = form.locale === 'az' ? 'və' : form.locale === 'ru' ? 'и' : '&';
-  const welcome = form.welcomeText || (form.locale === 'ru' ? 'С радостью приглашаем вас разделить с нами особенный день — нашу свадьбу!' : form.locale === 'az' ? 'Sizi toy mərasimimizə dəvət edirik' : 'We invite you to celebrate our special day');
+function DeviceStage({ device, children }: { device: Device; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const size = DEVICES[device];
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      const maxHeight = device === 'mobile' ? Math.max(480, window.innerHeight - 190) : Infinity;
+      const next = Math.min(1, rect.width / (size.width + (device === 'mobile' ? 24 : 0)), maxHeight / size.height);
+      setScale(Number.isFinite(next) && next > 0 ? next : 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    window.addEventListener('resize', measure);
+    return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
+  }, [device, size.width, size.height]);
 
   return (
-    <div className={`preview-device ${mode === 'mobile' ? 'preview-mobile' : ''}`}>
-      <div className={`preview-canvas-v2 preview-v2-${activeTemplate}`}>
-        {/* Template 1: Classic Cream */}
-        {activeTemplate === 'classic' && (
-          <div className="preview-v2-classic">
-            <div className="preview-floral-tl" aria-hidden="true"><FloralCorner position="top-left" className="w-16 h-16" /></div>
-            <div className="preview-floral-tr" aria-hidden="true"><FloralCorner position="top-right" className="w-16 h-16" /></div>
-            <div className="preview-floral-bl" aria-hidden="true"><FloralCorner position="bottom-left" className="w-16 h-16" /></div>
-            <div className="preview-floral-br" aria-hidden="true"><FloralCorner position="bottom-right" className="w-16 h-16" /></div>
-            <div className="preview-classic-inner">
-              <div className="preview-monogram">{initOne} <i>&</i> {initTwo}</div>
-              <p className="preview-v2-subtitle">{sub}</p>
-              <h1 className="preview-v2-classic-names">
-                <span>{names[0]}</span>
-                <small>{andWord}</small>
-                <span>{names[1]}</span>
-              </h1>
-              <div className="preview-v2-heart"><HeartOutlineIcon className="w-4 h-4 text-amber-700/60 inline-block" /></div>
-              <p className="preview-v2-welcome">{welcome}</p>
-              <div className="preview-v2-details">
-                <span><CalendarIcon className="w-3.5 h-3.5 inline-block mr-1" />{dateLabel(form.eventDate, form.locale)}</span>
-                <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
-                <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Template 2: Modern Photo */}
-        {activeTemplate === 'modern' && (
-          <div className="preview-v2-modern" style={{ backgroundImage: `url("${photoBg}")` }}>
-            <div className="preview-modern-scrim" />
-            <div className="preview-modern-content">
-              <p className="preview-v2-subtitle">{sub}</p>
-              <h1 className="preview-v2-modern-names">
-                <span>{names[0]}</span>
-                <small>{andWord}</small>
-                <span>{names[1]}</span>
-              </h1>
-              <p className="preview-v2-welcome">{welcome}</p>
-              <div className="preview-v2-details text-white/90">
-                <span><CalendarIcon className="w-3.5 h-3.5 inline-block mr-1" />{dateLabel(form.eventDate, form.locale)}</span>
-                <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
-                <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Template 3: Minimal Linear */}
-        {activeTemplate === 'minimal' && (
-          <div className="preview-v2-minimal">
-            <div className="preview-minimal-grid">
-              <div className="preview-minimal-left">
-                <p className="preview-v2-subtitle">{sub}</p>
-                <h1 className="preview-v2-minimal-names">
-                  <span>{names[0]}</span>
-                  <span>{andWord} {names[1]}</span>
-                </h1>
-                <p className="preview-v2-welcome">{welcome}</p>
-                <div className="preview-v2-details">
-                  <span><CalendarIcon className="w-3.5 h-3.5 inline-block mr-1" />{dateLabel(form.eventDate, form.locale)}</span>
-                  <span><ClockIcon className="w-3.5 h-3.5 inline-block mr-1" />{form.eventTime || '17:00'}</span>
-                  <span><MapPinIcon className="w-3.5 h-3.5 inline-block mr-1" />{venue}</span>
-                </div>
-              </div>
-              <div className="preview-minimal-right">
-                <BotanicalLineArt className="w-20 h-auto opacity-70" />
-              </div>
-            </div>
-          </div>
-        )}
+    <div ref={ref} className="st-stage-canvas">
+      <div
+        className={`st-device st-device--${device}`}
+        style={{ width: size.width * scale, height: size.height * scale }}
+      >
+        <div
+          className="st-device-screen"
+          style={{
+            width: size.width, height: size.height,
+            transform: `scale(${scale})`,
+            ['--preview-h' as string]: `${size.height}px`,
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
 }
 
+// ---------------------------------------------------------------------------
+
 export default function WeddingEditor({
-  initialWedding, accountName, accountEmail,
+  initialWedding, locale = 'az', rsvps = [],
 }: {
-  initialWedding: Wedding | null; accountName: string; accountEmail: string;
+  initialWedding: Wedding | null;
+  rsvps?: RsvpEntry[];
+  accountName?: string;
+  accountEmail?: string;
+  locale?: Locale;
 }) {
-  const [language, setLanguage] = useState<Locale>('az');
+  const language = locale;
+  const t = dict[language];
+  const g = guestDict[language];
+
   const [origin, setOrigin] = useState('');
   const [wedding, setWedding] = useState<Wedding | null>(initialWedding);
-  const [mode, setMode] = useState<'desktop' | 'mobile'>('desktop');
-  const [activeSection, setActiveSection] = useState<'details' | 'content' | 'design'>('details');
+  const [form, setForm] = useState<FormState>(() => initialForm(initialWedding));
+  const [step, setStep] = useState<Step>('details');
+  const [device, setDevice] = useState<Device>('mobile');
+  const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit');
+  const [replayKey, setReplayKey] = useState(0);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [linkCopied, setLinkCopied] = useState(false);
+
   const [guests, setGuests] = useState<Guest[]>([]);
   const [guestName, setGuestName] = useState('');
   const [guestBusy, setGuestBusy] = useState(false);
@@ -260,48 +296,31 @@ export default function WeddingEditor({
   const [importFileName, setImportFileName] = useState('');
   const [importBusy, setImportBusy] = useState(false);
 
+  const formRef = useRef(form);
+  useEffect(() => { formRef.current = form; }, [form]);
+  useEffect(() => { setOrigin(window.location.origin); }, []);
 
-  const [form, setForm] = useState<FormState>({
-    partnerOne: initialWedding?.partnerOne ?? '',
-    partnerTwo: initialWedding?.partnerTwo ?? '',
-    eventDate: initialWedding?.eventDate?.slice(0, 10) ?? '',
-    eventTime: initialWedding?.eventTime ?? '',
-    venueName: initialWedding?.venueName ?? '',
-    venueAddress: initialWedding?.venueAddress ?? '',
-    welcomeText: initialWedding?.welcomeText ?? '',
-    story: initialWedding?.story ?? '',
-    locale: (initialWedding?.locale as Locale) || 'az',
-    template: initialWedding?.template ?? 'classic',
-    coverImage: initialWedding?.coverImage ?? null,
-  });
-
+  const weddingId = wedding?.id;
   useEffect(() => {
-    setOrigin(window.location.origin);
-    const stored = localStorage.getItem('invitations-dashboard-locale');
-    if (stored === 'az' || stored === 'ru' || stored === 'en') setLanguage(stored);
-  }, []);
-
-  const t = dict[language];
-
-  useEffect(() => {
-    if (!wedding) {
-      setGuests([]);
-      return;
-    }
+    if (!weddingId) { setGuests([]); return; }
     let cancelled = false;
     fetch('/api/guests')
       .then(async response => {
         if (!response.ok) throw new Error('Could not load guest list');
         return response.json();
       })
-      .then(data => {
-        if (!cancelled) setGuests(data.guests || []);
-      })
-      .catch(error => {
-        if (!cancelled) setGuestError(error.message);
-      });
+      .then(data => { if (!cancelled) setGuests(data.guests || []); })
+      .catch(err => { if (!cancelled) setGuestError(err.message); });
     return () => { cancelled = true; };
-  }, [wedding?.id]);
+  }, [weddingId]);
+
+  // Warn before leaving with unsaved edits.
+  useEffect(() => {
+    if (!hasChanges) return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => { event.preventDefault(); };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [hasChanges]);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm(old => ({ ...old, [key]: value }));
@@ -309,32 +328,55 @@ export default function WeddingEditor({
     setMessage('');
   }
 
+  const missing = useMemo(() => {
+    const list: (keyof typeof t.missing)[] = [];
+    if (!form.partnerOne.trim() || !form.partnerTwo.trim()) list.push('names');
+    if (!form.eventDate) list.push('date');
+    if (!form.eventTime) list.push('time');
+    if (!form.venueName.trim()) list.push('venue');
+    return list;
+  }, [form, t]);
+
+  const usingSample = !form.partnerOne.trim() || !form.partnerTwo.trim();
+
+  // The preview is the real invitation renderer fed with the unsaved form.
+  const previewData = useMemo<InvitationData>(() => ({
+    slug: wedding?.slug,
+    partnerOne: form.partnerOne.trim() || SAMPLE_NAMES[form.locale][0],
+    partnerTwo: form.partnerTwo.trim() || SAMPLE_NAMES[form.locale][1],
+    eventDate: form.eventDate || null,
+    eventTime: form.eventTime || null,
+    timezone: wedding?.timezone ?? 'Asia/Baku',
+    venueName: form.venueName || null,
+    venueAddress: form.venueAddress || null,
+    welcomeText: form.welcomeText || null,
+    story: form.story || null,
+    locale: form.locale,
+    template: form.template,
+    coverImage: form.coverImage,
+    music: form.music,
+  }), [form, wedding?.slug, wedding?.timezone]);
+
   function handleImageUpload(file: File) {
-    if (!file.type.startsWith('image/')) return;
+    if (!file.type.startsWith('image/')) { setError(t.photoError); return; }
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
         const maxDim = 1600;
-        let width = img.width;
-        let height = img.height;
+        let { width, height } = img;
         if (width > maxDim || height > maxDim) {
-          if (width > height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
+          if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
+          else { width = Math.round((width * maxDim) / height); height = maxDim; }
         }
+        const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          update('coverImage', dataUrl);
+          update('coverImage', canvas.toDataURL('image/jpeg', 0.85));
+          setError('');
         }
       };
       img.src = e.target?.result as string;
@@ -342,10 +384,12 @@ export default function WeddingEditor({
     reader.readAsDataURL(file);
   }
 
-  async function save() {
+  const save = useCallback(async (): Promise<Wedding | null> => {
     if (!form.partnerOne.trim() || !form.partnerTwo.trim()) {
       setError(t.required);
-      return;
+      setStep('details');
+      setMobileView('edit');
+      return null;
     }
     setSaving(true); setError(''); setMessage('');
     const submittedForm = JSON.stringify(form);
@@ -370,110 +414,124 @@ export default function WeddingEditor({
         throw new Error(result.error || t.error);
       }
       setWedding(result.wedding);
-      setHasChanges(JSON.stringify(form) !== submittedForm);
-      setMessage(t.saved);
+      // Edits typed while the request was in flight stay marked as unsaved.
+      setHasChanges(JSON.stringify(formRef.current) !== submittedForm);
+      setMessage(t.savedMsg);
+      return result.wedding as Wedding;
     } catch (e) {
       setError(e instanceof Error ? e.message : t.error);
-    } finally { setSaving(false); }
-  }
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  }, [form, wedding, t]);
 
-  async function publish() {
-    if (!wedding) { await save(); return; }
+  async function togglePublish() {
+    // Publishing always includes the latest edits.
+    let current = wedding;
+    if (!current || hasChanges) {
+      current = await save();
+      if (!current) return;
+    }
+    const nextState = !current.isPublished;
     setSaving(true); setError(''); setMessage('');
     try {
       const response = await fetch('/api/wedding', {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isPublished: !wedding.isPublished }),
+        body: JSON.stringify({ isPublished: nextState }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || t.error);
       setWedding(result.wedding);
-      setMessage(t.saved);
-    } catch (e) { setError(e instanceof Error ? e.message : t.error); }
-    finally { setSaving(false); }
+      setMessage(nextState ? t.publishedMsg : t.unpublishedMsg);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t.error);
+    } finally {
+      setSaving(false);
+    }
   }
 
+  // Cmd/Ctrl + S saves.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        if (!saving) void save();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [save, saving]);
+
+  async function copyLink() {
+    if (!wedding) return;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/${wedding.slug}`);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2200);
+    } catch { /* clipboard unavailable — the link is visible to copy manually */ }
+  }
+
+  // ----- Personal invitations (unchanged behaviour) -----
 
   async function addGuest() {
     if (!guestName.trim()) return;
-    setGuestBusy(true);
-    setGuestError('');
-    setGuestMessage('');
+    setGuestBusy(true); setGuestError(''); setGuestMessage('');
     try {
       const response = await fetch('/api/guests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: guestName.trim() }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Could not create invitation');
       setGuests(old => [result.guest, ...old]);
       setGuestName('');
-      setGuestMessage(language === 'ru' ? 'Персональная ссылка создана' : language === 'az' ? 'Şəxsi keçid yaradıldı' : 'Personal link created');
-    } catch (error) {
-      setGuestError(error instanceof Error ? error.message : 'Error');
+      setGuestMessage(g.created);
+    } catch (err) {
+      setGuestError(err instanceof Error ? err.message : 'Error');
     } finally {
       setGuestBusy(false);
     }
   }
 
   async function deleteGuest(id: string) {
-    if (!window.confirm(language === 'ru' ? 'Удалить это приглашение?' : language === 'az' ? 'Bu dəvətnamə silinsin?' : 'Delete this invitation?')) return;
-    setGuestBusy(true);
-    setGuestError('');
+    if (!window.confirm(g.confirm)) return;
+    setGuestBusy(true); setGuestError('');
     try {
       const response = await fetch('/api/guests', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Could not delete invitation');
       setGuests(old => old.filter(guest => guest.id !== id));
-    } catch (error) {
-      setGuestError(error instanceof Error ? error.message : 'Error');
+    } catch (err) {
+      setGuestError(err instanceof Error ? err.message : 'Error');
     } finally {
       setGuestBusy(false);
     }
   }
 
   async function copyGuestLink(slug: string) {
-    await navigator.clipboard.writeText(`${window.location.origin}/guest/${slug}`);
-    setGuestMessage(language === 'ru' ? 'Ссылка скопирована' : language === 'az' ? 'Keçid kopyalandı' : 'Link copied');
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/guest/${slug}`);
+      setGuestMessage(g.copied);
+    } catch { /* clipboard unavailable */ }
   }
 
   async function previewGuestFile(file: File) {
-    setImportBusy(true);
-    setGuestError('');
-    setGuestMessage('');
-    setImportNames([]);
-
+    setImportBusy(true); setGuestError(''); setGuestMessage(''); setImportNames([]);
     try {
       const formData = new FormData();
       formData.append('file', file);
-
-      const response = await fetch('/api/guests/import/preview', {
-        method: 'POST',
-        body: formData,
-      });
-
+      const response = await fetch('/api/guests/import/preview', { method: 'POST', body: formData });
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Could not read file');
-      }
-
+      if (!response.ok) throw new Error(result.error || 'Could not read file');
       setImportNames(result.names || []);
       setImportFileName(result.fileName || file.name);
-      setGuestMessage(
-        language === 'ru'
-          ? `Распознано имён: ${result.count}. Проверь список перед импортом.`
-          : language === 'az'
-            ? `Tapılan adlar: ${result.count}. İdxaldan əvvəl siyahını yoxlayın.`
-            : `Found ${result.count} names. Review the list before importing.`
-      );
-    } catch (error) {
-      setGuestError(error instanceof Error ? error.message : 'Could not read file');
+      setGuestMessage(g.found(result.count));
+    } catch (err) {
+      setGuestError(err instanceof Error ? err.message : 'Could not read file');
     } finally {
       setImportBusy(false);
     }
@@ -481,372 +539,436 @@ export default function WeddingEditor({
 
   async function confirmGuestImport() {
     if (!importNames.length) return;
-
-    setImportBusy(true);
-    setGuestError('');
-    setGuestMessage('');
-
+    setImportBusy(true); setGuestError(''); setGuestMessage('');
     try {
       const response = await fetch('/api/guests/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ names: importNames }),
       });
-
       const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Could not import guests');
-      }
-
+      if (!response.ok) throw new Error(result.error || 'Could not import guests');
       setGuests(old => [
         ...(result.guests || []),
-        ...old.filter(existing =>
-          !(result.guests || []).some((created: Guest) => created.id === existing.id)
-        ),
+        ...old.filter(existing => !(result.guests || []).some((created: Guest) => created.id === existing.id)),
       ]);
-
       setImportNames([]);
       setImportFileName('');
-
-      setGuestMessage(
-        language === 'ru'
-          ? `Импортировано: ${result.imported}. Пропущено дубликатов: ${result.skippedDuplicates}.`
-          : language === 'az'
-            ? `İdxal edildi: ${result.imported}. Təkrar olduğu üçün buraxıldı: ${result.skippedDuplicates}.`
-            : `Imported: ${result.imported}. Duplicates skipped: ${result.skippedDuplicates}.`
-      );
-    } catch (error) {
-      setGuestError(error instanceof Error ? error.message : 'Import failed');
+      setGuestMessage(g.imported(result.imported, result.skippedDuplicates));
+    } catch (err) {
+      setGuestError(err instanceof Error ? err.message : 'Import failed');
     } finally {
       setImportBusy(false);
     }
   }
 
-  async function copyLink() {
-    if (!wedding) return;
-    await navigator.clipboard.writeText(`${window.location.origin}/${wedding.slug}`);
-    setMessage(language === 'ru' ? 'Ссылка скопирована' : language === 'az' ? 'Keçid kopyalandı' : 'Link copied');
-  }
+  // ---------------------------------------------------------------------------
 
-  const input = 'builder-input';
-  const label = 'builder-label';
-  const section = (id: 'details' | 'content' | 'design', title: string) => (
-    <button type="button" className={`builder-tab ${activeSection === id ? 'active' : ''}`} onClick={() => setActiveSection(id)}>{title}</button>
-  );
+  const status = saving ? 'saving' : hasChanges || !wedding ? 'dirty' : 'saved';
+  const title = form.partnerOne.trim() && form.partnerTwo.trim()
+    ? `${form.partnerOne.trim()} & ${form.partnerTwo.trim()}`
+    : t.untitled;
+  const steps: Step[] = ['details', 'content', 'design', 'music'];
+  const canPublish = wedding?.isPublished || missing.length === 0;
 
   return (
-    <main className="builder-shell">
-      <div className="builder-toolbar">
-        <div><Link href="/dashboard" className="inline-flex items-center gap-1.5"><ArrowLeftIcon className="w-3.5 h-3.5 inline-block" /> {t.back}</Link><span>/</span><strong>{t.dashboard}</strong></div>
-        <div className="builder-actions">
-          <span className={`builder-save-indicator ${saving ? 'is-saving' : hasChanges ? 'is-dirty' : 'is-saved'}`}>
-            <i />
-            {saving
-              ? (language === 'ru' ? 'Сохранение…' : language === 'az' ? 'Saxlanılır…' : 'Saving…')
-              : hasChanges
-                ? (language === 'ru' ? 'Есть изменения' : language === 'az' ? 'Dəyişikliklər var' : 'Unsaved changes')
-                : (language === 'ru' ? 'Сохранено' : language === 'az' ? 'Saxlanılıb' : 'Saved')}
-          </span>
-          <span className={`builder-status ${wedding?.isPublished ? 'is-published' : ''}`}>{wedding?.isPublished ? t.published : t.draft}</span>
-          <button type="button" className="builder-button secondary" onClick={save} disabled={saving}>{saving ? t.saving : t.save}</button>
-          <button type="button" className="builder-button primary" onClick={publish} disabled={saving}>{wedding?.isPublished ? t.unpublish : t.publish}</button>
+    <div className="st">
+      <header className="st-bar">
+        <div className="st-bar-title">
+          <Link href="/dashboard" className="st-back"><ArrowLeftIcon className="w-3.5 h-3.5" aria-hidden="true" /> {t.back}</Link>
+          <div>
+            <p className="st-kicker">{t.studio}</p>
+            <h1 className="st-title">{title}</h1>
+          </div>
         </div>
+        <div className="st-bar-actions">
+          <span className={`st-save-state is-${status}`} aria-live="polite">
+            <i aria-hidden="true" />{status === 'saving' ? t.saving : status === 'dirty' ? t.unsaved : t.saved}
+          </span>
+          <span className={`st-pill ${wedding?.isPublished ? 'is-live' : ''}`}>{wedding?.isPublished ? t.published : t.draft}</span>
+          <button type="button" className="st-btn" onClick={() => void save()} disabled={saving || (!hasChanges && Boolean(wedding))}>
+            {saving ? t.saving : t.save}
+          </button>
+          <button type="button" className="st-btn st-btn--primary" onClick={() => void togglePublish()}
+            disabled={saving || !canPublish}
+            title={!canPublish ? `${t.missingTitle} ${missing.map(k => t.missing[k]).join(', ')}` : undefined}>
+            {wedding?.isPublished ? t.unpublish : t.publish}
+          </button>
+        </div>
+      </header>
+
+      {(message || error) && (
+        <div className={`st-toast ${error ? 'is-error' : ''}`} role={error ? 'alert' : 'status'}>{error || message}</div>
+      )}
+
+      <div className="st-switch" role="tablist" aria-label={t.preview}>
+        <button type="button" role="tab" aria-selected={mobileView === 'edit'} className={mobileView === 'edit' ? 'is-active' : ''} onClick={() => setMobileView('edit')}>{t.edit}</button>
+        <button type="button" role="tab" aria-selected={mobileView === 'preview'} className={mobileView === 'preview' ? 'is-active' : ''} onClick={() => setMobileView('preview')}>{t.show}</button>
       </div>
 
-      <div className="builder-workspace">
-        <aside className="builder-sidebar">
-          <div className="builder-sidebar-heading"><div><small>ELARIOLABS / STUDIO</small><h1>{t.dashboard}</h1></div></div>
-          <nav className="builder-tabs">
-            {section('details', t.sectionDetails)}
-            {section('content', t.sectionContent)}
-            {section('design', t.sectionDesign)}
+      <div className={`st-work is-${mobileView}`}>
+        <aside className="st-panel" aria-label={t.studio}>
+          <nav className="st-steps" role="tablist" aria-label={t.studio}>
+            {steps.map((id, index) => (
+              <button key={id} type="button" role="tab" id={`st-tab-${id}`} aria-controls={`st-step-${id}`}
+                aria-selected={step === id} className={`st-step ${step === id ? 'is-active' : ''}`} onClick={() => setStep(id)}>
+                <small>{String(index + 1).padStart(2, '0')}</small>{t.steps[id]}
+              </button>
+            ))}
           </nav>
 
-          <div className="builder-panel">
-            {activeSection === 'details' && <>
-              <div className="builder-group">
-                <h2>{t.names}</h2>
-                <div className="builder-field-grid">
-                  <label className={label}>{t.first}<input className={input} value={form.partnerOne} onChange={e => update('partnerOne', e.target.value)} maxLength={100}/></label>
-                  <label className={label}>{t.second}<input className={input} value={form.partnerTwo} onChange={e => update('partnerTwo', e.target.value)} maxLength={100}/></label>
-                </div>
-              </div>
-              <div className="builder-group">
-                <h2>{t.details}</h2>
-                <div className="builder-field-grid">
-                  <label className={label}>{t.date}<input className={input} type="date" value={form.eventDate} onChange={e => update('eventDate', e.target.value)}/></label>
-                  <label className={label}>{t.time}<input className={input} type="time" value={form.eventTime} onChange={e => update('eventTime', e.target.value)}/></label>
-                </div>
-              </div>
-              <div className="builder-group">
-                <h2>{t.venue}</h2>
-                <label className={label}>{t.venueName}<input className={input} value={form.venueName} onChange={e => update('venueName', e.target.value)} maxLength={200}/></label>
-                <label className={label}>{t.address}<input className={input} value={form.venueAddress} onChange={e => update('venueAddress', e.target.value)} maxLength={500}/></label>
-              </div>
-              <div className="builder-group">
-                <h2>{t.language}</h2>
-                <select className={input} value={form.locale} onChange={e => update('locale', e.target.value as Locale)}>
-                  <option value="az">{t.languageAZ}</option><option value="ru">{t.languageRU}</option><option value="en">{t.languageEN}</option>
-                </select>
-              </div>
-            </>}
+          <div className="st-panel-body" role="tabpanel" id={`st-step-${step}`} aria-labelledby={`st-tab-${step}`}>
+            {step === 'details' && (
+              <>
+                <fieldset className="st-group">
+                  <legend>{t.names}</legend>
+                  <div className="st-grid-2">
+                    <label className="st-field"><span>{t.first} <b aria-hidden="true">*</b></span>
+                      <input value={form.partnerOne} onChange={e => update('partnerOne', e.target.value)} maxLength={100} autoComplete="off" required />
+                    </label>
+                    <label className="st-field"><span>{t.second} <b aria-hidden="true">*</b></span>
+                      <input value={form.partnerTwo} onChange={e => update('partnerTwo', e.target.value)} maxLength={100} autoComplete="off" required />
+                    </label>
+                  </div>
+                </fieldset>
+                <fieldset className="st-group">
+                  <legend>{t.when}</legend>
+                  <div className="st-grid-2">
+                    <label className="st-field"><span>{t.date} <b aria-hidden="true">*</b></span>
+                      <input type="date" value={form.eventDate} onChange={e => update('eventDate', e.target.value)} />
+                    </label>
+                    <label className="st-field"><span>{t.time} <b aria-hidden="true">*</b></span>
+                      <input type="time" value={form.eventTime} onChange={e => update('eventTime', e.target.value)} />
+                    </label>
+                  </div>
+                </fieldset>
+                <fieldset className="st-group">
+                  <legend>{t.where}</legend>
+                  <label className="st-field"><span>{t.venueName} <b aria-hidden="true">*</b></span>
+                    <input value={form.venueName} onChange={e => update('venueName', e.target.value)} maxLength={200} />
+                  </label>
+                  <label className="st-field"><span>{t.address}</span>
+                    <input value={form.venueAddress} onChange={e => update('venueAddress', e.target.value)} maxLength={500} />
+                    <small>{t.addressHint}</small>
+                  </label>
+                </fieldset>
+                <fieldset className="st-group">
+                  <legend>{t.language}</legend>
+                  <div className="st-segment" role="radiogroup" aria-label={t.language}>
+                    {(['az', 'ru', 'en'] as Locale[]).map(code => (
+                      <label key={code} className={form.locale === code ? 'is-active' : ''}>
+                        <input type="radio" name="st-locale" checked={form.locale === code} onChange={() => update('locale', code)} />
+                        {t.languages[code]}
+                      </label>
+                    ))}
+                  </div>
+                  <small className="st-hint">{t.languageHint}</small>
+                </fieldset>
+              </>
+            )}
 
-            {activeSection === 'content' && <>
-              <div className="builder-group">
-                <h2>{t.content}</h2>
-                <label className={label}>{t.welcome}<textarea className={input} rows={5} value={form.welcomeText} onChange={e => update('welcomeText', e.target.value)} maxLength={5000}/></label>
-                <label className={label}>{t.story}<textarea className={input} rows={8} value={form.story} onChange={e => update('story', e.target.value)} maxLength={10000}/></label>
-                <p className="builder-hint">{language === 'ru' ? 'Изменения сразу появляются в предпросмотре. Сохраните, чтобы они попали в приглашение.' : language === 'az' ? 'Dəyişikliklər dərhal önbaxışda görünür. Dəvətnaməyə düşməsi üçün yadda saxlayın.' : 'Changes appear in the preview immediately. Save to apply them to the invitation.'}</p>
-              </div>
-            </>}
-
-            {activeSection === 'design' && <>
-              <div className="builder-group">
-                <h2>{t.design}</h2>
-                <p className="builder-hint">{t.designHint}</p>
-                <div className="builder-template-grid">
-                  {templates.map(tpl => {
-                    const item = { ...tpl, ...templateTexts[language][tpl.id] };
-                    const isSelected = form.template === item.id || (form.template === 'elegant' && item.id === 'modern');
-                    return (
-                      <button
-                        type="button"
-                        key={item.id}
-                        onClick={() => update('template', item.id)}
-                        className={`builder-template ${isSelected ? 'selected' : ''}`}
-                      >
-                        <div className={`template-art template-art-${item.id}`}>
-                          <span><TemplateOrnament template={item.id} className="w-5 h-5 text-amber-500/80" /></span>
-                          <b>{item.variant}</b>
-                          <i>{item.name}</i>
-                        </div>
-                        <div className="template-meta">
-                          <strong>{item.name}</strong>
-                          <span className="text-amber-500/90 text-xs font-semibold">{item.variant}</span>
-                          <small>{item.desc}</small>
-                        </div>
-                        {isSelected && <span className="template-check"><CheckIcon className="w-3.5 h-3.5" /></span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Photo section for Template 2 (Photo) */}
-              <div className="builder-group">
-                <h2>{language === 'ru' ? 'Фотография пары' : language === 'az' ? 'Cütlük şəkli' : 'Couple photo'}</h2>
-                <p className="builder-hint">
-                  {language === 'ru'
-                    ? `Главное фото для «${templateTexts.ru.modern.name}». Вы можете загрузить свой снимок или использовать романтичное фото.`
-                    : language === 'az'
-                      ? `«${templateTexts.az.modern.name}» üçün əsas şəkil. Şəxsi şəklinizi yükləyə və ya romantik şəkildən istifadə edə bilərsiniz.`
-                      : `Main photo for “${templateTexts.en.modern.name}”. You can upload your own picture or use a romantic stock photo.`}
-                </p>
-
-                <div className="builder-photo-card">
+            {step === 'content' && (
+              <>
+                <fieldset className="st-group">
+                  <legend>{t.welcome}</legend>
+                  <label className="st-field">
+                    <span className="inv-sr">{t.welcome}</span>
+                    <textarea rows={5} value={form.welcomeText} onChange={e => update('welcomeText', e.target.value)} maxLength={5000}
+                      placeholder={invitationCopy[form.locale].welcomeDefault} />
+                    <small>{t.welcomeHint}</small>
+                  </label>
+                </fieldset>
+                <fieldset className="st-group">
+                  <legend>{t.story}</legend>
+                  <label className="st-field">
+                    <span className="inv-sr">{t.story}</span>
+                    <textarea rows={7} value={form.story} onChange={e => update('story', e.target.value)} maxLength={10000} />
+                    <small>{t.storyHint}</small>
+                  </label>
+                </fieldset>
+                <fieldset className="st-group">
+                  <legend>{t.photo}</legend>
+                  <small className="st-hint">{t.photoHint}</small>
                   {form.coverImage ? (
-                    <div className="builder-photo-preview-box">
-                      <div
-                        className="builder-photo-img"
-                        style={{ backgroundImage: `url("${form.coverImage}")` }}
-                      />
-                      <div className="builder-photo-actions">
-                        <label className="builder-photo-btn">
-                          <UploadIcon className="w-3.5 h-3.5 inline-block mr-1" />
-                          <span>{language === 'ru' ? 'Заменить фото' : language === 'az' ? 'Şəkli dəyiş' : 'Change photo'}</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={e => {
-                              const f = e.target.files?.[0];
-                              if (f) handleImageUpload(f);
-                            }}
-                          />
+                    <div className="st-photo">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- data URL or user-provided link */}
+                      <img src={form.coverImage} alt="" />
+                      <div className="st-photo-actions">
+                        <label className="st-btn st-btn--small">
+                          <UploadIcon className="w-3.5 h-3.5" aria-hidden="true" />{t.replace}
+                          <input type="file" accept="image/*" className="inv-sr"
+                            onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); e.currentTarget.value = ''; }} />
                         </label>
-                        <button
-                          type="button"
-                          className="builder-photo-btn danger"
-                          onClick={() => update('coverImage', null)}
-                        >
-                          {language === 'ru' ? 'Удалить' : language === 'az' ? 'Sil' : 'Remove'}
-                        </button>
+                        <button type="button" className="st-btn st-btn--small st-btn--danger" onClick={() => update('coverImage', null)}>{t.remove}</button>
                       </div>
                     </div>
                   ) : (
-                    <div className="builder-photo-empty-box">
-                      <label className="builder-photo-upload-zone">
-                        <PhotoIcon className="w-8 h-8 text-neutral-400 mb-2 inline-block" />
-                        <strong>{language === 'ru' ? 'Выбрать фото с устройства' : language === 'az' ? 'Cihazdan şəkil seçin' : 'Upload photo'}</strong>
-                        <small>{language === 'ru' ? 'JPG, PNG, WebP (оптимизируется автоматически)' : language === 'az' ? 'JPG, PNG, WebP (avtomatik optimallaşdırılır)' : 'JPG, PNG, WebP (optimized automatically)'}</small>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={e => {
-                            const f = e.target.files?.[0];
-                            if (f) handleImageUpload(f);
-                          }}
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        className="builder-photo-preset-btn"
-                        onClick={() => update('coverImage', 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80')}
-                      >
-                        {language === 'ru' ? 'Использовать свадебное фото по умолчанию' : language === 'az' ? 'Standart toy şəklini seç' : 'Use default wedding photo'}
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="mt-3">
-                    <label className={label}>
-                      {language === 'ru' ? 'Или прямая ссылка на изображение (URL)' : language === 'az' ? 'Və ya birbaşa şəkil linki' : 'Or direct image URL'}
-                      <input
-                        type="url"
-                        className={input}
-                        placeholder="https://images.unsplash.com/..."
-                        value={form.coverImage || ''}
-                        onChange={e => update('coverImage', e.target.value)}
-                      />
+                    <label className="st-drop">
+                      <PhotoIcon className="w-7 h-7" aria-hidden="true" />
+                      <strong>{t.upload}</strong>
+                      <small>{t.uploadSub}</small>
+                      <input type="file" accept="image/*" className="inv-sr"
+                        onChange={e => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); e.currentTarget.value = ''; }} />
                     </label>
-                  </div>
+                  )}
+                  <label className="st-field">
+                    <span>{t.photoUrl}</span>
+                    <input type="url" inputMode="url" placeholder="https://…"
+                      value={form.coverImage?.startsWith('data:') ? '' : form.coverImage ?? ''}
+                      onChange={e => update('coverImage', e.target.value || null)} />
+                  </label>
+                </fieldset>
+              </>
+            )}
+
+            {step === 'design' && (
+              <fieldset className="st-group">
+                <legend>{t.designTitle}</legend>
+                <small className="st-hint">{t.designHint}</small>
+                <div className="st-templates" role="radiogroup" aria-label={t.designTitle}>
+                  {TEMPLATES.map(tpl => {
+                    const selected = form.template === tpl.id;
+                    return (
+                      <div key={tpl.id} className={`st-template ${selected ? 'is-selected' : ''}`}>
+                        <span className="st-template-thumb" aria-hidden="true">
+                          <span className="st-template-thumb-inner">
+                            <InvitationView data={{ ...previewData, template: tpl.id }} mode="thumbnail" />
+                          </span>
+                        </span>
+                        <span className="st-template-meta">
+                          <small>{tpl.style[language]}</small>
+                          <strong>{tpl.name[language]}</strong>
+                          <span>{tpl.description[language]}</span>
+                          <span className="st-swatches" aria-hidden="true">
+                            {tpl.swatches.map(c => <i key={c} style={{ background: c }} />)}
+                          </span>
+                          {tpl.usesPhoto === 'hero' && !form.coverImage && <em>{t.withPhoto}</em>}
+                        </span>
+                        {selected && <span className="st-template-check" aria-hidden="true"><CheckIcon className="w-3.5 h-3.5" /></span>}
+                        <button type="button" role="radio" aria-checked={selected} className="st-template-hit"
+                          aria-label={`${tpl.name[language]} — ${tpl.style[language]}`} onClick={() => update('template', tpl.id)} />
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            </>}
+              </fieldset>
+            )}
+
+            {step === 'music' && (
+              <MusicPicker value={form.music} onChange={value => update('music', value)} locale={language} t={t} />
+            )}
           </div>
 
-          <div className="builder-sidebar-footer">
-            <button type="button" className="builder-button primary full" onClick={save} disabled={saving}>{saving ? t.saving : t.save}</button>
-            {message && <p className="builder-success">{message}</p>}
-            {error && <p className="builder-error">{error}</p>}
-          </div>
+          <footer className="st-panel-foot">
+            {missing.length === 0 ? (
+              <p className="st-ready"><CheckIcon className="w-3.5 h-3.5" aria-hidden="true" /> {t.readyTitle}</p>
+            ) : (
+              <p className="st-missing">{t.missingTitle} <strong>{missing.map(k => t.missing[k]).join(', ')}</strong></p>
+            )}
+          </footer>
         </aside>
 
-        <section className="builder-preview-area">
-          <div className="preview-toolbar">
-            <div><span className="preview-live-dot"/><strong>{t.preview}</strong></div>
-            <div className="preview-switch">
-              <button type="button" className={mode === 'desktop' ? 'active' : ''} onClick={() => setMode('desktop')}><DesktopIcon className="w-4 h-4 inline-block" /> {t.desktop}</button>
-              <button type="button" className={mode === 'mobile' ? 'active' : ''} onClick={() => setMode('mobile')}><MobileIcon className="w-4 h-4 inline-block" /> {t.mobile}</button>
+        <section className="st-stage" aria-label={t.preview}>
+          <div className="st-stage-bar">
+            <p><span className="st-live-dot" aria-hidden="true" />{t.preview}</p>
+            <div className="st-stage-tools">
+              <div className="st-segment st-segment--icons" role="radiogroup" aria-label={t.preview}>
+                {(['mobile', 'desktop'] as Device[]).map(d => (
+                  <label key={d} className={device === d ? 'is-active' : ''} title={d === 'mobile' ? t.mobile : t.desktop}>
+                    <input type="radio" name="st-device" checked={device === d} onChange={() => setDevice(d)} />
+                    {d === 'mobile' ? <MobileIcon className="w-4 h-4" aria-hidden="true" /> : <DesktopIcon className="w-4 h-4" aria-hidden="true" />}
+                    <span>{d === 'mobile' ? t.mobile : t.desktop}</span>
+                  </label>
+                ))}
+              </div>
+              <button type="button" className="st-btn st-btn--small" onClick={() => setReplayKey(k => k + 1)}>{t.replay}</button>
             </div>
           </div>
-          <div className="preview-stage">
-            <Preview form={form} mode={mode} />
-          </div>
-          {wedding && <div className="builder-public-link">
-            <div><small>{t.link}</small><strong>{origin ? `${origin}/${wedding.slug}` : `/${wedding.slug}`}</strong></div>
-            <button type="button" onClick={copyLink}>{t.copy}</button>
-            {wedding.isPublished && <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer">{t.open} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></a>}
-          </div>}
-          {wedding && <section className="builder-guests">
-            <div className="builder-guests-heading">
-              <div>
-                <small>ELARIOLABS / PERSONAL INVITATIONS</small>
-                <h2>{language === 'ru' ? 'Именные приглашения' : language === 'az' ? 'Adlı dəvətnamələr' : 'Personal invitations'}</h2>
-                <p>{language === 'ru' ? 'Создавайте отдельную ссылку для каждого гостя или семьи.' : language === 'az' ? 'Hər qonaq və ya ailə üçün ayrıca keçid yaradın.' : 'Create a unique invitation link for each guest or family.'}</p>
-              </div>
-              <strong>{guests.length}</strong>
-            </div>
-            <form className="builder-guest-form" onSubmit={e => { e.preventDefault(); void addGuest(); }}>
-              <input
-                value={guestName}
-                onChange={e => setGuestName(e.target.value)}
-                placeholder={language === 'ru' ? 'Например: Семья Алиевых' : language === 'az' ? 'Məsələn: Əliyevlər ailəsi' : 'e.g. The Aliyev family'}
-                maxLength={160}
-                aria-label="Guest name"
-              />
-              <button type="submit" disabled={guestBusy || !guestName.trim()}>
-                {guestBusy ? '…' : language === 'ru' ? 'Создать ссылку' : language === 'az' ? 'Keçid yarat' : 'Create link'}
-              </button>
-            </form>
-            <div className="builder-guest-import">
-              <div className="builder-guest-import-heading">
-                <strong>
-                  {language === 'ru' ? 'Массовый импорт гостей' : language === 'az' ? 'Qonaqların kütləvi idxalı' : 'Bulk guest import'}
-                </strong>
-                <small>
-                  {language === 'ru'
-                    ? 'CSV, Excel, Word, TXT или PDF · до 10 МБ'
-                    : language === 'az'
-                      ? 'CSV, Excel, Word, TXT və ya PDF · maksimum 10 MB'
-                      : 'CSV, Excel, Word, TXT or PDF · up to 10 MB'}
-                </small>
-              </div>
-              <label className="builder-guest-file">
-                <input
-                  type="file"
-                  accept=".csv,.xlsx,.xls,.docx,.txt,.pdf"
-                  disabled={importBusy || guestBusy}
-                  onChange={event => {
-                    const file = event.target.files?.[0];
-                    if (file) void previewGuestFile(file);
-                    event.currentTarget.value = '';
-                  }}
-                />
-                <span>
-                  {importBusy
-                    ? (language === 'ru' ? 'Обработка…' : language === 'az' ? 'Emal edilir…' : 'Processing…')
-                    : (language === 'ru' ? 'Выбрать файл' : language === 'az' ? 'Fayl seç' : 'Choose file')}
-                </span>
-              </label>
-
-              {importFileName && <p className="builder-guest-import-filename">{importFileName}</p>}
-
-              {importNames.length > 0 && <>
-                <div className="builder-guest-import-summary">
-                  <strong>
-                    {language === 'ru' ? `Распознано: ${importNames.length}` : language === 'az' ? `Tapılan: ${importNames.length}` : `Detected: ${importNames.length}`}
-                  </strong>
-                  <button type="button" onClick={() => { setImportNames([]); setImportFileName(''); }}>
-                    {language === 'ru' ? 'Очистить' : language === 'az' ? 'Təmizlə' : 'Clear'}
-                  </button>
-                </div>
-                <div className="builder-guest-import-list">
-                  {importNames.map((name, index) => (
-                    <div className="builder-guest-import-row" key={`${index}-${name}`}>
-                      <span>{index + 1}.</span>
-                      <input
-                        aria-label={`Guest ${index + 1}`}
-                        maxLength={160}
-                        value={name}
-                        onChange={event => setImportNames(old => old.map((item, i) => i === index ? event.target.value : item))}
-                      />
-                      <button
-                        type="button"
-                        aria-label="Remove guest"
-                        onClick={() => setImportNames(old => old.filter((_, i) => i !== index))}
-                      >×</button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="builder-guest-import-confirm"
-                  disabled={importBusy || guestBusy || !importNames.some(name => name.trim())}
-                  onClick={() => void confirmGuestImport()}
-                >
-                  {language === 'ru' ? 'Подтвердить импорт' : language === 'az' ? 'İdxalı təsdiqlə' : 'Confirm import'}
-                </button>
-              </>}
-            </div>
-            {guestMessage && <p className="builder-success">{guestMessage}</p>}
-            {guestError && <p className="builder-error">{guestError}</p>}
-            <div className="builder-guest-list">
-              {guests.length === 0
-                ? <p className="builder-hint">{language === 'ru' ? 'Пока нет именных приглашений.' : language === 'az' ? 'Hələ adlı dəvətnamə yoxdur.' : 'No personal invitations yet.'}</p>
-                : guests.map(guest => <div className="builder-guest-row" key={guest.id}>
-                    <div><strong>{guest.name}</strong><small>{origin ? `${origin}/guest/${guest.slug}` : `/guest/${guest.slug}`}</small></div>
-                    <button type="button" onClick={() => void copyGuestLink(guest.slug)}>{language === 'ru' ? 'Копировать' : language === 'az' ? 'Kopyala' : 'Copy'}</button>
-                    <button type="button" className="danger" disabled={guestBusy} onClick={() => void deleteGuest(guest.id)} aria-label="Delete guest">×</button>
-                  </div>)
-              }
-            </div>
-          </section>}
-
+          <DeviceStage device={device}>
+            <InvitationView key={`${replayKey}-${form.template}`} data={previewData} mode="preview" />
+          </DeviceStage>
+          {usingSample && <p className="st-stage-note">{t.sample}</p>}
         </section>
       </div>
-    </main>
+
+      {wedding && (
+        <section className="st-card st-share">
+          <div>
+            <p className="st-kicker">{t.link}</p>
+            <p className="st-share-url">{origin ? `${origin}/${wedding.slug}` : `/${wedding.slug}`}</p>
+            {!wedding.isPublished && <small className="st-hint">{t.notLive}</small>}
+          </div>
+          <div className="st-share-actions">
+            <button type="button" className="st-btn" onClick={() => void copyLink()}>
+              {linkCopied ? <CheckIcon className="w-3.5 h-3.5" aria-hidden="true" /> : <CopyIcon className="w-3.5 h-3.5" aria-hidden="true" />}
+              <span aria-live="polite">{linkCopied ? t.copied : t.copy}</span>
+            </button>
+            {wedding.isPublished && (
+              <a className="st-btn st-btn--primary" href={`/${wedding.slug}`} target="_blank" rel="noreferrer">
+                {t.open} <ArrowUpRightIcon className="w-3.5 h-3.5" aria-hidden="true" />
+              </a>
+            )}
+          </div>
+        </section>
+      )}
+
+      {wedding && (
+        <section className="st-card st-replies" aria-labelledby="st-replies-title">
+          <header className="st-guests-head">
+            <div>
+              <h2 id="st-replies-title">{g.repliesTitle}</h2>
+              <p>{g.repliesSub}</p>
+            </div>
+          </header>
+          {rsvps.length === 0 ? (
+            <p className="st-hint">{g.repliesEmpty}</p>
+          ) : (
+            <>
+              <dl className="st-stats">
+                <div><dt>{g.attending}</dt><dd>{rsvps.filter(r => r.attending).length}</dd></div>
+                <div><dt>{g.people}</dt><dd>{rsvps.filter(r => r.attending).reduce((sum, r) => sum + r.guestsCount, 0)}</dd></div>
+                <div><dt>{g.declined}</dt><dd>{rsvps.filter(r => !r.attending).length}</dd></div>
+              </dl>
+              <ul className="st-guest-list">
+                {[...rsvps].sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '')).map((r, i) => (
+                  <li key={`${r.guestName}-${i}`} className="st-reply">
+                    <div>
+                      <strong>{r.guestName}</strong>
+                      {r.message && <small>“{r.message}”</small>}
+                    </div>
+                    <span className={`st-pill ${r.attending ? 'is-live' : ''}`}>
+                      {r.attending ? `${g.yes} · ${r.guestsCount}` : g.no}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
+
+      {wedding && (
+        <section className="st-card st-guests" aria-labelledby="st-guests-title">
+          <header className="st-guests-head">
+            <div>
+              <h2 id="st-guests-title">{g.title}</h2>
+              <p>{g.sub}</p>
+            </div>
+            <strong className="st-count">{guests.length}</strong>
+          </header>
+
+          <form className="st-inline-form" onSubmit={e => { e.preventDefault(); void addGuest(); }}>
+            <input value={guestName} onChange={e => setGuestName(e.target.value)} placeholder={g.placeholder} maxLength={160} aria-label={g.guestName} />
+            <button type="submit" className="st-btn st-btn--primary" disabled={guestBusy || !guestName.trim()}>{guestBusy ? '…' : g.create}</button>
+          </form>
+
+          <div className="st-import">
+            <div>
+              <strong>{g.importTitle}</strong>
+              <small>{g.importSub}</small>
+            </div>
+            <label className={`st-btn ${importBusy || guestBusy ? 'is-disabled' : ''}`}>
+              <UploadIcon className="w-3.5 h-3.5" aria-hidden="true" />
+              {importBusy ? g.processing : g.choose}
+              <input type="file" className="inv-sr" accept=".csv,.xlsx,.xls,.docx,.txt,.pdf" disabled={importBusy || guestBusy}
+                onChange={event => { const file = event.target.files?.[0]; if (file) void previewGuestFile(file); event.currentTarget.value = ''; }} />
+            </label>
+          </div>
+
+          {importFileName && <p className="st-hint">{importFileName}</p>}
+
+          {importNames.length > 0 && (
+            <div className="st-import-review">
+              <div className="st-import-summary">
+                <strong>{g.detected(importNames.length)}</strong>
+                <button type="button" className="st-link" onClick={() => { setImportNames([]); setImportFileName(''); }}>{g.clear}</button>
+              </div>
+              <ol className="st-import-list">
+                {importNames.map((name, index) => (
+                  <li key={index}>
+                    <span>{index + 1}.</span>
+                    <input aria-label={`${g.guestName} ${index + 1}`} maxLength={160} value={name}
+                      onChange={event => setImportNames(old => old.map((item, i) => (i === index ? event.target.value : item)))} />
+                    <button type="button" aria-label={g.remove} onClick={() => setImportNames(old => old.filter((_, i) => i !== index))}>×</button>
+                  </li>
+                ))}
+              </ol>
+              <button type="button" className="st-btn st-btn--primary" disabled={importBusy || guestBusy || !importNames.some(n => n.trim())}
+                onClick={() => void confirmGuestImport()}>{g.confirmImport}</button>
+            </div>
+          )}
+
+          {guestMessage && <p className="st-msg" role="status">{guestMessage}</p>}
+          {guestError && <p className="st-msg is-error" role="alert">{guestError}</p>}
+
+          <ul className="st-guest-list">
+            {guests.length === 0 ? (
+              <li className="st-hint">{g.empty}</li>
+            ) : guests.map(guest => (
+              <li key={guest.id} className="st-guest">
+                <div>
+                  <strong>{guest.name}</strong>
+                  <small>{origin ? `${origin}/guest/${guest.slug}` : `/guest/${guest.slug}`}</small>
+                </div>
+                <button type="button" className="st-btn st-btn--small" onClick={() => void copyGuestLink(guest.slug)}>{g.copy}</button>
+                <button type="button" className="st-icon-btn" disabled={guestBusy} onClick={() => void deleteGuest(guest.id)} aria-label={`${g.remove}: ${guest.name}`}>×</button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+function MusicPicker({ value, onChange, locale, t }: {
+  value: MusicChoice;
+  onChange: (value: MusicChoice) => void;
+  locale: Locale;
+  t: (typeof dict)['en'];
+}) {
+  const snapshot = useMusicSnapshot();
+  useEffect(() => () => music().stop(PICKER_OWNER), []);
+
+  const previewing = (id: TrackId) =>
+    snapshot.owner === PICKER_OWNER && snapshot.trackId === id && (snapshot.status === 'playing' || snapshot.status === 'starting');
+
+  return (
+    <fieldset className="st-group">
+      <legend>{t.musicTitle}</legend>
+      <small className="st-hint">{t.musicHint}</small>
+      <div className="st-tracks" role="radiogroup" aria-label={t.musicTitle}>
+        <div className={`st-track ${value === MUSIC_NONE ? 'is-selected' : ''}`}>
+          <button type="button" role="radio" aria-checked={value === MUSIC_NONE} className="st-track-select"
+            onClick={() => { music().stop(PICKER_OWNER); onChange(MUSIC_NONE); }}>
+            <span className="st-track-radio" aria-hidden="true" />
+            <span className="st-track-text"><strong>{t.noMusic}</strong><small>{t.noMusicSub}</small></span>
+          </button>
+        </div>
+        {TRACKS.map(track => {
+          const playing = previewing(track.id);
+          return (
+            <div key={track.id} className={`st-track ${value === track.id ? 'is-selected' : ''} ${playing ? 'is-playing' : ''}`}>
+              <button type="button" role="radio" aria-checked={value === track.id} className="st-track-select" onClick={() => onChange(track.id)}>
+                <span className="st-track-radio" aria-hidden="true" />
+                <span className="st-track-text">
+                  <strong>{track.title[locale]}</strong>
+                  <small>{track.mood[locale]}</small>
+                  <small className="st-track-note">{track.note[locale]}</small>
+                </span>
+              </button>
+              <button type="button" className="st-track-play" aria-pressed={playing}
+                aria-label={`${playing ? t.stop : t.listen}: ${track.title[locale]}`}
+                onClick={() => (playing ? music().stop(PICKER_OWNER) : void music().play(track.id, PICKER_OWNER))}>
+                {playing ? <PauseIcon className="w-3.5 h-3.5" aria-hidden="true" /> : <PlayIcon className="w-3.5 h-3.5" aria-hidden="true" />}
+                <span>{playing ? t.stop : t.listen}</span>
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <small className="st-hint">{t.musicSource}</small>
+    </fieldset>
   );
 }

@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import DashboardShell from '@/app/components/dashboard-shell';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
 import { ArrowUpRightIcon, CrestStarIcon, StudioNavIcon, GuestsNavIcon } from '@/app/components/icons';
+import { templateMeta } from '@/app/components/invitation/catalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -153,7 +154,7 @@ export default async function DashboardPage() {
             <div><span>{t.date}</span><strong>{date}</strong></div>
             <div><span>{t.time}</span><strong>{wedding?.eventTime || t.unspecified}</strong></div>
             <div><span>{t.venue}</span><strong>{wedding?.venueName || t.noVenue}</strong></div>
-            <div><span>{t.design}</span><strong>{wedding?.template || t.unspecified}</strong></div>
+            <div><span>{t.design}</span><strong>{wedding ? `${templateMeta(wedding.template).name[locale]} · ${templateMeta(wedding.template).style[locale]}` : t.unspecified}</strong></div>
           </div>
         </div>
         <div className="overview-quick-card">

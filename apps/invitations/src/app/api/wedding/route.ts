@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { currentInvitationAccount, sameOrigin } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { MUSIC_CHOICES } from '@/app/components/invitation/catalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,7 @@ const weddingSchema = z.object({
   locale: z.enum(['az', 'ru', 'en']).optional(),
   template: z.string().max(50).optional(),
   coverImage: z.string().max(5000000).nullable().optional(),
+  music: z.string().refine(value => MUSIC_CHOICES.includes(value), 'Unknown music track').nullable().optional(),
   isPublished: z.boolean().optional(),
 });
 
@@ -57,6 +59,7 @@ export async function GET() {
     wedding: {
       ...wedding,
       coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
+      music: typeof theme.music === 'string' ? theme.music : null,
     },
   });
 }
@@ -115,7 +118,12 @@ export async function POST(request: NextRequest) {
       story: data.story ?? null,
       locale: data.locale ?? 'az',
       template: data.template ?? 'classic',
-      theme: data.coverImage ? { coverImage: data.coverImage } : undefined,
+      theme: data.coverImage || data.music
+        ? {
+          ...(data.coverImage && { coverImage: data.coverImage }),
+          ...(data.music && { music: data.music }),
+        }
+        : undefined,
     },
   });
 
@@ -123,6 +131,7 @@ export async function POST(request: NextRequest) {
     wedding: {
       ...wedding,
       coverImage: data.coverImage ?? null,
+      music: data.music ?? null,
     },
   }, { status: 201 });
 }
@@ -194,9 +203,12 @@ export async function PATCH(request: NextRequest) {
     ? existing.theme as Record<string, unknown>
     : {};
 
-  const nextTheme = data.coverImage !== undefined
-    ? { ...existingTheme, coverImage: data.coverImage }
-    : existingTheme;
+  const themeChanged = data.coverImage !== undefined || data.music !== undefined;
+  const nextTheme = {
+    ...existingTheme,
+    ...(data.coverImage !== undefined && { coverImage: data.coverImage }),
+    ...(data.music !== undefined && { music: data.music }),
+  };
 
   const wedding = await db.invitationWedding.update({
     where: { id: existing.id },
@@ -213,7 +225,7 @@ export async function PATCH(request: NextRequest) {
       ...(data.story !== undefined && { story: data.story }),
       ...(data.locale !== undefined && { locale: data.locale }),
       ...(data.template !== undefined && { template: data.template }),
-      ...(data.coverImage !== undefined && { theme: nextTheme as never }),
+      ...(themeChanged && { theme: nextTheme as never }),
       ...(data.isPublished !== undefined && {
         isPublished: data.isPublished,
         publishedAt: data.isPublished ? new Date() : null,
@@ -225,6 +237,7 @@ export async function PATCH(request: NextRequest) {
     wedding: {
       ...wedding,
       coverImage: typeof nextTheme.coverImage === 'string' ? nextTheme.coverImage : null,
+      music: typeof nextTheme.music === 'string' ? nextTheme.music : null,
     },
   });
 }

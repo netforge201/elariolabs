@@ -57,5 +57,7 @@ export default async function PublicWeddingPage({ params }: Props) {
     locale: wedding.locale,
     template: wedding.template,
     coverImage: typeof theme.coverImage === 'string' ? theme.coverImage : null,
+    music: typeof theme.music === 'string' ? theme.music : null,
+    timezone: wedding.timezone,
   }} />;
 }
