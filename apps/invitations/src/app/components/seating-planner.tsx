@@ -1480,9 +1480,9 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                   y={marquee.y}
                   width={marquee.width}
                   height={marquee.height}
-                  fill="#a78e9a"
+                  fill="#6f8f7c"
                   fillOpacity=".12"
-                  stroke="#8d687d"
+                  stroke="#2f5a46"
                   strokeWidth="2"
                   strokeDasharray="7 5"
                   pointerEvents="none"
@@ -1532,7 +1532,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                           width={object.width + 18}
                           height={object.height + 18}
                           fill="none"
-                          stroke="#87566f"
+                          stroke="#1f3a2e"
                           strokeWidth="3"
                           strokeDasharray="7 3"
                           rx="9"
@@ -1553,7 +1553,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                             height="8"
                             rx="2"
                             fill="#fff"
-                            stroke="#87566f"
+                            stroke="#1f3a2e"
                             strokeWidth="2"
                             pointerEvents="none"
                           />
@@ -1565,7 +1565,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                             width={Math.max(72, object.name.length * 6 + 18)}
                             height="19"
                             rx="5"
-                            fill="#87566f"
+                            fill="#1f3a2e"
                           />
                           <text
                             x={object.x + Math.max(72, object.name.length * 6 + 18) / 2}
@@ -1699,7 +1699,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                 width={1200 / zoom}
                 height={800 / zoom}
                 fill="none"
-                stroke="#8d687d"
+                stroke="#2f5a46"
                 strokeWidth="8"
               />
             </svg>

@@ -3,65 +3,59 @@ import Link from 'next/link';
 import { currentInvitationAccount } from '@/lib/auth';
 import { db } from '@/lib/db';
 import DashboardShell from '@/app/components/dashboard-shell';
+import RecentGuests from '@/app/components/recent-guests';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
-import { ArrowUpRightIcon, CrestStarIcon, StudioNavIcon, GuestsNavIcon } from '@/app/components/icons';
+import { GuestsNavIcon } from '@/app/components/icons';
 import { templateMeta } from '@/app/components/invitation/catalog';
+import { eventInstant, formatDateParts } from '@/app/components/invitation/event-time';
+import { normalizeSeatingPlan } from '@/lib/seating-types';
+import { locateSeat } from '@/lib/seating-logic';
 
 export const dynamic = 'force-dynamic';
 
-/** Shown instead of a single design name when each guest has their own design. */
-const INDIVIDUAL_LABEL = { az: 'Hər qonağa öz dizaynı', ru: 'Дизайн для каждого гостя', en: 'Design per guest' } as const;
-
 const translations = {
   az: {
-    eyebrow: 'ŞƏXSİ KABİNET', welcome: 'Hekayəniz', welcome2: 'burada başlayır.',
-    description: 'Toy gününüzə aid hər şey bir məkanda.',
-    account: 'Hesab', active: 'Aktiv', access: 'Giriş müddəti', unlimited: 'Limitsiz',
-    guests: 'Fərdi dəvətnamələr', manage: 'Qonaqlara bax', publication: 'Dərc statusu',
-    published: 'Dərc edilib', draft: 'Qaralama', wedding: 'Sizin toyunuz',
-    date: 'Tarix', time: 'Saat', venue: 'Məkan', design: 'Dizayn',
-    unspecified: 'Göstərilməyib', noDate: 'Tarix təyin edilməyib',
-    noVenue: 'Məkan əlavə edilməyib', open: 'Dəvətnaməni aç',
-    studio: 'Studiyanı aç', create: 'Dəvətnamə yarat',
-    empty: 'Hələ dəvətnaməniz yoxdur',
-    emptyText: 'İlk dəvətnamənizi yaradın və özəl gününüzü qonaqlarınızla bölüşün.',
-    quick: 'SÜRƏTLİ KEÇİDLƏR', edit: 'Dizaynı redaktə et',
-    guestAction: 'Qonaqları idarə et', invitation: 'DƏVƏTNAMƏNİZ',
-    status: 'Nəşr vəziyyəti', accessUntil: 'Giriş qüvvədədir',
+    kicker: 'Toyunuz', noWedding: 'Toyunuzu yaradın',
+    countdown: 'Toya qalıb', days: 'gün', today: 'Bu gün toy günüdür!', past: 'Toy keçdi', noDate: 'Tarixi təyin edin',
+    setDate: 'Studiyada tarixi əlavə edin →',
+    guests: 'qonaq', guestsSub: 'adlı keçidlər', addGuests: 'Qonaq əlavə edin →',
+    seated: 'yerləşdirilib', planCta: 'Oturacaq planı →',
+    design: 'Dizayn', perGuest: 'Hər qonağa öz dizaynı', changeDesign: 'Studiyada dəyiş →',
+    status: 'Status', published: 'Dərc edilib', draft: 'Qaralama', draftSub: 'Qonaqlar hələ görmür', publishedSub: 'Qonaqlar dəvətnaməni görür',
+    publishCta: 'Studiyada dərc et', openCta: 'Dəvətnaməni aç',
+    recent: 'Son qonaqlar', all: 'Hamısı →', noGuests: 'Hələ qonaq yoxdur.',
+    create: 'Studiyanı aç', createSub: 'Adları, tarixi və məkanı daxil edin — qalan hər şey buradan idarə olunur.',
+    send: 'Göndər', copy: 'Kopyala', copied: 'Kopyalandı', shareText: 'sizin şəxsi dəvətnaməniz:',
   },
   ru: {
-    eyebrow: 'ЛИЧНЫЙ КАБИНЕТ', welcome: 'Ваша история', welcome2: 'начинается здесь.',
-    description: 'Всё, что связано с вашим свадебным днём, в одном месте.',
-    account: 'Аккаунт', active: 'Активен', access: 'Доступ до', unlimited: 'Без ограничений',
-    guests: 'Персональные приглашения', manage: 'Список гостей', publication: 'Публикация',
-    published: 'Опубликовано', draft: 'Черновик', wedding: 'Ваша свадьба',
-    date: 'Дата', time: 'Время', venue: 'Место проведения', design: 'Дизайн',
-    unspecified: 'Не указано', noDate: 'Дата пока не указана',
-    noVenue: 'Место не добавлено', open: 'Открыть приглашение',
-    studio: 'Открыть студию', create: 'Создать приглашение',
-    empty: 'У вас пока нет приглашения',
-    emptyText: 'Создайте своё первое приглашение и поделитесь этим особенным днём с гостями.',
-    quick: 'БЫСТРЫЕ ДЕЙСТВИЯ', edit: 'Редактировать дизайн',
-    guestAction: 'Управление гостями', invitation: 'ВАШЕ ПРИГЛАШЕНИЕ',
-    status: 'Статус публикации', accessUntil: 'Доступ активен',
+    kicker: 'Ваша свадьба', noWedding: 'Создайте свою свадьбу',
+    countdown: 'До свадьбы', days: 'дн.', today: 'Свадьба сегодня!', past: 'Свадьба прошла', noDate: 'Укажите дату',
+    setDate: 'Добавьте дату в студии →',
+    guests: 'гостей', guestsSub: 'личные ссылки', addGuests: 'Добавьте гостей →',
+    seated: 'рассажено', planCta: 'План рассадки →',
+    design: 'Дизайн', perGuest: 'Свой дизайн у каждого гостя', changeDesign: 'Изменить в студии →',
+    status: 'Статус', published: 'Опубликовано', draft: 'Черновик', draftSub: 'Гости пока не видят', publishedSub: 'Гости видят приглашение',
+    publishCta: 'Опубликовать в студии', openCta: 'Открыть приглашение',
+    recent: 'Последние гости', all: 'Все →', noGuests: 'Гостей пока нет.',
+    create: 'Открыть студию', createSub: 'Укажите имена, дату и место — всё остальное настраивается отсюда.',
+    send: 'Отправить', copy: 'Копировать', copied: 'Скопировано', shareText: 'ваше персональное приглашение:',
   },
   en: {
-    eyebrow: 'YOUR PRIVATE SPACE', welcome: 'Your story', welcome2: 'starts here.',
-    description: 'Everything for your wedding day, thoughtfully brought together.',
-    account: 'Account', active: 'Active', access: 'Access until', unlimited: 'Unlimited',
-    guests: 'Personal invitations', manage: 'View guests', publication: 'Publication',
-    published: 'Published', draft: 'Draft', wedding: 'Your wedding',
-    date: 'Date', time: 'Time', venue: 'Venue', design: 'Design',
-    unspecified: 'Not specified', noDate: 'Date not set',
-    noVenue: 'Venue not added', open: 'Open invitation',
-    studio: 'Open studio', create: 'Create invitation',
-    empty: 'Your invitation is waiting',
-    emptyText: 'Create your first invitation and share your special day with the people you love.',
-    quick: 'QUICK ACTIONS', edit: 'Edit your design',
-    guestAction: 'Manage your guests', invitation: 'YOUR INVITATION',
-    status: 'Publication status', accessUntil: 'Access is active',
+    kicker: 'Your wedding', noWedding: 'Create your wedding',
+    countdown: 'Until the wedding', days: 'days', today: 'The wedding is today!', past: 'The wedding has passed', noDate: 'Set the date',
+    setDate: 'Add the date in the studio →',
+    guests: 'guests', guestsSub: 'personal links', addGuests: 'Add guests →',
+    seated: 'seated', planCta: 'Seating plan →',
+    design: 'Design', perGuest: 'A design per guest', changeDesign: 'Change in the studio →',
+    status: 'Status', published: 'Published', draft: 'Draft', draftSub: 'Guests cannot see it yet', publishedSub: 'Guests can see the invitation',
+    publishCta: 'Publish in the studio', openCta: 'Open invitation',
+    recent: 'Latest guests', all: 'All →', noGuests: 'No guests yet.',
+    create: 'Open studio', createSub: 'Add the names, date and venue — everything else is managed from here.',
+    send: 'Send', copy: 'Copy', copied: 'Copied', shareText: 'here is your personal invitation:',
   },
 };
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export default async function DashboardPage() {
   const account = await currentInvitationAccount();
@@ -70,102 +64,138 @@ export default async function DashboardPage() {
   const locale = await getDashboardLocale();
   const t = translations[locale];
 
-  const wedding = await db.invitationWedding.findUnique({
-    where: { accountId: account.id },
-  });
+  const wedding = await db.invitationWedding.findUnique({ where: { accountId: account.id } });
+  const guests = wedding
+    ? await db.invitationGuest.findMany({ where: { weddingId: wedding.id }, select: { id: true, name: true, slug: true }, orderBy: { createdAt: 'desc' } })
+    : [];
 
-  const guestCount = wedding
-    ? await db.invitationGuest.count({ where: { weddingId: wedding.id } })
-    : 0;
-
-  const date = wedding?.eventDate
-    ? new Intl.DateTimeFormat(locale === 'az' ? 'az-AZ' : locale === 'ru' ? 'ru-RU' : 'en-GB',
-      { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Baku' }).format(wedding.eventDate)
-    : t.noDate;
-
-  const expiry = account.accessExpiresAt
-    ? new Intl.DateTimeFormat(locale === 'az' ? 'az-AZ' : locale === 'ru' ? 'ru-RU' : 'en-GB',
-      { day: 'numeric', month: 'long', year: 'numeric' }).format(account.accessExpiresAt)
-    : t.unlimited;
-
-  const published = Boolean(wedding?.isPublished);
-
-  return (
+  const shell = (children: React.ReactNode) => (
     <DashboardShell active="overview" accountName={account.name} accountEmail={account.email} locale={locale}>
-      <div className="overview-heading">
-        <div>
-          <span className="elario-eyebrow">{t.eyebrow}</span>
-          <h1>{t.welcome}<br /><em>{t.welcome2}</em></h1>
-          <p>{t.description}</p>
-        </div>
-        <div className="overview-date-mark">
-          <span>EST.</span><strong>2026</strong><i><CrestStarIcon className="w-3.5 h-3.5 inline-block text-amber-500/80" /></i>
-        </div>
-      </div>
+      {children}
+    </DashboardShell>
+  );
 
-      <section className="overview-hero">
-        <div className="overview-hero-copy">
-          <span className="elario-eyebrow">{t.invitation}</span>
-          {wedding ? (
+  if (!wedding) {
+    return shell(
+      <section className="bx-empty">
+        <p className="bx-kicker">{t.kicker}</p>
+        <h1 className="bx-title">{t.noWedding}</h1>
+        <p className="bx-muted">{t.createSub}</p>
+        <Link href="/dashboard/studio" className="bx-button bx-button--dark">{t.create}</Link>
+      </section>,
+    );
+  }
+
+  // Countdown in the wedding's own time zone.
+  const day = wedding.eventDate ? wedding.eventDate.toISOString().slice(0, 10) : null;
+  const dateParts = day ? formatDateParts(day, locale) : null;
+  let countdown: { kind: 'days'; days: number } | { kind: 'today' | 'past' | 'none' } = { kind: 'none' };
+  if (day) {
+    const start = eventInstant(day, wedding.eventTime, wedding.timezone || 'Asia/Baku').getTime();
+    const diff = start - Date.now();
+    countdown = diff > 0 ? { kind: 'days', days: Math.ceil(diff / DAY_MS) } : diff > -DAY_MS ? { kind: 'today' } : { kind: 'past' };
+  }
+
+  // Seated guests from the saved plan (only seats that still exist, guests that still exist).
+  const theme = wedding.theme && typeof wedding.theme === 'object' && !Array.isArray(wedding.theme)
+    ? wedding.theme as Record<string, unknown> : {};
+  const plan = normalizeSeatingPlan(theme.seatingPlan);
+  const guestIds = new Set(guests.map(guest => guest.id));
+  const seated = new Set(plan.assignments
+    .filter(item => guestIds.has(item.guestId) && locateSeat(plan, item.seatId))
+    .map(item => item.guestId)).size;
+  const seatedShare = guests.length ? seated / guests.length : 0;
+  const ring = 2 * Math.PI * 18;
+
+  const meta = templateMeta(wedding.template);
+  const individual = wedding.designMode === 'individual';
+  const published = wedding.isPublished;
+
+  return shell(
+    <div className="bx-overview">
+      <header className="bx-page-head">
+        <div>
+          <p className="bx-kicker">{t.kicker}</p>
+          <h1 className="bx-title">{wedding.partnerOne || '—'} &amp; {wedding.partnerTwo || '—'}</h1>
+        </div>
+        {published
+          ? <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer" className="bx-button bx-button--dark bx-head-cta">{t.openCta}</a>
+          : <Link href="/dashboard/studio" className="bx-button bx-button--dark bx-head-cta">{t.publishCta}</Link>}
+      </header>
+
+      <div className="bx-grid">
+        <section className="bx-tile bx-tile--hero bx-span-2">
+          <p className="bx-tile-label">{t.countdown}</p>
+          {countdown.kind === 'days' && (
+            <p className="bx-countdown">{countdown.days}<span> {t.days}</span></p>
+          )}
+          {countdown.kind === 'today' && <p className="bx-countdown bx-countdown--text">{t.today}</p>}
+          {countdown.kind === 'past' && <p className="bx-countdown bx-countdown--text">{t.past}</p>}
+          {countdown.kind === 'none' && (
             <>
-              <h2>{wedding.partnerOne}<br /><i>&</i> {wedding.partnerTwo}</h2>
-              <p>{date}{wedding.eventTime ? ` · ${wedding.eventTime}` : ''}</p>
-              <div className="overview-hero-actions">
-                <Link href="/dashboard/studio" className="elario-button-light">{t.edit} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
-                {published && <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer" className="elario-button-ghost">{t.open} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></a>}
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>{t.empty}</h2>
-              <p>{t.emptyText}</p>
-              <Link href="/dashboard/studio" className="elario-button-light">{t.create} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
+              <p className="bx-countdown bx-countdown--text">{t.noDate}</p>
+              <Link href="/dashboard/studio" className="bx-tile-link bx-tile-link--light">{t.setDate}</Link>
             </>
           )}
-        </div>
-        <div className="overview-hero-art" aria-hidden="true">
-          <div className="overview-art-ring ring-one" />
-          <div className="overview-art-ring ring-two" />
-          <div className="overview-art-flower"><CrestStarIcon className="w-6 h-6 text-amber-500/60" /></div>
-          <span>THE BEGINNING OF FOREVER</span>
-        </div>
-      </section>
+          {dateParts && (
+            <p className="bx-tile-foot">
+              {dateParts.weekday}, {dateParts.full}{wedding.eventTime ? ` · ${wedding.eventTime}` : ''}{wedding.venueName ? ` · ${wedding.venueName}` : ''}
+            </p>
+          )}
+        </section>
 
-      <section className="overview-stats">
-        <article className="overview-stat">
-          <span>{t.publication}</span>
-          <strong className={published ? 'stat-green' : ''}>{published ? t.published : t.draft}</strong>
-          <small>{t.status}</small>
-        </article>
-        <article className="overview-stat">
-          <span>{t.guests}</span>
-          <strong>{guestCount.toString().padStart(2, '0')}</strong>
-          <Link href="/dashboard/guests">{t.manage} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
-        </article>
-        <article className="overview-stat">
-          <span>{t.account}</span>
-          <strong className="stat-green">{t.active}</strong>
-          <small>{t.access}: {expiry}</small>
-        </article>
-      </section>
+        <Link href="/dashboard/guests" className="bx-tile bx-tile--accent bx-tile--link">
+          <GuestsNavIcon className="w-7 h-7" aria-hidden="true" />
+          <span>
+            <span className="bx-stat">{guests.length}</span>
+            <span className="bx-stat-label">{t.guests} · {guests.length ? t.guestsSub : t.addGuests}</span>
+          </span>
+        </Link>
 
-      <section className="overview-bottom">
-        <div className="overview-wedding-card">
-          <span className="elario-eyebrow">{t.wedding.toUpperCase()}</span>
-          <h2>{wedding ? `${wedding.partnerOne} & ${wedding.partnerTwo}` : t.empty}</h2>
-          <div className="overview-detail-grid">
-            <div><span>{t.date}</span><strong>{date}</strong></div>
-            <div><span>{t.time}</span><strong>{wedding?.eventTime || t.unspecified}</strong></div>
-            <div><span>{t.venue}</span><strong>{wedding?.venueName || t.noVenue}</strong></div>
-            <div><span>{t.design}</span><strong>{wedding ? (wedding.designMode === 'individual' ? INDIVIDUAL_LABEL[locale] : `${templateMeta(wedding.template).name[locale]} · ${templateMeta(wedding.template).style[locale]}`) : t.unspecified}</strong></div>
+        <Link href="/dashboard/seating" className="bx-tile bx-tile--link">
+          <svg className="bx-ring" viewBox="0 0 44 44" role="img" aria-label={`${Math.round(seatedShare * 100)}%`}>
+            <circle cx="22" cy="22" r="18" />
+            <circle cx="22" cy="22" r="18" className="bx-ring-value"
+              strokeDasharray={`${Math.max(seatedShare * ring, seatedShare > 0 ? 2 : 0.01)} ${ring}`} transform="rotate(-90 22 22)" />
+          </svg>
+          <span>
+            <span className="bx-stat">{seated} / {guests.length}</span>
+            <span className="bx-stat-label">{t.seated} · {t.planCta}</span>
+          </span>
+        </Link>
+
+        <section className="bx-tile bx-span-2 bx-recent">
+          <div className="bx-tile-head">
+            <h2>{t.recent}</h2>
+            <Link href="/dashboard/guests" className="bx-tile-link">{t.all}</Link>
           </div>
-        </div>
-        <div className="overview-quick-card">
-          <span className="elario-eyebrow">{t.quick}</span>
-          <Link href="/dashboard/studio"><span className="quick-icon"><StudioNavIcon className="w-4 h-4" /></span><span>{t.edit}</span><b><ArrowUpRightIcon className="w-3.5 h-3.5" /></b></Link>
-          <Link href="/dashboard/guests"><span className="quick-icon"><GuestsNavIcon className="w-4 h-4" /></span><span>{t.guestAction}</span><b><ArrowUpRightIcon className="w-3.5 h-3.5" /></b></Link>
-        </div>
-      </section>
-    </DashboardShell>
+          {guests.length === 0
+            ? <p className="bx-muted">{t.noGuests}</p>
+            : <RecentGuests guests={guests.slice(0, 4)} labels={{ send: t.send, copy: t.copy, copied: t.copied, shareText: t.shareText }} />}
+        </section>
+
+        <section className="bx-tile">
+          <p className="bx-tile-label">{t.design}</p>
+          <p className="bx-tile-value">{individual ? t.perGuest : meta.name[locale]}</p>
+          {!individual && (
+            <div className="bx-swatches" aria-hidden="true">
+              {meta.swatches.map(color => <i key={color} style={{ background: color }} />)}
+            </div>
+          )}
+          <Link href="/dashboard/studio" className="bx-tile-link">{t.changeDesign}</Link>
+        </section>
+
+        <section className="bx-tile">
+          <p className="bx-tile-label">{t.status}</p>
+          <p className="bx-tile-value">
+            <span className={`bx-dot ${published ? 'is-live' : ''}`} aria-hidden="true" />{published ? t.published : t.draft}
+          </p>
+          <p className="bx-muted">{published ? t.publishedSub : t.draftSub}</p>
+          {published
+            ? <a href={`/${wedding.slug}`} target="_blank" rel="noreferrer" className="bx-button bx-button--dark">{t.openCta}</a>
+            : <Link href="/dashboard/studio" className="bx-button bx-button--dark">{t.publishCta}</Link>}
+        </section>
+      </div>
+    </div>,
   );
 }

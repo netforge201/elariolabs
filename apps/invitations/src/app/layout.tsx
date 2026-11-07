@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import './mobile.css';
+import './bento.css';
 
 export const metadata: Metadata = {
   title: {
