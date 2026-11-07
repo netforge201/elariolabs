@@ -1,0 +1,198 @@
+/* Mobile-first refinements for the couple's dashboard.
+   Loaded after globals.css. Invitation templates are not touched here. */
+
+/* Elements that exist only on phones */
+.elario-mobilebar, .elario-tabbar { display: none; }
+
+/* Guest directory (all sizes) */
+.guests-search { padding: 14px 27px; border-bottom: 1px solid var(--el-line); }
+.guests-search input {
+  width: 100%; min-height: 42px; padding: 0 14px; border: 1px solid var(--el-line); border-radius: 10px;
+  background: #fff; color: var(--el-ink); font-size: 13px; outline: none;
+}
+.guests-search input:focus { border-color: #c7b4bd; box-shadow: 0 0 0 3px rgba(146,113,132,.12); }
+.guests-no-match { padding: 22px 27px; color: #a09496; font-size: 12px; }
+.guests-table-labels, .guests-table-row { grid-template-columns: 1.1fr 1.5fr auto; }
+.guest-row-actions { display: flex; justify-self: end; align-items: center; gap: 6px; }
+.guest-action {
+  display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px;
+  padding: 0 11px; border: 1px solid var(--el-line); border-radius: 8px; background: #fff;
+  color: #896b7e; font-size: 11px; text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+.guest-action:hover { border-color: #c7b4bd; color: #604657; }
+.guest-action--primary { border-color: #806a78; background: #806a78; color: #fff; }
+
+/* Seat sheet: phones only */
+.sp-seat-sheet { display: none; }
+
+/* Relation picker (compatibility, mobile list) */
+.gc-relation-picker { display: grid; flex: none; grid-template-columns: repeat(4, 40px); gap: 4px; }
+.gc-pick {
+  height: 40px; border: 1px solid #ece8e2; border-radius: 9px; background: #fff;
+  color: #9b9389; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.gc-pick.is-active.gc-none { border-color: #cfc9c0; background: #f2f0ec; color: #6e675e; }
+.gc-pick.is-active.gc-required { border-color: #cbb9e3; background: #efe8f8; color: #6a4b9a; }
+.gc-pick.is-active.gc-preferred { border-color: #b9d3be; background: #e8f2ea; color: #3f6f4b; }
+.gc-pick.is-active.gc-excluded { border-color: #e7bdb5; background: #fbebe8; color: #a24c3e; }
+
+@media (max-width: 700px) {
+  /* ---------- Shell: compact top bar + bottom tab bar ---------- */
+  .elario-sidebar, .elario-topbar, .elario-footer { display: none; }
+
+  .elario-mobilebar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    min-height: 56px; padding: env(safe-area-inset-top) 16px 0;
+    border-bottom: 1px solid var(--el-line); background: var(--el-paper);
+  }
+  .elario-mobilebar-brand {
+    font-family: Georgia, serif; font-size: 27px; letter-spacing: -.07em; line-height: 1;
+    color: #392e33; text-decoration: none;
+  }
+  .elario-mobilebar-brand span { color: #a98296; }
+  .elario-mobilebar-actions { display: flex; align-items: center; gap: 8px; }
+  .elario-mobilebar-logout {
+    display: grid; width: 40px; height: 40px; place-items: center;
+    border: 1px solid #e9e2dc; border-radius: 10px; background: #fff; color: #8d7d84;
+  }
+
+  .elario-tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--el-line);
+    background: rgba(255, 253, 252, .94); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  }
+  .elario-tab {
+    display: flex; min-width: 0; min-height: 52px; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    color: #8d8285; text-decoration: none; -webkit-tap-highlight-color: transparent;
+  }
+  .elario-tab-icon { display: grid; width: 48px; height: 28px; place-items: center; border-radius: 14px; transition: background .2s; }
+  .elario-tab-label { max-width: 100%; overflow: hidden; font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
+  .elario-tab.active { color: #6f5265; }
+  .elario-tab.active .elario-tab-icon { background: #f1e6ec; }
+  .elario-tab.active .elario-tab-label { font-weight: 600; }
+
+  .elario-content { padding: 22px 16px calc(92px + env(safe-area-inset-bottom)); }
+
+  /* iOS zooms into any field under 16px — keep every dashboard field at 16px. */
+  .elario-app input:not([type=checkbox]):not([type=radio]),
+  .elario-app select, .elario-app textarea { font-size: 16px; }
+
+  /* Readable small print */
+  .elario-eyebrow { font-size: 10px; }
+  .overview-heading p, .guests-page-heading p { font-size: 14px; }
+  .overview-hero p { font-size: 14px; }
+  .overview-stat > span, .overview-stat small { font-size: 12px; }
+  .overview-detail-grid span { font-size: 11px; }
+  .overview-detail-grid strong { font-size: 14px; }
+
+  /* Overview */
+  .overview-heading h1 { font-size: 34px; }
+  .overview-hero { min-height: 0; padding: 28px 22px; }
+  .overview-hero h2 { font-size: 36px; }
+  .elario-button-light, .elario-button-ghost, .elario-button-dark { min-height: 46px; font-size: 13px; }
+  .overview-stat a { display: inline-flex; min-height: 40px; align-items: center; font-size: 13px; }
+  .overview-quick-card > a { min-height: 56px; font-size: 14px; }
+
+  /* Guests page */
+  .guests-page-heading .elario-button-dark { width: 100%; }
+  .guests-table-heading { padding: 18px; }
+  .guests-search { padding: 12px 16px; }
+  .guests-search input { min-height: 46px; }
+  .guests-table-row { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 14px 16px; }
+  .guest-identity strong { font-size: 15px; }
+  .guest-number { font-size: 13px; }
+  .guest-link-text { grid-column: 1; grid-row: auto; padding-left: 28px; font-size: 12px; }
+  .guest-row-actions { grid-column: 1; grid-row: auto; justify-self: stretch; padding-left: 28px; }
+  .guest-action { flex: 1; min-height: 44px; font-size: 13px; }
+
+  /* ---------- Seating editor ---------- */
+  .sp-topbar { gap: 12px; }
+  .sp-heading h1 { font-size: 26px; }
+  .sp-heading p { font-size: 13px; }
+  .sp-top-actions { width: 100%; display: grid; grid-template-columns: auto 1fr 1fr; gap: 8px; }
+  .sp-top-actions .sp-primary, .sp-top-actions .sp-export-button { min-height: 44px; font-size: 14px; }
+
+  /* Tool panel becomes one swipeable row of chips instead of a tall grid. */
+  .sp-tools {
+    display: flex; flex-direction: row; gap: 6px; padding: 10px 12px;
+    overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .sp-tools::-webkit-scrollbar { display: none; }
+  .sp-tools .sp-panel-label, .sp-tools .sp-selection-count:empty { display: none; }
+  .sp-tools .sp-tool-divider { flex: none; width: 1px; height: auto; margin: 4px 2px; }
+  .sp-tools button {
+    flex: none; display: inline-flex; min-height: 40px; align-items: center; gap: 6px;
+    padding: 0 12px; border: 1px solid var(--sp-line); border-radius: 20px; background: #fff;
+    font-size: 13px; white-space: nowrap;
+  }
+  .sp-tools button:disabled { display: none; }
+
+  .sp-canvas-toolbar { flex-direction: column; align-items: stretch; padding: 8px 10px; }
+  .sp-canvas-toolbar > span { font-size: 11px; }
+  .sp-canvas-toolbar > div { flex-wrap: wrap; gap: 6px; }
+  .sp-canvas-toolbar button { min-width: 40px; min-height: 38px; font-size: 13px; }
+  .sp-canvas-toolbar strong { font-size: 13px; }
+  .sp-venue-toolbar { gap: 6px !important; }
+  .sp-venue-toolbar button, .sp-venue-toolbar input { min-height: 38px; }
+  .sp-canvas { height: 56vh; min-height: 340px; max-height: 560px; }
+  .sp-canvas-footer { flex-wrap: wrap; gap: 6px 16px; font-size: 12px; }
+
+  .sp-inspector { display: flex; padding: 16px 14px; }
+  .sp-panel-label { font-size: 10px; }
+  .sp-muted { font-size: 13px; }
+  .sp-fields label { font-size: 12px; }
+  .sp-fields input, .sp-guest-section select { height: 44px; }
+  .sp-primary, .sp-secondary, .sp-danger { min-height: 44px; font-size: 14px; }
+  .sp-guest-search { height: 44px; }
+  .sp-guest-filters button { min-height: 36px; font-size: 12px; }
+  .sp-guest-row { min-height: 44px; }
+  .sp-guest-name { font-size: 14px; }
+  .sp-guest-status { font-size: 11px; }
+  .sp-table-guest-remove, .sp-guest-row .sp-table-guest-remove { width: 36px; height: 36px; flex-basis: 36px; }
+
+  .sp-seat-sheet {
+    position: fixed; left: 10px; right: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 65;
+    display: flex; flex-direction: column; gap: 10px; padding: 14px;
+    border: 1px solid #e6dce0; border-radius: 16px; background: #fff;
+    box-shadow: 0 14px 40px rgba(48, 30, 40, .2);
+  }
+  .sp-seat-sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .sp-seat-sheet-head > div { display: flex; min-width: 0; flex-direction: column; gap: 2px; }
+  .sp-seat-sheet-head small { color: #9a8e87; font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+  .sp-seat-sheet-head strong { font-size: 16px; font-weight: 600; }
+  .sp-seat-sheet-head span { color: #7d736d; font-size: 13px; }
+  .sp-seat-sheet-close {
+    display: grid; flex: none; width: 40px; height: 40px; place-items: center;
+    border-radius: 10px; background: #f4f1ee; color: #6e655e; font-size: 20px;
+  }
+  .sp-seat-sheet-assign { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .sp-seat-sheet-assign select {
+    min-width: 0; height: 44px; padding: 0 10px; border: 1px solid var(--sp-line); border-radius: 9px;
+    background: #fff; color: #403a35;
+  }
+  .sp-seat-sheet .sp-wide { margin-top: 0; }
+  .sp-notice { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  /* Keep the toast above the seat sheet while it is open. */
+  .sp-editor:has(.sp-seat-sheet) .sp-notice { bottom: calc(76px + 190px + env(safe-area-inset-bottom)); }
+
+  /* ---------- Compatibility ---------- */
+  .gc-mobile-controls > label { font-size: 14px; }
+  .gc-mobile-controls select { min-height: 46px; }
+  .gc-vip-toggle { display: flex !important; align-items: center; gap: 10px; min-height: 44px; }
+  .gc-vip-toggle input { width: 20px; height: 20px; margin: 0; accent-color: #87566f; }
+  .gc-mobile-row { min-height: 52px; font-size: 14px; }
+  .gc-mobile-row > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gc-save-button { min-height: 44px; }
+  .gc-add-group input, .gc-add-group button { min-height: 44px; }
+}
+
+@media (max-width: 360px) {
+  .gc-relation-picker { grid-template-columns: repeat(4, 36px); }
+  .elario-tab-label { font-size: 9.5px; }
+}
+
+@media print {
+  .elario-mobilebar, .elario-tabbar, .sp-seat-sheet { display: none !important; }
+}

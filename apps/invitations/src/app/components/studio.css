@@ -328,3 +328,45 @@
   .st-guest--design { grid-template-columns: minmax(0, 1fr) auto auto; }
   .st-guest-design { justify-items: start; }
 }
+
+/* ---------- Guest list tools ---------- */
+.st-guest-search {
+  width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid var(--st-line); border-radius: 10px;
+  background: #fff; color: var(--st-ink); font: inherit; font-size: 15px;
+}
+.st-guest-search:focus { outline: none; border-color: var(--st-rose); box-shadow: var(--st-ring); }
+.st-guest-actions { display: flex; align-items: center; gap: 8px; }
+.st-guest > div:first-child small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; word-break: normal; }
+
+/* ---------- Phones: sticky compact action bar, 16px fields, 44px targets ---------- */
+@media (max-width: 700px) {
+  .st-bar {
+    position: sticky; top: 0; z-index: 30;
+    flex-wrap: nowrap; align-items: center; gap: 10px;
+    margin: -22px -16px 0; padding: 10px 16px calc(10px);
+    padding-top: max(10px, env(safe-area-inset-top));
+    background: rgba(248, 245, 243, .94); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  }
+  .st-bar-title { flex: 1; min-width: 0; gap: 0; }
+  .st-bar-title .st-back, .st-bar-title .st-kicker, .st-bar .st-pill { display: none; }
+  .st-title { overflow: hidden; font-size: 21px; text-overflow: ellipsis; white-space: nowrap; }
+  .st-bar-actions { width: auto; flex-wrap: nowrap; gap: 6px; }
+  .st-bar-actions .st-btn { flex: none; min-height: 40px; padding: 0 13px; }
+  .st-save-state { gap: 0; font-size: 0; }
+  .st-save-state i { width: 9px; height: 9px; }
+
+  .st-field input, .st-field textarea, .st-inline-form input, .st-import-list input,
+  .st-guest-design select, .st-guest-search, .st select { font-size: 16px; }
+  .st-btn, .st-btn--small { min-height: 44px; }
+  .st-icon-btn { width: 44px; height: 44px; }
+  .st-step { min-height: 52px; }
+
+  .st-guest, .st-guest--design { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 10px; padding: 14px 0; }
+  .st-guest > div:first-child { grid-column: 1 / -1; }
+  .st-guest-design { grid-column: 1 / -1; justify-items: stretch; }
+  .st-guest-design select { width: 100%; min-height: 44px; }
+  .st-guest-actions { grid-column: 1; }
+  .st-guest-actions .st-btn { flex: 1; }
+  .st-guest .st-icon-btn { grid-column: 2; }
+  .st-toast { position: fixed; left: 16px; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 70; box-shadow: 0 10px 30px rgba(48,39,43,.16); }
+}

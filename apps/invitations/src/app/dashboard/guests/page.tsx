@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { currentInvitationAccount } from '@/lib/auth';
 import { db } from '@/lib/db';
 import DashboardShell from '@/app/components/dashboard-shell';
+import GuestDirectory from '@/app/components/guest-directory';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
 import { ArrowUpRightIcon, CrestStarIcon, GuestsNavIcon } from '@/app/components/icons';
 
@@ -17,7 +18,9 @@ const translations = {
     goStudio: 'Studiyaya keç', empty: 'İlk qonağınızı dəvət edin',
     emptyText: 'Studiyada ilk fərdi dəvətnamə keçidini yaradın.',
     create: 'Dəvətnamə yarat', open: 'Aç', invitation: 'dəvətnamə',
-    invitations: 'dəvətnamə', couple: 'CÜTLÜK', link: 'ŞƏXSİ KEÇİD',
+    invitations: 'dəvətnamə', couple: 'CÜTLÜK', link: 'ŞƏXSİ KEÇİD', guest: 'QONAQ',
+    copy: 'Kopyala', copied: 'Kopyalandı', share: 'Göndər', search: 'Qonaq axtar…', noMatch: 'Heç kim tapılmadı.',
+    shareText: 'sizin şəxsi dəvətnaməniz:',
   },
   ru: {
     eyebrow: 'ПЕРСОНАЛЬНЫЕ ПРИГЛАШЕНИЯ', title: 'Ваши гости',
@@ -27,7 +30,9 @@ const translations = {
     goStudio: 'Перейти в студию', empty: 'Пригласите первого гостя',
     emptyText: 'Создайте первую персональную ссылку в студии.',
     create: 'Создать приглашение', open: 'Открыть', invitation: 'приглашение',
-    invitations: 'приглашений', couple: 'МОЛОДОЖЁНЫ', link: 'ПЕРСОНАЛЬНАЯ ССЫЛКА',
+    invitations: 'приглашений', couple: 'МОЛОДОЖЁНЫ', link: 'ПЕРСОНАЛЬНАЯ ССЫЛКА', guest: 'ГОСТЬ',
+    copy: 'Копировать', copied: 'Скопировано', share: 'Отправить', search: 'Поиск гостя…', noMatch: 'Никого не найдено.',
+    shareText: 'ваше персональное приглашение:',
   },
   en: {
     eyebrow: 'PERSONAL INVITATIONS', title: 'Your guests',
@@ -37,7 +42,9 @@ const translations = {
     goStudio: 'Go to studio', empty: 'Invite your first guest',
     emptyText: 'Create your first personal invitation link in the studio.',
     create: 'Create invitation', open: 'Open', invitation: 'invitation',
-    invitations: 'invitations', couple: 'THE COUPLE', link: 'PERSONAL LINK',
+    invitations: 'invitations', couple: 'THE COUPLE', link: 'PERSONAL LINK', guest: 'GUEST',
+    copy: 'Copy', copied: 'Copied', share: 'Send', search: 'Search guests…', noMatch: 'No guests match your search.',
+    shareText: 'here is your personal invitation:',
   },
 };
 
@@ -98,17 +105,13 @@ export default async function GuestsPage() {
             <div><span className="elario-eyebrow">{t.couple}</span><h2>{wedding.partnerOne} & {wedding.partnerTwo}</h2></div>
             <span>{guests.length.toString().padStart(2, '0')}</span>
           </div>
-          <div className="guests-table-labels"><span>GUEST</span><span>{t.link}</span><span /></div>
-          {guests.map((guest, index) => (
-            <div key={guest.id} className="guests-table-row">
-              <div className="guest-identity">
-                <span className="guest-number">{String(index + 1).padStart(2, '0')}</span>
-                <strong>{guest.name}</strong>
-              </div>
-              <span className="guest-link-text">/guest/{guest.slug}</span>
-              <a href={`/guest/${guest.slug}`} target="_blank" rel="noreferrer" className="guest-open-link">{t.open} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></a>
-            </div>
-          ))}
+          <GuestDirectory
+            guests={guests.map(guest => ({ id: guest.id, name: guest.name, slug: guest.slug }))}
+            labels={{
+              open: t.open, copy: t.copy, copied: t.copied, share: t.share, search: t.search,
+              noMatch: t.noMatch, shareText: t.shareText, guestColumn: t.guest, linkColumn: t.link,
+            }}
+          />
         </section>
       )}
     </DashboardShell>

@@ -134,10 +134,10 @@ export default function SeatingPrintReport({ locale, couple, guests, plan }: Pro
   const assignedIds = new Set(assignmentDetails.map(item => item.guest.id));
   const unassigned = guests
     .filter(guest => !assignedIds.has(guest.id))
-    .sort((a, b) => a.name.localeCompare(b.name, locale));
+    .sort((a, b) => compareNames(a.name, b.name, locale));
 
   const alphabetic = [...assignmentDetails].sort((a, b) =>
-    a.guest.name.localeCompare(b.guest.name, locale)
+    compareNames(a.guest.name, b.guest.name, locale)
   );
 
   const occupiedTables = tableObjects
@@ -166,7 +166,7 @@ export default function SeatingPrintReport({ locale, couple, guests, plan }: Pro
           <span>ELARIO / WEDDING STUDIO</span>
           <h1>{words.title}</h1>
           <p>{couple}</p>
-          <small>{words.generated}: {new Date().toLocaleDateString(locale)}</small>
+          <small suppressHydrationWarning>{words.generated}: {formatGeneratedDate(new Date())}</small>
         </header>
 
         <section className="seating-report-section seating-floor-section">
@@ -409,4 +409,29 @@ export default function SeatingPrintReport({ locale, couple, guests, plan }: Pro
       </article>
     </div>
   );
+}
+
+/** Same output on the server (Node ICU) and in every browser: dd.mm.yyyy in Baku time. */
+function formatGeneratedDate(date: Date) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Baku',
+  }).formatToParts(date);
+  const get = (type: string) => parts.find(part => part.type === type)?.value ?? '';
+  return `${get('day')}.${get('month')}.${get('year')}`;
+}
+
+// Browsers ship without Azerbaijani collation while Node has it, so localeCompare(…, 'az')
+// sorts differently on server and client. Sort by the Azerbaijani alphabet explicitly.
+const AZ_ALPHABET = 'aAbBcCçÇdDeEəƏfFgGğĞhHxXıIiİjJkKqQlLmMnNoOöÖpPrRsSşŞtTuUüÜvVyYzZ';
+function azKey(value: string) {
+  return Array.from(value.trim(), ch => {
+    const index = AZ_ALPHABET.indexOf(ch);
+    if (index !== -1) return String.fromCharCode(0x100 + Math.floor(index / 2));
+    return /\s/.test(ch) ? ' ' : String.fromCharCode(0x200 + (ch.codePointAt(0) ?? 0));
+  }).join('');
+}
+function compareNames(a: string, b: string, locale: string) {
+  if (locale !== 'az') return a.localeCompare(b, locale);
+  const ka = azKey(a), kb = azKey(b);
+  return ka < kb ? -1 : ka > kb ? 1 : 0;
 }

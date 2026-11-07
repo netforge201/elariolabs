@@ -18,7 +18,7 @@ export default function LanguageSwitcher({ locale }: { locale: 'az' | 'ru' | 'en
       aria-label="Interface language"
       value={locale}
       onChange={event => changeLanguage(event.target.value)}
-      className="rounded-lg border border-[#e9e2dc] bg-white px-3 py-2 text-xs font-medium text-[#746a64]"
+      className="min-h-10 rounded-lg border border-[#e9e2dc] bg-white px-3 py-2 text-base font-medium text-[#746a64] md:min-h-0 md:text-xs"
     >
       <option value="az">AZ</option>
       <option value="ru">RU</option>

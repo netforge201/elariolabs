@@ -18,16 +18,22 @@ const translations = {
     overview: 'Ümumi baxış', studio: 'Dəvətnamə studiyası', guests: 'Qonaqlar', seating: 'Oturacaq planı', compatibility: 'Uyğunluq',
     workspace: 'İŞ SAHƏSİ', logout: 'Hesabdan çıxış', subtitle: 'Wedding invitations',
     account: 'HESAB', online: 'Aktiv hesab',
+    short: { overview: 'Baxış', studio: 'Studiya', guests: 'Qonaqlar', seating: 'Oturacaq', compatibility: 'Uyğunluq' },
+    menu: 'Bölmələr',
   },
   ru: {
     overview: 'Обзор', studio: 'Студия приглашений', guests: 'Гости', seating: 'План рассадки', compatibility: 'Совместимость',
     workspace: 'РАБОЧЕЕ ПРОСТРАНСТВО', logout: 'Выйти из аккаунта',
     subtitle: 'Wedding invitations', account: 'АККАУНТ', online: 'Аккаунт активен',
+    short: { overview: 'Обзор', studio: 'Студия', guests: 'Гости', seating: 'Рассадка', compatibility: 'Связи' },
+    menu: 'Разделы',
   },
   en: {
     overview: 'Overview', studio: 'Invitation studio', guests: 'Guests', seating: 'Seating plan', compatibility: 'Compatibility',
     workspace: 'WORKSPACE', logout: 'Sign out', subtitle: 'Wedding invitations',
     account: 'ACCOUNT', online: 'Account active',
+    short: { overview: 'Overview', studio: 'Studio', guests: 'Guests', seating: 'Seating', compatibility: 'Relations' },
+    menu: 'Sections',
   },
 };
 
@@ -59,6 +65,18 @@ export default function DashboardShell({
 
   return (
     <div className="elario-app min-h-screen md:flex">
+      <header className="elario-mobilebar">
+        <Link href="/dashboard" className="elario-mobilebar-brand" aria-label="elario">elario<span>.</span></Link>
+        <div className="elario-mobilebar-actions">
+          <LanguageSwitcher locale={locale} />
+          <form action="/api/logout" method="post">
+            <button className="elario-mobilebar-logout" aria-label={t.logout} title={t.logout}>
+              <LogoutNavIcon className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+      </header>
+
       <aside className="elario-sidebar">
         <Link href="/dashboard" className="elario-brand">
           <span className="elario-brand-name">elario<span>.</span></span>
@@ -113,12 +131,21 @@ export default function DashboardShell({
           <span>ELARIO WEDDING INVITATIONS</span>
           <span>MADE FOR YOUR STORY</span>
         </footer>
-        <div className="elario-mobile-logout">
-          <form action="/api/logout" method="post">
-            <button>{t.logout}</button>
-          </form>
-        </div>
       </div>
+
+      <nav className="elario-tabbar" aria-label={t.menu}>
+        {items.map(item => {
+          const Icon = navIcons[item.id];
+          const current = active === item.id;
+          return (
+            <Link key={item.id} href={item.href} aria-current={current ? 'page' : undefined}
+              className={`elario-tab ${current ? 'active' : ''}`}>
+              <span className="elario-tab-icon"><Icon className="w-5 h-5" /></span>
+              <span className="elario-tab-label">{t.short[item.id]}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

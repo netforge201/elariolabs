@@ -1,7 +1,38 @@
 import { redirect } from 'next/navigation';
 import { currentInvitationAccount } from '@/lib/auth';
+import { getDashboardLocale } from '@/lib/dashboard-locale';
+import LanguageSwitcher from '@/app/components/language-switcher';
 
 export const metadata = { title: 'Sign in' };
+
+const copy = {
+  az: {
+    kicker: 'Yeni başlanğıc', headline: 'Hər xüsusi an gözəl dəvətnaməyə layiqdir.',
+    lead: 'Tədbirlərinizi yaratmaq, paylaşmaq və idarə etmək üçün şəxsi məkanınız.', madeBy: 'ElarioLabs tərəfindən hazırlanıb',
+    welcome: 'Xoş gəldiniz', title: 'Daxil olun', intro: 'Sizə verilmiş hesab məlumatlarını daxil edin.',
+    error: 'Daxil olmaq alınmadı. E-poçtu və şifrəni yoxlayın və ya administratorla əlaqə saxlayın.',
+    email: 'E-poçt ünvanı', password: 'Şifrə', passwordPlaceholder: 'Şifrənizi daxil edin', submit: 'Hesaba daxil ol',
+    note: 'Giriş administrator tərəfindən verilir.', noteTwo: 'Açıq qeydiyyat mövcud deyil.',
+  },
+  ru: {
+    kicker: 'Новое начало', headline: 'Каждый особенный момент достоин красивого приглашения.',
+    lead: 'Ваше личное пространство, чтобы создавать, делиться и управлять событиями.', madeBy: 'Сделано ElarioLabs',
+    welcome: 'С возвращением', title: 'Вход', intro: 'Введите данные аккаунта, которые вам выдали.',
+    error: 'Не удалось войти. Проверьте e-mail и пароль или свяжитесь с администратором.',
+    email: 'E-mail', password: 'Пароль', passwordPlaceholder: 'Введите пароль', submit: 'Войти в аккаунт',
+    note: 'Доступ выдаёт администратор.', noteTwo: 'Открытой регистрации нет.',
+  },
+  en: {
+    kicker: 'A new beginning', headline: 'Every special moment deserves a beautiful invitation.',
+    lead: 'Your personal space to create, share and manage memorable events.', madeBy: 'Thoughtfully made by ElarioLabs',
+    welcome: 'Welcome back', title: 'Sign in', intro: 'Enter the account details provided to you.',
+    error: 'Unable to sign in. Check your email and password or contact your administrator.',
+    email: 'Email address', password: 'Password', passwordPlaceholder: 'Enter your password', submit: 'Sign in to your account',
+    note: 'Access is provided by your administrator.', noteTwo: 'Public registration is not available.',
+  },
+};
+
+const inputClass = 'w-full rounded-xl border border-[#e9e5e9] bg-white px-4 py-3.5 text-base md:text-sm outline-none transition focus:border-[#b89eae] focus:ring-4 focus:ring-[#b89eae]/10';
 
 export default async function LoginPage({
   searchParams,
@@ -13,72 +44,63 @@ export default async function LoginPage({
 
   const params = await searchParams;
   const hasError = Boolean(params.error);
+  const locale = await getDashboardLocale();
+  const t = copy[locale];
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-5 py-12">
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-[0_20px_80px_rgba(50,35,45,0.08)] md:grid-cols-2">
-        <section className="flex flex-col justify-between bg-[#eee5e9] p-9 md:p-12">
-          <div className="text-sm font-semibold tracking-[0.22em] text-[#796475]">ELARIOLABS</div>
-          <div className="my-16">
-            <div className="mb-6 text-xs uppercase tracking-[0.3em] text-[#90798a]">A new beginning</div>
-            <h1 className="max-w-sm font-serif text-5xl leading-[1.12] text-[#41343f]">
-              Every special moment deserves a beautiful invitation.
-            </h1>
-            <p className="mt-6 max-w-sm text-sm leading-7 text-[#796d77]">
-              Your personal space to create, share and manage memorable events.
-            </p>
+    <main className="login-page flex min-h-screen items-center justify-center px-4 py-6 md:px-5 md:py-12">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-[24px] bg-white shadow-[0_20px_80px_rgba(50,35,45,0.08)] md:rounded-[28px] md:grid-cols-2">
+        <section className="flex flex-col justify-between bg-[#eee5e9] px-6 py-6 md:p-12">
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-sm font-semibold tracking-[0.22em] text-[#796475]">ELARIOLABS</div>
+            <div className="md:hidden"><LanguageSwitcher locale={locale} /></div>
           </div>
-          <div className="text-xs text-[#968794]">Thoughtfully made by ElarioLabs</div>
+          <div className="mt-6 md:my-16">
+            <div className="mb-3 text-xs uppercase tracking-[0.3em] text-[#90798a] md:mb-6">{t.kicker}</div>
+            <h1 className="max-w-sm font-serif text-[28px] leading-[1.15] text-[#41343f] md:text-5xl md:leading-[1.12]">
+              {t.headline}
+            </h1>
+            <p className="mt-6 hidden max-w-sm text-sm leading-7 text-[#796d77] md:block">{t.lead}</p>
+          </div>
+          <div className="hidden text-xs text-[#968794] md:block">{t.madeBy}</div>
         </section>
 
-        <section className="flex flex-col justify-center p-8 md:p-14">
-          <div className="mb-10">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#a88a9c]">Welcome back</div>
-            <h2 className="font-serif text-4xl text-[#292630]">Sign in</h2>
-            <p className="mt-3 text-sm leading-6 text-[#85818d]">
-              Enter the account details provided to you.
-            </p>
+        <section className="flex flex-col justify-center px-6 py-8 md:p-14">
+          <div className="mb-8 flex items-start justify-between gap-4 md:mb-10">
+            <div>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#a88a9c]">{t.welcome}</div>
+              <h2 className="font-serif text-4xl text-[#292630]">{t.title}</h2>
+              <p className="mt-3 text-sm leading-6 text-[#85818d]">{t.intro}</p>
+            </div>
+            <div className="hidden md:block"><LanguageSwitcher locale={locale} /></div>
           </div>
 
           {hasError && (
-            <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-              Unable to sign in. Check your email and password or contact your administrator.
-            </div>
+            <div role="alert" className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{t.error}</div>
           )}
 
           <form action="/api/login" method="POST" className="space-y-5">
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-[#494550]">Email address</span>
-              <input
-                type="email"
-                name="email"
-                required
-                autoComplete="username"
-                placeholder="you@example.com"
-                className="w-full rounded-xl border border-[#e9e5e9] bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#b89eae] focus:ring-4 focus:ring-[#b89eae]/10"
-              />
+              <span className="mb-2 block text-sm font-medium text-[#494550]">{t.email}</span>
+              <input type="email" name="email" required autoComplete="username" inputMode="email"
+                autoCapitalize="none" autoCorrect="off" spellCheck={false}
+                placeholder="you@example.com" className={inputClass} />
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-[#494550]">Password</span>
-              <input
-                type="password"
-                name="password"
-                required
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                className="w-full rounded-xl border border-[#e9e5e9] bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#b89eae] focus:ring-4 focus:ring-[#b89eae]/10"
-              />
+              <span className="mb-2 block text-sm font-medium text-[#494550]">{t.password}</span>
+              <input type="password" name="password" required autoComplete="current-password"
+                placeholder={t.passwordPlaceholder} className={inputClass} />
             </label>
 
-            <button className="w-full rounded-xl bg-[#8f7487] px-5 py-4 text-sm font-semibold text-white transition hover:bg-[#796174]">
-              Sign in to your account
+            <button className="min-h-[52px] w-full rounded-xl bg-[#8f7487] px-5 py-4 text-base font-semibold text-white transition hover:bg-[#796174] md:text-sm">
+              {t.submit}
             </button>
           </form>
 
           <p className="mt-8 text-center text-xs leading-6 text-[#a09aa3]">
-            Access is provided by your administrator.
-            <br />Public registration is not available.
+            {t.note}
+            <br />{t.noteTwo}
           </p>
         </section>
       </div>

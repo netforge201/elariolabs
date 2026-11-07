@@ -334,6 +334,13 @@ export default function CompatibilityManager({
     return '·';
   }
 
+  function relationName(relation: Relation) {
+    if (relation === 'required') return t.required;
+    if (relation === 'preferred') return t.preferred;
+    if (relation === 'excluded') return t.excluded;
+    return t.none;
+  }
+
   function cycleRelation(a: string, b: string) {
     const current = getRelation(a, b);
     const next = relationOrder[(relationOrder.indexOf(current) + 1) % relationOrder.length];
@@ -358,7 +365,7 @@ export default function CompatibilityManager({
     return (
       <section className="gc-page">
         <div className="gc-heading">
-          <span className="gc-eyebrow">ELARIO / GUEST MANAGEMENT</span>
+          <span className="gc-eyebrow">{locale === 'ru' ? 'ELARIO / ГОСТИ' : locale === 'az' ? 'ELARIO / QONAQLAR' : 'ELARIO / GUEST MANAGEMENT'}</span>
           <h1>{t.title}</h1>
           <p>{t.empty}</p>
         </div>
@@ -371,7 +378,7 @@ export default function CompatibilityManager({
   return (
     <section className="gc-page">
       <div className="gc-heading">
-        <span className="gc-eyebrow">ELARIO / GUEST MANAGEMENT</span>
+        <span className="gc-eyebrow">{locale === 'ru' ? 'ELARIO / ГОСТИ' : locale === 'az' ? 'ELARIO / QONAQLAR' : 'ELARIO / GUEST MANAGEMENT'}</span>
         <h1>{t.title}</h1>
         <p>{t.subtitle}</p>
       </div>
@@ -447,14 +454,22 @@ export default function CompatibilityManager({
                 return (
                   <div className="gc-mobile-row" key={guest.id}>
                     <span>{guest.name}</span>
-                    <button
-                      type="button"
-                      className={`gc-cell gc-${relation}`}
-                      onClick={() => cycleRelation(selectedGuest, guest.id)}
-                      aria-label={`${guest.name}: ${relation}`}
-                    >
-                      {relationLabel(relation)}
-                    </button>
+                    <div className="gc-relation-picker" role="radiogroup" aria-label={guest.name}>
+                      {(['none', 'required', 'preferred', 'excluded'] as Relation[]).map(option => (
+                        <button
+                          key={option}
+                          type="button"
+                          role="radio"
+                          aria-checked={relation === option}
+                          className={`gc-pick gc-${option} ${relation === option ? 'is-active' : ''}`}
+                          onClick={() => setRelation(selectedGuest, guest.id, option)}
+                          aria-label={`${guest.name}: ${relationName(option)}`}
+                          title={relationName(option)}
+                        >
+                          {relationLabel(option)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 );
               })}

@@ -212,6 +212,8 @@ const guestDict = {
     found: (n: number) => `Found ${n} names. Review the list before importing.`, detected: (n: number) => `Detected: ${n}`,
     clear: 'Clear', confirmImport: 'Confirm import',
     imported: (a: number, b: number) => `Imported: ${a}. Duplicates skipped: ${b}.`, guestName: 'Guest name',
+    search: 'Search guests…', noMatch: 'No guests match your search.', share: 'Send', copiedShort: 'Copied',
+    shareText: (name: string) => `${name}, here is your personal invitation:`,
   },
   ru: {
     title: 'Именные приглашения', sub: 'Отдельная ссылка для каждого гостя или семьи — с обращением по имени и номером стола.',
@@ -221,6 +223,8 @@ const guestDict = {
     found: (n: number) => `Распознано имён: ${n}. Проверьте список перед импортом.`, detected: (n: number) => `Распознано: ${n}`,
     clear: 'Очистить', confirmImport: 'Подтвердить импорт',
     imported: (a: number, b: number) => `Импортировано: ${a}. Пропущено дубликатов: ${b}.`, guestName: 'Имя гостя',
+    search: 'Поиск гостя…', noMatch: 'Никого не найдено.', share: 'Отправить', copiedShort: 'Скопировано',
+    shareText: (name: string) => `${name}, ваше персональное приглашение:`,
   },
   az: {
     title: 'Adlı dəvətnamələr', sub: 'Hər qonaq və ya ailə üçün ayrıca keçid — adla müraciət və masa nömrəsi ilə.',
@@ -230,6 +234,8 @@ const guestDict = {
     found: (n: number) => `Tapılan adlar: ${n}. İdxaldan əvvəl siyahını yoxlayın.`, detected: (n: number) => `Tapılan: ${n}`,
     clear: 'Təmizlə', confirmImport: 'İdxalı təsdiqlə',
     imported: (a: number, b: number) => `İdxal edildi: ${a}. Təkrar olduğu üçün buraxıldı: ${b}.`, guestName: 'Qonağın adı',
+    search: 'Qonaq axtar…', noMatch: 'Heç kim tapılmadı.', share: 'Göndər', copiedShort: 'Kopyalandı',
+    shareText: (name: string) => `${name}, sizin şəxsi dəvətnaməniz:`,
   },
 };
 
@@ -388,6 +394,9 @@ export default function WeddingEditor({
   const [importNames, setImportNames] = useState<string[]>([]);
   const [importFileName, setImportFileName] = useState('');
   const [importBusy, setImportBusy] = useState(false);
+  const [guestQuery, setGuestQuery] = useState('');
+  const [copiedGuestId, setCopiedGuestId] = useState<string | null>(null);
+  const [canShare, setCanShare] = useState(false);
 
   const formRef = useRef(form);
   useEffect(() => { formRef.current = form; }, [form]);
@@ -681,12 +690,34 @@ export default function WeddingEditor({
     }
   }
 
-  async function copyGuestLink(slug: string) {
+  // Detected after mount so server and client markup match.
+  useEffect(() => {
+    setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+      && window.matchMedia('(pointer: coarse)').matches);
+  }, []);
+
+  async function copyGuestLink(guest: Guest) {
     try {
-      await navigator.clipboard.writeText(`${window.location.origin}/guest/${slug}`);
-      setGuestMessage(g.copied);
-    } catch { /* clipboard unavailable */ }
+      await navigator.clipboard.writeText(`${window.location.origin}/guest/${guest.slug}`);
+      setCopiedGuestId(guest.id);
+      window.setTimeout(() => setCopiedGuestId(current => (current === guest.id ? null : current)), 2000);
+    } catch { /* clipboard unavailable — the link stays visible in the row */ }
   }
+
+  async function shareGuestLink(guest: Guest) {
+    const url = `${window.location.origin}/guest/${guest.slug}`;
+    try {
+      await navigator.share({ title: title || g.title, text: g.shareText(guest.name), url });
+    } catch (err) {
+      // AbortError = the person closed the share sheet; anything else falls back to copying.
+      if (!(err instanceof DOMException && err.name === 'AbortError')) void copyGuestLink(guest);
+    }
+  }
+
+  const guestNeedle = guestQuery.trim().toLocaleLowerCase();
+  const visibleGuests = guestNeedle
+    ? guests.filter(guest => guest.name.toLocaleLowerCase().includes(guestNeedle))
+    : guests;
 
   async function previewGuestFile(file: File) {
     setImportBusy(true); setGuestError(''); setGuestMessage(''); setImportNames([]);
@@ -1061,10 +1092,17 @@ export default function WeddingEditor({
           {guestMessage && <p className="st-msg" role="status">{guestMessage}</p>}
           {guestError && <p className="st-msg is-error" role="alert">{guestError}</p>}
 
+          {guests.length > 6 && (
+            <input type="search" className="st-guest-search" value={guestQuery} placeholder={g.search}
+              aria-label={g.search} onChange={event => setGuestQuery(event.target.value)} />
+          )}
+
           <ul className="st-guest-list">
             {guests.length === 0 ? (
               <li className="st-hint">{g.empty}</li>
-            ) : guests.map(guest => (
+            ) : visibleGuests.length === 0 ? (
+              <li className="st-hint">{g.noMatch}</li>
+            ) : visibleGuests.map(guest => (
               <li key={guest.id} className="st-guest st-guest--design">
                 <div>
                   <strong>{guest.name}</strong>
@@ -1083,7 +1121,14 @@ export default function WeddingEditor({
                     {TEMPLATES.map(tpl => <option key={tpl.id} value={tpl.id}>{tpl.name[language]}</option>)}
                   </select>
                 </label>
-                <button type="button" className="st-btn st-btn--small" onClick={() => void copyGuestLink(guest.slug)}>{g.copy}</button>
+                <div className="st-guest-actions">
+                  {canShare && (
+                    <button type="button" className="st-btn st-btn--small st-btn--primary" onClick={() => void shareGuestLink(guest)}>{g.share}</button>
+                  )}
+                  <button type="button" className="st-btn st-btn--small" onClick={() => void copyGuestLink(guest)} aria-live="polite">
+                    {copiedGuestId === guest.id ? <><CheckIcon className="w-3.5 h-3.5" aria-hidden="true" /> {g.copiedShort}</> : g.copy}
+                  </button>
+                </div>
                 <button type="button" className="st-icon-btn" disabled={guestBusy} onClick={() => void deleteGuest(guest.id)} aria-label={`${g.remove}: ${guest.name}`}>×</button>
               </li>
             ))}

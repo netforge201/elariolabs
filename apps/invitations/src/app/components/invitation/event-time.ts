@@ -2,6 +2,15 @@ import type { Locale } from './catalog';
 
 const intlLocale: Record<Locale, string> = { az: 'az-AZ', ru: 'ru-RU', en: 'en-GB' };
 
+// Chrome and other browsers ship without Azerbaijani date data, so Intl falls back to
+// "M05" there while Node prints "may" — guests saw "M05" and React hit a hydration
+// mismatch. Azerbaijani names are spelled out (identical to Node's output).
+const AZ_MONTHS = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avqust', 'sentyabr', 'oktyabr', 'noyabr', 'dekabr'];
+/** Sunday-first, matching Date#getUTCDay(). */
+const AZ_WEEKDAYS = ['bazar', 'bazar ertəsi', 'çərşənbə axşamı', 'çərşənbə', 'cümə axşamı', 'cümə', 'şənbə'];
+/** Monday-first two-letter labels for the calendar grid. */
+const AZ_WEEKDAYS_SHORT = ['BE', 'ÇA', 'Ç', 'CA', 'C', 'Ş', 'B'];
+
 /** "2026-06-14" from an ISO string or a plain date value. */
 export function dayKey(value: string): string {
   return value.slice(0, 10);
@@ -38,7 +47,11 @@ export function eventInstant(day: string, time: string | null | undefined, timeZ
 }
 
 function capitalize(value: string, locale: Locale) {
-  return value ? value.charAt(0).toLocaleUpperCase(intlLocale[locale]) + value.slice(1) : value;
+  if (!value) return value;
+  const first = value.charAt(0);
+  if (locale === 'az' && first === 'i') return 'İ' + value.slice(1);
+  if (locale === 'az' && first === 'ı') return 'I' + value.slice(1);
+  return first.toLocaleUpperCase(intlLocale[locale]) + value.slice(1);
 }
 
 export type DateParts = {
@@ -52,6 +65,18 @@ export type DateParts = {
 
 export function formatDateParts(day: string, locale: Locale): DateParts {
   const date = utcNoon(day);
+  if (locale === 'az') {
+    const [y, m, d] = dayKey(day).split('-');
+    const month = AZ_MONTHS[Number(m) - 1];
+    return {
+      full: `${Number(d)} ${month} ${y}`,
+      weekday: capitalize(AZ_WEEKDAYS[date.getUTCDay()], locale),
+      day: String(Number(d)),
+      month: capitalize(month, locale),
+      year: y,
+      numeric: `${d}.${m}.${y}`,
+    };
+  }
   const fmt = new Intl.DateTimeFormat(intlLocale[locale], {
     day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
   });
@@ -77,6 +102,10 @@ export function monthGrid(day: string, locale: Locale) {
   const cells: (number | null)[] = Array.from({ length: lead }, () => null);
   for (let i = 1; i <= daysInMonth; i++) cells.push(i);
   while (cells.length % 7) cells.push(null);
+
+  if (locale === 'az') {
+    return { cells, weekdays: AZ_WEEKDAYS_SHORT, highlighted: d, monthTitle: capitalize(`${AZ_MONTHS[m - 1]} ${y}`, locale) };
+  }
 
   // 2024-01-01 was a Monday.
   const weekdays = Array.from({ length: 7 }, (_, i) =>

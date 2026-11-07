@@ -310,8 +310,36 @@ function objectLabel(type: SeatingObjectType, t: typeof labels.ru): string {
   return t[map[type]];
 }
 
+const uiCopy = {
+  en: {
+    eyebrow: 'ELARIO / WEDDING STUDIO', objects: 'OBJECTS', duplicate: 'Duplicate',
+    alignLeft: 'Align left', alignTop: 'Align top', centerX: 'Center horizontally', centerY: 'Center vertically',
+    selected: (n: number) => `${n} selected`, zoomIn: 'Zoom in', zoomOut: 'Zoom out',
+    small: 'Small', medium: 'Medium', large: 'Large', overview: 'VENUE OVERVIEW',
+    tables: (n: number) => `${n} ${n === 1 ? 'table' : 'tables'}`, objectCount: (n: number) => `${n} ${n === 1 ? 'object' : 'objects'}`,
+    rotation: 'Rotation', close: 'Close', seatSheet: 'Selected seat',
+  },
+  ru: {
+    eyebrow: 'ELARIO / СВАДЕБНАЯ СТУДИЯ', objects: 'ОБЪЕКТЫ', duplicate: 'Дублировать',
+    alignLeft: 'По левому краю', alignTop: 'По верхнему краю', centerX: 'Центр по горизонтали', centerY: 'Центр по вертикали',
+    selected: (n: number) => `Выбрано: ${n}`, zoomIn: 'Приблизить', zoomOut: 'Отдалить',
+    small: 'Малый', medium: 'Средний', large: 'Большой', overview: 'ОБЗОР ЗАЛА',
+    tables: (n: number) => `Столов: ${n}`, objectCount: (n: number) => `Объектов: ${n}`,
+    rotation: 'Поворот', close: 'Закрыть', seatSheet: 'Выбранное место',
+  },
+  az: {
+    eyebrow: 'ELARIO / TOY STUDİYASI', objects: 'OBYEKTLƏR', duplicate: 'Kopyasını yarat',
+    alignLeft: 'Sola düzlə', alignTop: 'Yuxarı düzlə', centerX: 'Üfüqi mərkəzlə', centerY: 'Şaquli mərkəzlə',
+    selected: (n: number) => `Seçilib: ${n}`, zoomIn: 'Böyüt', zoomOut: 'Kiçilt',
+    small: 'Kiçik', medium: 'Orta', large: 'Böyük', overview: 'ZALIN XƏRİTƏSİ',
+    tables: (n: number) => `Masa: ${n}`, objectCount: (n: number) => `Obyekt: ${n}`,
+    rotation: 'Fırlanma', close: 'Bağla', seatSheet: 'Seçilmiş yer',
+  },
+} as const;
+
 export default function SeatingPlanner({ locale, couple, guests, initialPlan }: Props) {
   const t = labels[locale];
+  const ui = uiCopy[locale];
   const svgRef = useRef<SVGSVGElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
   const [plan, setPlan] = useState<SeatingPlanV2>(() => initialPlan ?? createEmptySeatingPlan());
@@ -1273,7 +1301,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
     <div className="sp-editor" tabIndex={0} onKeyDown={handleDuplicateShortcut}>
       <header className="sp-topbar">
         <div className="sp-heading">
-          <span className="sp-eyebrow">ELARIO / WEDDING STUDIO</span>
+          <span className="sp-eyebrow">{ui.eyebrow}</span>
           <h1>{t.title}</h1>
           <p>{couple} · {t.subtitle}</p>
         </div>
@@ -1292,7 +1320,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
 
       <div className="sp-workspace">
         <aside className="sp-tools">
-          <span className="sp-panel-label">OBJECTS</span>
+          <span className="sp-panel-label">{ui.objects}</span>
           <button onClick={() => addObject('round-table')} className="flex items-center gap-1.5"><RoundTableIcon className="w-4 h-4 inline-block" /> {t.addRound}</button>
           <button onClick={() => addObject('rect-table')} className="flex items-center gap-1.5"><RectTableIcon className="w-4 h-4 inline-block" /> {t.addRect}</button>
           <button onClick={() => addObject('oval-table')} className="flex items-center gap-1.5"><OvalTableIcon className="w-4 h-4 inline-block" /> {t.addOval}</button>
@@ -1316,14 +1344,14 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           <button onClick={undo} disabled={!past.length} className="flex items-center gap-1.5"><UndoIcon className="w-3.5 h-3.5 inline-block" /> {t.undo}</button>
           <button onClick={redo} disabled={!future.length} className="flex items-center gap-1.5"><RedoIcon className="w-3.5 h-3.5 inline-block" /> {t.redo}</button>
           <div className="sp-tool-divider" />
-          <button onClick={duplicateSelected} disabled={!selectedIds.length && !selectedId} className="flex items-center gap-1.5"><DuplicateIcon className="w-3.5 h-3.5 inline-block" /> Duplicate</button>
-          <button onClick={() => alignSelected('left')} disabled={selectedIds.length < 2}>Align left</button>
-          <button onClick={() => alignSelected('top')} disabled={selectedIds.length < 2}>Align top</button>
-          <button onClick={() => alignSelected('center-x')} disabled={selectedIds.length < 2}>Center horizontally</button>
-          <button onClick={() => alignSelected('center-y')} disabled={selectedIds.length < 2}>Center vertically</button>
+          <button onClick={duplicateSelected} disabled={!selectedIds.length && !selectedId} className="flex items-center gap-1.5"><DuplicateIcon className="w-3.5 h-3.5 inline-block" /> {ui.duplicate}</button>
+          <button onClick={() => alignSelected('left')} disabled={selectedIds.length < 2}>{ui.alignLeft}</button>
+          <button onClick={() => alignSelected('top')} disabled={selectedIds.length < 2}>{ui.alignTop}</button>
+          <button onClick={() => alignSelected('center-x')} disabled={selectedIds.length < 2}>{ui.centerX}</button>
+          <button onClick={() => alignSelected('center-y')} disabled={selectedIds.length < 2}>{ui.centerY}</button>
 
           <span className="sp-selection-count">
-            {selectedIds.length > 1 ? `${selectedIds.length} selected` : ''}
+            {selectedIds.length > 1 ? ui.selected(selectedIds.length) : ''}
           </span>
         </aside>
 
@@ -1333,12 +1361,12 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
             <div>
               {(selectedIds.length > 0 || selectedId !== null) && (
                 <span className="sp-selection-indicator">
-                  {selectedIds.length || (selectedId ? 1 : 0)} selected
+                  {ui.selected(selectedIds.length || (selectedId ? 1 : 0))}
                 </span>
               )}
-              <button onClick={() => zoomFromCenter(1 / 1.2)} title="Zoom out" className="inline-flex items-center justify-center"><MinusIcon className="w-3 h-3" /></button>
+              <button onClick={() => zoomFromCenter(1 / 1.2)} title={ui.zoomOut} aria-label={ui.zoomOut} className="inline-flex items-center justify-center"><MinusIcon className="w-3 h-3" /></button>
               <strong>{Math.round(zoom * 100)}%</strong>
-              <button onClick={() => zoomFromCenter(1.2)} title="Zoom in">+</button>
+              <button onClick={() => zoomFromCenter(1.2)} title={ui.zoomIn} aria-label={ui.zoomIn}>+</button>
               <button onClick={fitCanvas}>{t.fit}</button>
               <button className={plan.settings.gridEnabled ? 'active' : ''} onClick={() => updatePlan({ ...plan, settings: { ...plan.settings, gridEnabled: !plan.settings.gridEnabled } })}>{t.grid}</button>
               <button className={plan.settings.snapEnabled ? 'active' : ''} onClick={() => updatePlan({ ...plan, settings: { ...plan.settings, snapEnabled: !plan.settings.snapEnabled } })}>{t.snap}</button>
@@ -1347,9 +1375,9 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
 
           <div className="sp-venue-toolbar">
             <span>{locale === 'ru' ? 'Размер зала' : locale === 'az' ? 'Zalın ölçüsü' : 'Venue size'}</span>
-            <button onClick={() => setVenueSize(1200, 800)}>Small · 1200 × 800</button>
-            <button onClick={() => setVenueSize(1600, 1100)}>Medium · 1600 × 1100</button>
-            <button onClick={() => setVenueSize(2200, 1500)}>Large · 2200 × 1500</button>
+            <button onClick={() => setVenueSize(1200, 800)}>{ui.small} · 1200 × 800</button>
+            <button onClick={() => setVenueSize(1600, 1100)}>{ui.medium} · 1600 × 1100</button>
+            <button onClick={() => setVenueSize(2200, 1500)}>{ui.large} · 2200 × 1500</button>
             <label>
               {locale === 'ru' ? 'Ширина' : locale === 'az' ? 'En' : 'Width'}
               <input
@@ -1636,7 +1664,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           </svg>
 
           <div className="sp-minimap">
-            <div className="sp-minimap-title">VENUE OVERVIEW</div>
+            <div className="sp-minimap-title">{ui.overview}</div>
             <svg
               viewBox={`0 0 ${plan.venue.width} ${plan.venue.height}`}
               preserveAspectRatio="xMidYMid meet"
@@ -1678,9 +1706,9 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           </div>
 
           <div className="sp-canvas-footer">
-            <span>{tableCount} tables</span>
+            <span>{ui.tables(tableCount)}</span>
             <span>{occupied} / {totalSeats} {t.guests.toLowerCase()}</span>
-            <span>{plan.objects.length} objects</span>
+            <span>{ui.objectCount(plan.objects.length)}</span>
           </div>
         </main>
 
@@ -1706,7 +1734,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
                   <label>W<input type="number" min="10" value={Math.round(selectedObject.width)} onChange={event => updateObject(selectedObject.id, { width: Math.max(10, Number(event.target.value)) })} /></label>
                   <label>H<input type="number" min="10" value={Math.round(selectedObject.height)} onChange={event => updateObject(selectedObject.id, { height: Math.max(10, Number(event.target.value)) })} /></label>
                 </div>
-                <label>Rotation
+                <label>{ui.rotation}
                   <input type="number" value={selectedObject.rotation} onChange={event => updateObject(selectedObject.id, { rotation: Number(event.target.value) })} />
                 </label>
                 <button className="sp-danger" onClick={removeSelected}>{t.delete}</button>
@@ -2208,6 +2236,40 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
       )}
 
       {error && <p className="sp-error">{error}</p>}
+
+      {/* Phones: the guest panel sits far below the canvas, so a tapped seat
+          gets a compact assign sheet pinned above the tab bar (hidden on desktop). */}
+      {selectedSeat && (() => {
+        const location = locateSeat(plan, selectedSeat);
+        if (!location) return null;
+        const occupantId = assignmentBySeat.get(selectedSeat);
+        return (
+          <div className="sp-seat-sheet" role="dialog" aria-label={ui.seatSheet}>
+            <div className="sp-seat-sheet-head">
+              <div>
+                <small>{ui.seatSheet}</small>
+                <strong>{location.table.name} · {ac.seat} {location.index + 1}</strong>
+                <span>{occupantId ? guestName(occupantId) : t.unassigned}</span>
+              </div>
+              <button type="button" className="sp-seat-sheet-close" aria-label={ui.close}
+                onClick={() => setSelectedSeat(null)}>×</button>
+            </div>
+            {occupantId ? (
+              <button type="button" className="sp-secondary sp-wide" onClick={unassignSeat}>{t.removeGuest}</button>
+            ) : unassigned.length === 0 ? (
+              <p className="sp-muted">{t.noGuests}</p>
+            ) : (
+              <div className="sp-seat-sheet-assign">
+                <select value={selectedGuest} onChange={event => setSelectedGuest(event.target.value)} aria-label={t.assign}>
+                  <option value="">{t.unassigned}</option>
+                  {unassigned.map(guest => <option key={guest.id} value={guest.id}>{guest.name}</option>)}
+                </select>
+                <button type="button" className="sp-primary" onClick={assignGuest} disabled={!selectedGuest}>{t.assign}</button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
