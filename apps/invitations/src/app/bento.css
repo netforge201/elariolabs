@@ -51,11 +51,8 @@
   box-sizing: border-box; padding: 16px 8px;
   border-radius: 28px; background: var(--bx-card);
 }
-.bx-rail-logo {
-  display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 14px;
-  border-radius: 16px; background: var(--bx-ink); color: #fff;
-  font: 700 20px var(--bx-head); text-decoration: none;
-}
+.bx-rail-logo { display: block; width: 48px; height: 48px; margin-bottom: 14px; border-radius: 16px; line-height: 0; }
+.bx-rail-logo svg, .bx-mobilebar-brand svg { display: block; flex: none; }
 .bx-rail-nav { display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .bx-rail-item {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -240,10 +237,6 @@
     padding: max(12px, env(safe-area-inset-top)) 16px 8px;
   }
   .bx-mobilebar-brand { display: flex; align-items: center; gap: 10px; color: var(--bx-ink); font: 700 20px var(--bx-head); letter-spacing: -.03em; text-decoration: none; }
-  .bx-mobilebar-brand span {
-    display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px;
-    background: var(--bx-ink); color: #fff; font-size: 16px; letter-spacing: 0;
-  }
   .bx-mobilebar-actions { display: flex; align-items: center; gap: 8px; }
   .bx-mobilebar .bx-icon-button { background: var(--bx-card); }
   .bx-mobilebar select[aria-label="Interface language"] { background-color: var(--bx-card); }

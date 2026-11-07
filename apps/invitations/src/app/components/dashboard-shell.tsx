@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import LanguageSwitcher from './language-switcher';
+import BrandMark from './brand-mark';
 import type { DashboardLocale } from '@/lib/dashboard-locale';
 import {
   OverviewNavIcon,
@@ -72,7 +73,7 @@ export default function DashboardShell({
     // `elario-app` keeps the --el-* variables the studio and older screens read.
     <div className="elario-app bx-app">
       <aside className="bx-rail" aria-label={t.menu}>
-        <Link href="/dashboard" className="bx-rail-logo" aria-label="elario">e</Link>
+        <Link href="/dashboard" className="bx-rail-logo" aria-label="elario"><BrandMark size={48} id="rail" /></Link>
         <nav className="bx-rail-nav">
           {SECTIONS.map(item => {
             const Icon = navIcons[item.id];
@@ -95,7 +96,7 @@ export default function DashboardShell({
 
       <div className="bx-main">
         <header className="bx-mobilebar">
-          <Link href="/dashboard" className="bx-mobilebar-brand" aria-label="elario"><span>e</span>elario</Link>
+          <Link href="/dashboard" className="bx-mobilebar-brand" aria-label="elario"><BrandMark size={36} id="bar" />elario</Link>
           <div className="bx-mobilebar-actions">
             <LanguageSwitcher locale={locale} />
             {logout('bx-icon-button', false)}
