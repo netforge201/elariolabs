@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { CheckIcon } from './icons';
 
-type Guest = { id: string; name: string; slug: string };
+/** `shareName` is what the guest sees; `name` is the couple's own label. */
+type Guest = { id: string; name: string; slug: string; shareName: string };
 type Labels = { send: string; copy: string; copied: string; shareText: string };
 
 /** The overview's "latest guests" tile: share on phones, copy elsewhere. */
@@ -29,7 +30,7 @@ export default function RecentGuests({ guests, labels }: { guests: Guest[]; labe
   async function act(guest: Guest) {
     if (!canShare) return copy(guest);
     try {
-      await navigator.share({ text: `${guest.name}, ${labels.shareText}`, url: urlFor(guest.slug) });
+      await navigator.share({ text: `${guest.shareName}, ${labels.shareText}`, url: urlFor(guest.slug) });
     } catch (err) {
       if (!(err instanceof DOMException && err.name === 'AbortError')) void copy(guest);
     }

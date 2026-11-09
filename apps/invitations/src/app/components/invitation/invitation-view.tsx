@@ -4,7 +4,7 @@ import './invitation.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildModel, type GuestInfo, type InvitationData } from './model';
 import { Cover, Hero, OPENING_DURATION } from './templates';
-import { Closing, Countdown, Details, Intro, Photo, Story } from './sections';
+import { Closing, Countdown, Details, Intro, Photo, Rsvp, Story } from './sections';
 import MusicControl, { INVITATION_OWNER } from './music-control';
 import { music } from './music-engine';
 import { musicSourceKey } from './catalog';
@@ -100,6 +100,8 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
               <Intro m={m} />
               <Photo m={m} />
               <Details m={m} preview={preview} />
+              {/* RSVP exists only on personal invitations whose guest has it switched on. */}
+              {m.guest?.rsvp && <Rsvp m={m} rsvp={m.guest.rsvp} slug={m.guest.slug} preview={preview} />}
               <Countdown m={m} />
               <Story m={m} />
               <Closing m={m} />

@@ -472,6 +472,21 @@ model InvitationGuest {
   slug      String            @unique
   /// The guest's own design, used only in "individual" mode (migration 009).
   template  String            @default("classic")
+  /// Name printed on the personal invitation (migration 012). Null → `name` is used.
+  /// `name` itself is the couple's own label for the guest (lists, seating, search).
+  inviteName  String?         @map("invite_name")
+  /// "male" | "female" | null — picks "… bəy" / "… xanım" in the greeting.
+  gender      String?
+  /// Invite the guest together with their family.
+  withFamily  Boolean         @default(false) @map("with_family")
+  /// RSVP form on this guest's personal invitation (migration 011). Off by default.
+  rsvpEnabled Boolean         @default(false) @map("rsvp_enabled")
+  /// "yes" | "no" | null (no answer yet)
+  rsvpStatus  String?         @map("rsvp_status")
+  /// How many people come with this invitation (1–20) when the answer is "yes".
+  rsvpGuests  Int?            @map("rsvp_guests")
+  rsvpNote    String?         @map("rsvp_note")
+  rsvpAt      DateTime?       @map("rsvp_at")
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
   wedding   InvitationWedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)

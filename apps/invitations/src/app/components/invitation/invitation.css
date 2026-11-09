@@ -655,6 +655,28 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
   .inv-detail + .inv-detail { border-left: 1px solid var(--line); }
 }
 
+.inv-greeting-invite { margin: 10px 0 0; color: var(--muted); font-family: var(--f-serif); font-size: 1.15rem; font-style: italic; }
+
+/* RSVP (personal invitations only) */
+.inv-rsvp-form, .inv-rsvp-done { display: grid; justify-items: center; gap: 14px; max-width: 460px; margin: 0 auto; text-align: center; }
+.inv-rsvp-intro { margin: 0; color: var(--muted); }
+.inv-rsvp-choice { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.inv-rsvp-choice .inv-btn { min-width: 150px; }
+.inv-rsvp-field { display: grid; gap: 6px; width: 100%; text-align: left; }
+.inv-rsvp-field select, .inv-rsvp-field textarea {
+  width: 100%; box-sizing: border-box; padding: 11px 14px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius);
+  background: color-mix(in srgb, var(--paper) 70%, transparent); color: var(--ink);
+  font-family: var(--f-sans); font-size: 16px; line-height: 1.4;
+}
+.inv-rsvp-field select:focus, .inv-rsvp-field textarea:focus { outline: none; border-color: var(--accent); }
+.inv-rsvp-field textarea { resize: vertical; min-height: 84px; }
+.inv-btn--solid { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.inv-btn--solid:hover { border-color: var(--ink); background: color-mix(in srgb, var(--ink) 85%, var(--paper)); color: var(--paper); }
+.inv-rsvp-thanks { margin: 0; color: var(--accent); font-family: var(--f-serif); font-size: 1.3rem; }
+.inv-rsvp-note-text { font-style: italic; }
+.inv-rsvp-error { margin: 0; color: #a2483a; font-size: 14px; }
+
 /* Countdown */
 .inv-count { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 500px; margin: 22px auto 0; }
 .inv-count-cell { display: grid; gap: 8px; padding: 0 4px; }

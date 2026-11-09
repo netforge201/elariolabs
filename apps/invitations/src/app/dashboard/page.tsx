@@ -66,7 +66,7 @@ export default async function DashboardPage() {
 
   const wedding = await db.invitationWedding.findUnique({ where: { accountId: account.id } });
   const guests = wedding
-    ? await db.invitationGuest.findMany({ where: { weddingId: wedding.id }, select: { id: true, name: true, slug: true }, orderBy: { createdAt: 'desc' } })
+    ? await db.invitationGuest.findMany({ where: { weddingId: wedding.id }, select: { id: true, name: true, slug: true, inviteName: true }, orderBy: { createdAt: 'desc' } })
     : [];
 
   const shell = (children: React.ReactNode) => (
@@ -171,7 +171,7 @@ export default async function DashboardPage() {
           </div>
           {guests.length === 0
             ? <p className="bx-muted">{t.noGuests}</p>
-            : <RecentGuests guests={guests.slice(0, 4)} labels={{ send: t.send, copy: t.copy, copied: t.copied, shareText: t.shareText }} />}
+            : <RecentGuests guests={guests.slice(0, 4).map(g => ({ id: g.id, name: g.name, slug: g.slug, shareName: g.inviteName?.trim() || g.name }))} labels={{ send: t.send, copy: t.copy, copied: t.copied, shareText: t.shareText }} />}
         </section>
 
         <section className="bx-tile">

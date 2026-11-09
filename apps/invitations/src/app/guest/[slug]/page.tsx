@@ -99,10 +99,18 @@ export default async function GuestInvitationPage({ params }: Props) {
 
   return (
     <PublicInvitation
-      guestName={guest.name}
+      // The couple's own label (`name`) never reaches the guest when an invite name is set.
+      guestName={guest.inviteName?.trim() || guest.name}
+      gender={guest.gender === 'male' || guest.gender === 'female' ? guest.gender : null}
+      withFamily={guest.withFamily}
       guestSlug={guest.slug}
       tableName={tableName}
       seatNumber={seatNumber}
+      rsvp={guest.rsvpEnabled ? {
+        status: guest.rsvpStatus === 'yes' || guest.rsvpStatus === 'no' ? guest.rsvpStatus : null,
+        guests: guest.rsvpGuests,
+        note: guest.rsvpNote,
+      } : null}
       wedding={{
         slug: wedding.slug,
         partnerOne: wedding.partnerOne,

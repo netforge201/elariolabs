@@ -25,12 +25,50 @@ export type InvitationData = {
   musicVolume?: number | null;
 };
 
+/** This guest's RSVP. Present only on personal invitations where the couple switched RSVP on. */
+export type GuestRsvp = {
+  status: 'yes' | 'no' | null;
+  guests: number | null;
+  note: string | null;
+};
+
 export type GuestInfo = {
   name: string;
   slug: string;
   tableName?: string | null;
   seatNumber?: number | null;
+  rsvp?: GuestRsvp | null;
+  /** "male" → "… bəy", "female" → "… xanım"; null keeps the neutral greeting. */
+  gender?: GuestGender;
+  /** The invitation is for the guest together with their family. */
+  withFamily?: boolean;
 };
+
+export type GuestGender = 'male' | 'female' | null;
+
+/**
+ * The personal greeting line, e.g. "Hörmətli Orxan bəy" / "Hörmətli Amina xanım".
+ * Shared by the invitation and the dashboard preview so both always match.
+ */
+export function formatGreeting(name: string, gender: GuestGender | undefined, locale: Locale): string {
+  const n = name.trim();
+  if (locale === 'az') {
+    if (gender === 'male') return `Hörmətli ${n} bəy`;
+    if (gender === 'female') return `Hörmətli ${n} xanım`;
+    return `${copy.az.greetingPrefix} ${n}`;
+  }
+  if (locale === 'ru') {
+    if (gender === 'male') return `Уважаемый ${n}`;
+    if (gender === 'female') return `Уважаемая ${n}`;
+    return `${copy.ru.greetingPrefix} ${n}`;
+  }
+  return `${copy.en.greetingPrefix} ${n}`;
+}
+
+/** "Sizi (ailənizlə birlikdə) toyumuza dəvət edirik" in the invitation's language. */
+export function formatInviteLine(withFamily: boolean | undefined, locale: Locale): string {
+  return withFamily ? copy[locale].youAreInvitedFamily : copy[locale].youAreInvited;
+}
 
 export type InvitationModel = {
   locale: Locale;
@@ -56,6 +94,8 @@ export type InvitationModel = {
   slug: string | null;
   guest: GuestInfo | null;
   greeting: string | null;
+  /** "We invite you (with your family) to our wedding" — personal guests get the family variant when set. */
+  inviteLine: string;
   tableLabel: string | null;
   seatNumber: number | null;
 };
@@ -98,7 +138,8 @@ export function buildModel(data: InvitationData, guest?: GuestInfo | null): Invi
     coverImage: clean(data.coverImage),
     slug: data.slug ?? null,
     guest: guest ?? null,
-    greeting: guest?.name ? `${t.greetingPrefix} ${guest.name}` : null,
+    greeting: guest?.name ? formatGreeting(guest.name, guest.gender, locale) : null,
+    inviteLine: formatInviteLine(guest?.withFamily, locale),
     tableLabel: guest?.tableName ? formatTableLabel(guest.tableName, locale) : null,
     seatNumber: guest?.seatNumber ?? null,
   };

@@ -116,9 +116,13 @@ export function sameOrigin(req: Request): boolean {
       return true;
     }
 
-    const baseHostname = new URL(publicBase(req)).hostname.toLowerCase();
-    if (originHostname === baseHostname) {
-      return true;
+    // Compare with the configured public URL only. (publicBase() prefers the
+    // request's own Origin header, so comparing with it would accept any site.)
+    const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL;
+    if (appUrl) {
+      try {
+        if (new URL(appUrl).hostname.toLowerCase() === originHostname) return true;
+      } catch { /* malformed APP_URL: fall through to the allow-list */ }
     }
 
     const allowedHostnames = new Set([

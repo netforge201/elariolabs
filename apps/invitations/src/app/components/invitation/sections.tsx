@@ -5,7 +5,10 @@ import Reveal from '../reveal';
 import {
   AppleIcon, CalendarIcon, CheckIcon, CopyIcon, GoogleCalendarIcon, MapPinIcon, NavigationIcon, TablePlateIcon,
 } from '../icons';
-import type { InvitationModel } from './model';
+import type { GuestRsvp, InvitationModel } from './model';
+import { CARPET_TEMPLATES } from './catalog';
+
+const isCarpetTemplate = (id: string) => (CARPET_TEMPLATES as readonly string[]).includes(id);
 import { eventInstant, googleCalendarUrl, icsFile, monthGrid } from './event-time';
 import { Flourish } from './ornaments';
 
@@ -29,6 +32,8 @@ export function Intro({ m }: SectionProps) {
         <div className="inv-greeting">
           <span className="inv-label">{m.t.personalInvitation}</span>
           <p className="inv-greeting-name">{m.greeting}</p>
+          {/* Carpet designs already print this line in their hero. */}
+          {!isCarpetTemplate(m.template) && <p className="inv-greeting-invite">{m.inviteLine}</p>}
         </div>
       )}
       <p className="inv-welcome">{m.welcome}</p>
@@ -176,6 +181,104 @@ export function Details({ m, preview }: SectionProps & { preview: boolean }) {
               </button>
             </div>
           </div>
+        )}
+      </section>
+    </Reveal>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+/** RSVP on a personal invitation (rendered only when the couple enabled it for this guest). */
+export function Rsvp({ m, rsvp, slug, preview }: SectionProps & { rsvp: GuestRsvp; slug: string; preview: boolean }) {
+  const headingId = useId();
+  const [saved, setSaved] = useState<GuestRsvp>(rsvp);
+  const [editing, setEditing] = useState(rsvp.status === null);
+  const [attending, setAttending] = useState<boolean | null>(rsvp.status === null ? null : rsvp.status === 'yes');
+  const [count, setCount] = useState(rsvp.guests ?? 1);
+  const [note, setNote] = useState(rsvp.note ?? '');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [justSent, setJustSent] = useState(false);
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (attending === null || busy || preview) return;
+    setBusy(true); setError('');
+    try {
+      const response = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, attending, guests: attending ? count : undefined, note: note.trim() || undefined }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.code === 'closed' ? m.t.rsvpClosed : m.t.rsvpError);
+      setSaved(result.rsvp as GuestRsvp);
+      setEditing(false);
+      setJustSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : m.t.rsvpError);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Reveal className="inv-section inv-rsvp">
+      <section aria-labelledby={headingId}>
+        <SectionHeading id={headingId}>{m.t.rsvpTitle}</SectionHeading>
+
+        {!editing && saved.status ? (
+          <div className="inv-rsvp-done" role="status">
+            {justSent && <p className="inv-rsvp-thanks">{saved.status === 'yes' ? m.t.rsvpThanksYes : m.t.rsvpThanksNo}</p>}
+            <span className="inv-label">{m.t.rsvpYour}</span>
+            <p className="inv-detail-main">
+              {saved.status === 'yes' ? m.t.rsvpYes : m.t.rsvpNo}
+              {saved.status === 'yes' && saved.guests ? ` · ${saved.guests} ${m.t.rsvpPeople}` : ''}
+            </p>
+            {saved.note && <p className="inv-detail-sub inv-rsvp-note-text">“{saved.note}”</p>}
+            <div className="inv-actions">
+              <button type="button" className="inv-btn" onClick={() => { setEditing(true); setJustSent(false); }}>{m.t.rsvpChange}</button>
+            </div>
+          </div>
+        ) : (
+          <form className="inv-rsvp-form" onSubmit={submit}>
+            <p className="inv-rsvp-intro">{m.t.rsvpIntro}</p>
+            <div className="inv-rsvp-choice" role="radiogroup" aria-label={m.t.rsvpTitle}>
+              <button type="button" role="radio" aria-checked={attending === true}
+                className={`inv-btn ${attending === true ? 'is-done' : ''}`} onClick={() => setAttending(true)}>
+                {attending === true && <CheckIcon className="inv-btn-icon" aria-hidden="true" />}{m.t.rsvpYes}
+              </button>
+              <button type="button" role="radio" aria-checked={attending === false}
+                className={`inv-btn ${attending === false ? 'is-done' : ''}`} onClick={() => setAttending(false)}>
+                {attending === false && <CheckIcon className="inv-btn-icon" aria-hidden="true" />}{m.t.rsvpNo}
+              </button>
+            </div>
+
+            {attending === true && (
+              <label className="inv-rsvp-field">
+                <span className="inv-label">{m.t.rsvpCount}</span>
+                <select value={count} onChange={e => setCount(Number(e.target.value))}>
+                  {Array.from({ length: 10 }, (_, i) => i + 1).map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
+              </label>
+            )}
+
+            {attending !== null && (
+              <label className="inv-rsvp-field">
+                <span className="inv-label">{m.t.rsvpNote}</span>
+                <textarea value={note} maxLength={500} rows={3} onChange={e => setNote(e.target.value)} />
+              </label>
+            )}
+
+            {error && <p className="inv-rsvp-error" role="alert">{error}</p>}
+
+            <div className="inv-actions">
+              <button type="submit" className="inv-btn inv-btn--solid" disabled={attending === null || busy || preview}>
+                {busy ? m.t.rsvpSending : m.t.rsvpSend}
+              </button>
+            </div>
+          </form>
         )}
       </section>
     </Reveal>
