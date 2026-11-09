@@ -72,7 +72,35 @@ export default async function AppDetail({params}:{params:Promise<{slug:string}>}
   const coverSrc=cover?imageUrl(cover.storageKey):app.coverUrl;
   const iconSrc=icon?imageUrl(icon.storageKey):app.iconUrl;
   const stores=app.platforms.filter(x=>x.url&&/^https:\/\//i.test(x.url));
+  const site='https://elariolabs.com';
+  const abs=(u?:string|null)=>u?(u.startsWith('http')?u:`${site}${u}`):undefined;
+  const platformNames=app.platforms.map(x=>x.platform.name).join(', ');
+  const jsonLd={
+    '@context':'https://schema.org',
+    '@graph':[
+      {
+        '@type':'SoftwareApplication',
+        name:app.name,
+        url:`${site}/apps/${app.slug}`,
+        description:app.shortDescription||app.tagline||undefined,
+        applicationCategory:'MobileApplication',
+        ...(platformNames?{operatingSystem:platformNames}:{}),
+        ...(abs(iconSrc)?{image:abs(iconSrc)}:{}),
+        ...(stores[0]?.url?{installUrl:stores[0].url}:{}),
+        author:{'@type':'Organization',name:'ElarioLabs',url:site},
+      },
+      {
+        '@type':'BreadcrumbList',
+        itemListElement:[
+          {'@type':'ListItem',position:1,name:'Home',item:`${site}/`},
+          {'@type':'ListItem',position:2,name:'Applications',item:`${site}/apps`},
+          {'@type':'ListItem',position:3,name:app.name,item:`${site}/apps/${app.slug}`},
+        ],
+      },
+    ],
+  };
   return <PublicFrame items={nav.filter((n:any)=>n.group==='header'&&n.href!=='/support')} copyright={copyright} logoUrl={logoUrl} socialLinks={socialLinks} contactEmail={contactEmail} contactPhone={contactPhone}>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(jsonLd)}}/>
     <div className="shell app-page">
       <nav className="app-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/apps">Applications</a><span>/</span><span>{app.name}</span></nav>
       <section className="app-hero">

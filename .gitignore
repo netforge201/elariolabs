@@ -20,3 +20,10 @@ var/media/
 
 .analytics-backup/
 apps/invitations/backups/
+
+# large archives / tooling
+*.zip
+.agents/
+skills-lock.json
+.role-security-backup/
+.ui-backup/

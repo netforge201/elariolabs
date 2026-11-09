@@ -48,5 +48,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en"><body><AnalyticsTracker />{children}</body></html>;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'Organization', '@id': `${siteUrl}/#org`, name: 'ElarioLabs', url: siteUrl },
+      { '@type': 'WebSite', '@id': `${siteUrl}/#website`, name: 'ElarioLabs', url: siteUrl, publisher: { '@id': `${siteUrl}/#org` } },
+    ],
+  };
+  return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(jsonLd)}} /><AnalyticsTracker />{children}</body></html>;
 }
