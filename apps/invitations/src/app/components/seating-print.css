@@ -1,0 +1,164 @@
+/* =====================================================================
+   Seating PDF export. Screen: sheets of paper + an options toolbar.
+   Print: one section per page group, landscape floor plan, cut-out cards.
+   ===================================================================== */
+
+.pr-root {
+  --ink: #1f3a2e; --muted: #4d6358; --line: #dce5de; --soft: #f2f6f1;
+  --yes: #1f5b38; --yes-bg: #e3f1e7; --no: #8f3627; --no-bg: #fbebe6; --warn-bg: #fdf3d8;
+  --sheet-w: 210mm; --sheet-pad: 14mm 12mm; --page-h: 265mm;
+  min-height: 100vh; padding: 0 0 48px; background: #dfe5df; color: var(--ink);
+  font-family: var(--font-dm, 'DM Sans'), system-ui, -apple-system, sans-serif;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.pr-paper-a3 { --sheet-w: 297mm; --page-h: 388mm; }
+
+/* ---------- Toolbar (screen only) ---------- */
+.pr-toolbar {
+  position: sticky; top: 0; z-index: 10; display: grid; gap: 12px;
+  padding: 14px max(16px, calc((100vw - 1100px) / 2)); margin-bottom: 24px;
+  background: rgba(255, 255, 255, .96); border-bottom: 1px solid var(--line);
+  box-shadow: 0 6px 20px rgba(31, 58, 46, .08);
+}
+.pr-toolbar-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.pr-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 16px;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink);
+  font: 700 14px inherit; text-decoration: none; cursor: pointer;
+}
+.pr-btn--primary { border-color: var(--ink); background: var(--ink); color: #fff; }
+.pr-btn:disabled { opacity: .45; cursor: not-allowed; }
+.pr-hint { color: var(--muted); font-size: 13px; }
+.pr-field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 0; border: 0; }
+.pr-field legend, .pr-field-label { margin-right: 4px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.pr-field legend { float: left; padding: 9px 0 0; }
+.pr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pr-chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 12px;
+  border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.pr-chip input { width: 16px; height: 16px; margin: 0; accent-color: var(--ink); }
+.pr-chip.is-on { border-color: var(--ink); background: var(--soft); }
+.pr-segment { display: inline-flex; gap: 3px; padding: 3px; border-radius: 12px; background: var(--soft); }
+.pr-segment button { min-height: 34px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: 600 13px inherit; cursor: pointer; }
+.pr-segment button.is-on { background: var(--ink); color: #fff; }
+.pr-warning { margin: 0; color: var(--no); font-weight: 600; }
+
+/* ---------- Sheets ---------- */
+.pr-document { display: grid; justify-items: center; gap: 24px; padding: 0 16px; }
+.pr-sheet {
+  box-sizing: border-box; width: min(100%, var(--sheet-w)); min-height: 120mm; padding: var(--sheet-pad);
+  background: #fff; box-shadow: 0 10px 30px rgba(31, 58, 46, .14);
+}
+.pr-plan { width: min(100%, calc(var(--sheet-w) * 1.414)); }
+
+.pr-kicker { margin: 0; color: var(--muted); font-size: 9pt; font-weight: 700; letter-spacing: .3em; }
+.pr-summary h1 { margin: 6mm 0 2mm; font: 700 26pt/1.1 var(--font-sora, 'Sora'), sans-serif; letter-spacing: -.02em; }
+.pr-couple { margin: 0; font: 600 16pt var(--font-sora, 'Sora'), sans-serif; }
+.pr-event { margin: 2mm 0 0; color: var(--muted); font-size: 11pt; }
+.pr-h2 { margin: 9mm 0 3mm; font: 700 12pt var(--font-sora, 'Sora'), sans-serif; }
+.pr-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3mm; margin-top: 7mm; }
+.pr-h2 + .pr-stats { margin-top: 0; }
+.pr-stat { display: grid; gap: 1mm; padding: 4mm; border-radius: 4mm; background: var(--soft); }
+.pr-stat span { color: var(--muted); font-size: 9pt; }
+.pr-stat strong { font: 700 17pt var(--font-sora, 'Sora'), sans-serif; }
+.pr-stat small { color: var(--muted); font-size: 8.5pt; }
+.pr-stat.is-yes { background: var(--yes-bg); }
+.pr-stat.is-no { background: var(--no-bg); }
+.pr-stat.is-warn { background: var(--warn-bg); }
+.pr-alert { margin-top: 6mm; padding: 4mm 5mm; border-left: 3px solid var(--no); border-radius: 2mm; background: var(--no-bg); font-size: 10pt; }
+.pr-alert ul { margin: 2mm 0 0; padding-left: 5mm; }
+.pr-contents { margin: 0; padding-left: 6mm; font-size: 11pt; line-height: 1.7; }
+.pr-generated { margin: 8mm 0 0; color: var(--muted); font-size: 9pt; }
+.pr-muted { color: var(--muted); font-size: 10pt; }
+
+.pr-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6mm; margin-bottom: 5mm; padding-bottom: 2.5mm; border-bottom: 1.5px solid var(--ink); }
+.pr-section-head h2 { margin: 0; font: 700 15pt var(--font-sora, 'Sora'), sans-serif; }
+.pr-section-head > span { color: var(--muted); font-size: 9.5pt; }
+
+/* Floor plan */
+.pr-legend { display: inline-flex; align-items: center; gap: 2mm 3mm; color: var(--muted); font-size: 9pt; }
+.pr-legend i { display: inline-block; width: 3.4mm; height: 3.4mm; border: 1.5px solid #8fa197; border-radius: 50%; background: #fff; }
+.pr-legend i.is-taken { border-color: var(--ink); background: var(--ink); }
+.pr-floor svg { display: block; width: 100%; height: auto; max-height: 170mm; }
+.pr-paper-a3 .pr-floor svg { max-height: 250mm; }
+
+/* Tables */
+.pr-table-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4mm; }
+.pr-paper-a3 .pr-table-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pr-table-card { break-inside: avoid; page-break-inside: avoid; padding: 3.5mm 4mm; border: 1px solid var(--line); border-radius: 3mm; }
+.pr-table-card header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2mm; }
+.pr-table-card h3 { margin: 0; font: 700 12pt var(--font-sora, 'Sora'), sans-serif; }
+.pr-occupancy { padding: .5mm 2.5mm; border-radius: 99px; background: var(--soft); font-size: 9pt; font-weight: 700; }
+.pr-table-card table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+.pr-table-card td { padding: 1.3mm 0; border-top: 1px solid #edf1ed; vertical-align: top; }
+.pr-seat-no { width: 7mm; color: var(--muted); font-weight: 700; }
+.pr-mark-cell { width: 11mm; text-align: right; }
+.pr-table-card footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2mm; margin-top: 1.5mm; color: var(--muted); font-size: 8.5pt; }
+.pr-tag { display: inline-block; margin-left: 1.5mm; padding: 0 1.8mm; border-radius: 99px; background: #f6e3a1; color: #5c4a12; font-size: 7.5pt; font-weight: 700; vertical-align: 1px; }
+.pr-mark { font-size: 9pt; font-weight: 700; white-space: nowrap; }
+.pr-mark.is-yes { color: var(--yes); }
+.pr-mark.is-no { color: var(--no); }
+.pr-mark.is-pending { color: var(--muted); }
+
+/* Alphabetical index */
+.pr-index { column-count: 2; column-gap: 9mm; }
+.pr-paper-a3 .pr-index { column-count: 3; }
+.pr-index-group { break-inside: avoid-column; margin-bottom: 2.5mm; }
+.pr-index-letter { margin: 0 0 1mm; color: var(--ink); font: 700 12pt var(--font-sora, 'Sora'), sans-serif; break-after: avoid; }
+.pr-index-row { display: flex; align-items: baseline; gap: 1.5mm; margin: 0; padding: .8mm 0; font-size: 10pt; break-inside: avoid; }
+.pr-index-name { flex: none; max-width: 70%; }
+.pr-index-dots { flex: 1; min-width: 4mm; border-bottom: 1px dotted #a9b8ae; transform: translateY(-1mm); }
+.pr-index-seat { flex: none; font-weight: 700; white-space: nowrap; }
+
+/* Unseated */
+.pr-unseated { margin: 0; padding-left: 7mm; column-count: 2; column-gap: 9mm; font-size: 10.5pt; line-height: 1.8; }
+.pr-unseated .pr-mark { margin-left: 2mm; }
+
+/* Cards */
+.pr-cards { padding: 8mm; }
+.pr-tablecards { display: grid; grid-template-rows: repeat(2, calc((var(--page-h) + 16mm) / 2)); }
+.pr-tablecard {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4mm;
+  border: 1px dashed #9fb0a5; text-align: center;
+}
+.pr-tablecard + .pr-tablecard { border-top: 0; }
+.pr-tablecard-couple { margin: 0; color: var(--muted); font-size: 11pt; letter-spacing: .2em; text-transform: uppercase; }
+.pr-tablecard-name { margin: 0; font: 400 54pt/1 Georgia, 'Times New Roman', serif; }
+.pr-paper-a3 .pr-tablecard-name { font-size: 80pt; }
+.pr-tablecard-date { margin: 0; color: var(--muted); font-size: 11pt; }
+
+.pr-placecards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, calc((var(--page-h) + 16mm) / 4)); position: relative; }
+.pr-placecard {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5mm;
+  padding: 4mm; border: 1px dashed #9fb0a5; margin: -.5px; text-align: center;
+}
+.pr-placecard-name { margin: 0; font: 400 19pt/1.2 Georgia, 'Times New Roman', serif; overflow-wrap: anywhere; }
+.pr-paper-a3 .pr-placecard-name { font-size: 26pt; }
+.pr-placecard-seat { margin: 0; padding-top: 2mm; border-top: 1px solid var(--line); color: var(--ink); font-size: 11pt; font-weight: 700; letter-spacing: .04em; }
+.pr-placecard-family { margin: 0; color: var(--muted); font-size: 9pt; }
+.pr-cut-hint { position: absolute; right: 8mm; bottom: 1.5mm; margin: 0; color: #8fa197; font-size: 7pt; }
+
+/* ---------- Print ---------- */
+@media print {
+  .pr-root { min-height: 0; padding: 0; background: #fff; }
+  .pr-toolbar { display: none !important; }
+  /* justify-items is honoured by block layout in current Chrome: stretch explicitly. */
+  .pr-document { display: block; padding: 0; justify-items: stretch; }
+  .pr-sheet { width: 100% !important; min-height: 0; padding: 0; box-shadow: none; justify-self: stretch; }
+  .pr-sheet + .pr-sheet { break-before: page; page-break-before: always; }
+  .pr-plan { page: plan; }
+  .pr-cards { page: cards; padding: 0; }
+  .pr-tablecards { grid-template-rows: repeat(2, calc(var(--page-h) / 2 + 7mm)); }
+  .pr-placecards { grid-template-rows: repeat(4, calc(var(--page-h) / 4 + 3.5mm)); }
+  /* Landscape content height minus the section header: the plan and its title share one sheet. */
+  .pr-floor svg { max-height: 160mm; }
+  .pr-paper-a3 .pr-floor svg { max-height: 245mm; }
+  .pr-sheet.pr-continue { break-before: auto; page-break-before: auto; margin-top: 10mm; }
+}
+
+@media (max-width: 700px) {
+  .pr-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pr-table-grid { grid-template-columns: minmax(0, 1fr); }
+  .pr-index, .pr-unseated { column-count: 1; }
+}
