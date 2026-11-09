@@ -8,6 +8,16 @@ try {
   if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
 }
 
+// `npm start` runs this with --on-start. Deploys must never change the
+// database on their own, so migrations at startup are opt-in: they only run
+// when RUN_MIGRATIONS=true is set explicitly. `npm run db:migrate` (no flag)
+// always runs them.
+const onStart = process.argv.includes('--on-start');
+if (onStart && process.env.RUN_MIGRATIONS !== 'true') {
+  console.log('Skipping database migrations on start (set RUN_MIGRATIONS=true to run them). The database is not touched.');
+  process.exit(0);
+}
+
 async function main() {
   const { Client } = pg;
   const url = process.env.DATABASE_URL;

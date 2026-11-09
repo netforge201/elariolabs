@@ -82,6 +82,15 @@ export function AppleIcon({ className = 'w-4 h-4', ...props }: IconProps) {
   );
 }
 
+/** Turn-by-turn navigation arrow (used for the Waze button). */
+export function NavigationIcon({ className = 'w-3.5 h-3.5', ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+      <path d="M3 11l19-9-9 19-2-8-8-2z" />
+    </svg>
+  );
+}
+
 export function MapPinIcon({ className = 'w-3.5 h-3.5', ...props }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>

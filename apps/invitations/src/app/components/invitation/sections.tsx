@@ -3,7 +3,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import Reveal from '../reveal';
 import {
-  AppleIcon, CalendarIcon, CheckIcon, CopyIcon, GoogleCalendarIcon, MapPinIcon, TablePlateIcon,
+  AppleIcon, CalendarIcon, CheckIcon, CopyIcon, GoogleCalendarIcon, MapPinIcon, NavigationIcon, TablePlateIcon,
 } from '../icons';
 import type { InvitationModel } from './model';
 import { eventInstant, googleCalendarUrl, icsFile, monthGrid } from './event-time';
@@ -96,6 +96,8 @@ export function Details({ m, preview }: SectionProps & { preview: boolean }) {
     timeZone: m.timezone,
   };
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.address)}`;
+  // Opens the Waze app on phones (web Waze elsewhere) with a route to the venue.
+  const wazeUrl = `https://waze.com/ul?q=${encodeURIComponent(m.address)}&navigate=yes`;
 
   async function copyAddress() {
     try {
@@ -148,6 +150,9 @@ export function Details({ m, preview }: SectionProps & { preview: boolean }) {
               <div className="inv-actions">
                 <a className="inv-btn" href={mapUrl} target="_blank" rel="noreferrer">
                   <MapPinIcon className="inv-btn-icon" aria-hidden="true" />{m.t.map}
+                </a>
+                <a className="inv-btn" href={wazeUrl} target="_blank" rel="noreferrer">
+                  <NavigationIcon className="inv-btn-icon" aria-hidden="true" />{m.t.waze}
                 </a>
                 <button type="button" className={`inv-btn ${copied ? 'is-done' : ''}`} onClick={copyAddress}>
                   {copied ? <CheckIcon className="inv-btn-icon" aria-hidden="true" /> : <CopyIcon className="inv-btn-icon" aria-hidden="true" />}
