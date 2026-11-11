@@ -539,19 +539,35 @@ export default function WeddingEditor({
     setSaving(true); setError(''); setMessage('');
     const submittedForm = JSON.stringify(form);
     try {
+      const toPayload = (f: FormState) => ({
+        ...f,
+        eventDate: f.eventDate || null,
+        eventTime: f.eventTime || null,
+        venueName: f.venueName || null,
+        venueAddress: f.venueAddress || null,
+        welcomeText: f.welcomeText || null,
+        story: f.story || null,
+        coverImage: f.coverImage || null,
+      });
+      let payload: Record<string, unknown> = toPayload(form);
+      if (wedding) {
+        // Send only what this editor actually changed. A copy of the editor that
+        // was loaded earlier must never overwrite settings (design mode, music…)
+        // that it did not touch.
+        const baseline = toPayload(initialForm(wedding)) as Record<string, unknown>;
+        payload = Object.fromEntries(
+          Object.entries(payload).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(baseline[key])),
+        );
+        if (Object.keys(payload).length === 0) {
+          setHasChanges(false);
+          setMessage(t.savedMsg);
+          return wedding;
+        }
+      }
       const response = await fetch('/api/wedding', {
         method: wedding ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          eventDate: form.eventDate || null,
-          eventTime: form.eventTime || null,
-          venueName: form.venueName || null,
-          venueAddress: form.venueAddress || null,
-          welcomeText: form.welcomeText || null,
-          story: form.story || null,
-          coverImage: form.coverImage || null,
-        }),
+        body: JSON.stringify(payload),
       });
       const result = await response.json();
       if (!response.ok) {
