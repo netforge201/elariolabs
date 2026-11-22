@@ -1186,14 +1186,14 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
     zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, nextZoom);
   }
 
-  async function save() {
+  async function save(target: SeatingPlanV2 = plan) {
     setSaving(true);
     setError('');
     try {
       const response = await fetch('/api/seating', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(plan),
+        body: JSON.stringify(target),
       });
       if (!response.ok) {
         const result = await response.json().catch(() => null);
@@ -1314,7 +1314,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           >
             {locale === 'ru' ? 'Экспорт PDF' : locale === 'az' ? 'PDF ixracı' : 'Export PDF'}
           </button>
-          <button className="sp-primary" onClick={save} disabled={saving || saved}>{saving ? t.saving : t.save}</button>
+          <button className="sp-primary" onClick={() => save()} disabled={saving || saved}>{saving ? t.saving : t.save}</button>
         </div>
       </header>
 
@@ -1330,12 +1330,12 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           ))}
           <div className="sp-tool-divider" />
           <span className="sp-panel-label">{locale === 'ru' ? 'В приглашении гостя показывать' : locale === 'az' ? 'Qonağın dəvətnaməsində göstər' : "Show on the guest's invitation"}</span>
-          <select value={plan.settings.seatDisplay} onChange={event => updatePlan({ ...plan, settings: { ...plan.settings, seatDisplay: event.target.value as SeatingPlanV2['settings']['seatDisplay'] } })}>
+          <select value={plan.settings.seatDisplay} onChange={event => { const next = { ...plan, settings: { ...plan.settings, seatDisplay: event.target.value as SeatingPlanV2['settings']['seatDisplay'] } }; updatePlan(next); void save(next); }}>
             <option value="both">{locale === 'ru' ? 'Номер стола и места' : locale === 'az' ? 'Masa və yer nömrəsi' : 'Table and seat number'}</option>
             <option value="table">{locale === 'ru' ? 'Только номер стола' : locale === 'az' ? 'Yalnız masa nömrəsi' : 'Table number only'}</option>
             <option value="none">{locale === 'ru' ? 'Ничего (гость не увидит ни стол, ни место)' : locale === 'az' ? 'Heç nə (qonaq masanı və yeri görməyəcək)' : 'Nothing (no table or seat shown)'}</option>
           </select>
-          <small className="sp-panel-label">{locale === 'ru' ? 'Не забудьте нажать «Сохранить»' : locale === 'az' ? '«Yadda saxla» düyməsini basmağı unutmayın' : 'Remember to press Save'}</small>
+          <small className="sp-panel-label">{locale === 'ru' ? 'Сохраняется сразу при выборе' : locale === 'az' ? 'Seçən kimi yadda saxlanılır' : 'Saved as soon as you choose'}</small>
           <div className="sp-tool-divider" />
           <button className="sp-auto-trigger flex items-center justify-center gap-1.5" onClick={() => openAutoSeating()} disabled={!guests.length || !plan.objects.some(isTable)}>
             <SparklesIcon className="w-4 h-4 inline-block text-amber-300" /> {locale === 'ru' ? 'Умная рассадка' : locale === 'az' ? 'Ağıllı yerləşdirmə' : 'Smart Seating'}
