@@ -49,6 +49,7 @@ const planSchema = z.object({
     gridEnabled: z.boolean(),
     snapEnabled: z.boolean(),
     gridSize: z.number().int().min(5).max(200),
+    seatDisplay: z.enum(['both', 'table', 'none']).default('both'),
   }),
 });
 
