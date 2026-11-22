@@ -1329,6 +1329,14 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
             <button key={type} onClick={() => addObject(type)}>{objectLabel(type, t)}</button>
           ))}
           <div className="sp-tool-divider" />
+          <span className="sp-panel-label">{locale === 'ru' ? 'В приглашении гостя показывать' : locale === 'az' ? 'Qonağın dəvətnaməsində göstər' : "Show on the guest's invitation"}</span>
+          <select value={plan.settings.seatDisplay} onChange={event => updatePlan({ ...plan, settings: { ...plan.settings, seatDisplay: event.target.value as SeatingPlanV2['settings']['seatDisplay'] } })}>
+            <option value="both">{locale === 'ru' ? 'Номер стола и места' : locale === 'az' ? 'Masa və yer nömrəsi' : 'Table and seat number'}</option>
+            <option value="table">{locale === 'ru' ? 'Только номер стола' : locale === 'az' ? 'Yalnız masa nömrəsi' : 'Table number only'}</option>
+            <option value="none">{locale === 'ru' ? 'Ничего (гость не увидит ни стол, ни место)' : locale === 'az' ? 'Heç nə (qonaq masanı və yeri görməyəcək)' : 'Nothing (no table or seat shown)'}</option>
+          </select>
+          <small className="sp-panel-label">{locale === 'ru' ? 'Не забудьте нажать «Сохранить»' : locale === 'az' ? '«Yadda saxla» düyməsini basmağı unutmayın' : 'Remember to press Save'}</small>
+          <div className="sp-tool-divider" />
           <button className="sp-auto-trigger flex items-center justify-center gap-1.5" onClick={() => openAutoSeating()} disabled={!guests.length || !plan.objects.some(isTable)}>
             <SparklesIcon className="w-4 h-4 inline-block text-amber-300" /> {locale === 'ru' ? 'Умная рассадка' : locale === 'az' ? 'Ağıllı yerləşdirmə' : 'Smart Seating'}
           </button>
@@ -1368,11 +1376,6 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
               <strong>{Math.round(zoom * 100)}%</strong>
               <button onClick={() => zoomFromCenter(1.2)} title={ui.zoomIn} aria-label={ui.zoomIn}>+</button>
               <button onClick={fitCanvas}>{t.fit}</button>
-              <select value={plan.settings.seatDisplay} title={locale === 'ru' ? 'Показ места в приглашении' : locale === 'az' ? 'Dəvətnamədə yer' : 'Seat on invitation'} onChange={event => updatePlan({ ...plan, settings: { ...plan.settings, seatDisplay: event.target.value as SeatingPlanV2['settings']['seatDisplay'] } })}>
-                <option value="both">{locale === 'ru' ? 'Стол и место' : locale === 'az' ? 'Masa və yer' : 'Table & seat'}</option>
-                <option value="table">{locale === 'ru' ? 'Только стол' : locale === 'az' ? 'Yalnız masa' : 'Table only'}</option>
-                <option value="none">{locale === 'ru' ? 'Не показывать' : locale === 'az' ? 'Göstərmə' : 'Hide'}</option>
-              </select>
               <button className={plan.settings.gridEnabled ? 'active' : ''} onClick={() => updatePlan({ ...plan, settings: { ...plan.settings, gridEnabled: !plan.settings.gridEnabled } })}>{t.grid}</button>
               <button className={plan.settings.snapEnabled ? 'active' : ''} onClick={() => updatePlan({ ...plan, settings: { ...plan.settings, snapEnabled: !plan.settings.snapEnabled } })}>{t.snap}</button>
             </div>
