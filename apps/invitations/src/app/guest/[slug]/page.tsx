@@ -97,6 +97,10 @@ export default async function GuestInvitationPage({ params }: Props) {
     }
   }
 
+  const seatDisplay = seatingPlan.settings.seatDisplay;
+  if (seatDisplay === 'none') tableName = null;
+  if (seatDisplay !== 'both') seatNumber = null;
+
   return (
     <PublicInvitation
       // The couple's own label (`name`) never reaches the guest when an invite name is set.

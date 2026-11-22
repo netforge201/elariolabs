@@ -54,6 +54,8 @@ export type SeatingPlanV2 = {
     gridEnabled: boolean;
     snapEnabled: boolean;
     gridSize: number;
+    /** What the guest invitation shows: table + seat, table only, or nothing. */
+    seatDisplay: 'both' | 'table' | 'none';
   };
 };
 
@@ -70,7 +72,7 @@ export function createEmptySeatingPlan(): SeatingPlanV2 {
     venue: { width: 1600, height: 1100, background: null },
     objects: [],
     assignments: [],
-    settings: { gridEnabled: true, snapEnabled: true, gridSize: 20 },
+    settings: { gridEnabled: true, snapEnabled: true, gridSize: 20, seatDisplay: 'both' },
   };
 }
 
@@ -140,6 +142,7 @@ export function normalizeSeatingPlan(value: unknown): SeatingPlanV2 {
         gridEnabled: settings.gridEnabled !== false,
         snapEnabled: settings.snapEnabled !== false,
         gridSize: typeof settings.gridSize === 'number' ? settings.gridSize : 20,
+        seatDisplay: settings.seatDisplay === 'table' || settings.seatDisplay === 'none' ? settings.seatDisplay : 'both',
       },
     };
   }

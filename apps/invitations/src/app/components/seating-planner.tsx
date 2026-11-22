@@ -1368,6 +1368,11 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
               <strong>{Math.round(zoom * 100)}%</strong>
               <button onClick={() => zoomFromCenter(1.2)} title={ui.zoomIn} aria-label={ui.zoomIn}>+</button>
               <button onClick={fitCanvas}>{t.fit}</button>
+              <select value={plan.settings.seatDisplay} title={locale === 'ru' ? 'Показ места в приглашении' : locale === 'az' ? 'Dəvətnamədə yer' : 'Seat on invitation'} onChange={event => updatePlan({ ...plan, settings: { ...plan.settings, seatDisplay: event.target.value as SeatingPlanV2['settings']['seatDisplay'] } })}>
+                <option value="both">{locale === 'ru' ? 'Стол и место' : locale === 'az' ? 'Masa və yer' : 'Table & seat'}</option>
+                <option value="table">{locale === 'ru' ? 'Только стол' : locale === 'az' ? 'Yalnız masa' : 'Table only'}</option>
+                <option value="none">{locale === 'ru' ? 'Не показывать' : locale === 'az' ? 'Göstərmə' : 'Hide'}</option>
+              </select>
               <button className={plan.settings.gridEnabled ? 'active' : ''} onClick={() => updatePlan({ ...plan, settings: { ...plan.settings, gridEnabled: !plan.settings.gridEnabled } })}>{t.grid}</button>
               <button className={plan.settings.snapEnabled ? 'active' : ''} onClick={() => updatePlan({ ...plan, settings: { ...plan.settings, snapEnabled: !plan.settings.snapEnabled } })}>{t.snap}</button>
             </div>
