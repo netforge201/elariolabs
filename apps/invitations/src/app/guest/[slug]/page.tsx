@@ -107,6 +107,7 @@ export default async function GuestInvitationPage({ params }: Props) {
       guestName={guest.inviteName?.trim() || guest.name}
       gender={guest.gender === 'male' || guest.gender === 'female' ? guest.gender : null}
       withFamily={guest.withFamily}
+      companion={guest.companion === 'wife' || guest.companion === 'spouse' ? guest.companion : null}
       guestSlug={guest.slug}
       tableName={tableName}
       seatNumber={seatNumber}

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import InvitationView, { type InvitationData } from './invitation/invitation-view';
-import type { GuestGender, GuestRsvp } from './invitation/model';
+import type { GuestCompanion, GuestGender, GuestRsvp } from './invitation/model';
 
 export type { Locale } from './invitation/catalog';
 
@@ -18,6 +18,7 @@ export default function PublicInvitation({
   rsvp,
   gender,
   withFamily,
+  companion,
 }: {
   wedding: Wedding;
   guestName?: string;
@@ -28,10 +29,11 @@ export default function PublicInvitation({
   rsvp?: GuestRsvp | null;
   gender?: GuestGender;
   withFamily?: boolean;
+  companion?: GuestCompanion;
 }) {
   const guest = useMemo(
-    () => (guestName && guestSlug ? { name: guestName, slug: guestSlug, tableName, seatNumber, rsvp: rsvp ?? null, gender: gender ?? null, withFamily: Boolean(withFamily) } : null),
-    [guestName, guestSlug, tableName, seatNumber, rsvp, gender, withFamily],
+    () => (guestName && guestSlug ? { name: guestName, slug: guestSlug, tableName, seatNumber, rsvp: rsvp ?? null, gender: gender ?? null, withFamily: Boolean(withFamily), companion: companion ?? null } : null),
+    [guestName, guestSlug, tableName, seatNumber, rsvp, gender, withFamily, companion],
   );
 
   return <InvitationView data={wedding} guest={guest} mode="live" />;

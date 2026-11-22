@@ -479,6 +479,8 @@ model InvitationGuest {
   gender      String?
   /// Invite the guest together with their family.
   withFamily  Boolean         @default(false) @map("with_family")
+  /// "wife" | "spouse" | null (migration 013). Takes precedence over withFamily.
+  companion   String?
   /// RSVP form on this guest's personal invitation (migration 011). Off by default.
   rsvpEnabled Boolean         @default(false) @map("rsvp_enabled")
   /// "yes" | "no" | null (no answer yet)

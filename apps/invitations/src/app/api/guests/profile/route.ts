@@ -13,6 +13,7 @@ const schema = z.object({
   inviteName: z.string().trim().max(160).nullable(),
   gender: z.enum(['male', 'female']).nullable(),
   withFamily: z.boolean(),
+  companion: z.enum(['wife', 'spouse']).nullable().default(null),
 });
 
 /** Saves how one guest is named and addressed. Nothing else is touched. */
@@ -29,12 +30,13 @@ export async function PATCH(request: NextRequest) {
   const wedding = await db.invitationWedding.findUnique({ where: { accountId: account.id }, select: { id: true } });
   if (!wedding) return NextResponse.json({ error: 'Wedding not found' }, { status: 404 });
 
-  const { id, name, inviteName, gender, withFamily } = parsed.data;
+  const { id, name, inviteName, gender, companion } = parsed.data;
+  const withFamily = companion ? false : parsed.data.withFamily;
   const result = await db.invitationGuest.updateMany({
     where: { id, weddingId: wedding.id },
-    data: { name, inviteName: inviteName || null, gender, withFamily },
+    data: { name, inviteName: inviteName || null, gender, withFamily, companion },
   });
   if (!result.count) return NextResponse.json({ error: 'Guest not found' }, { status: 404 });
 
-  return NextResponse.json({ guest: { id, name, inviteName: inviteName || null, gender, withFamily } });
+  return NextResponse.json({ guest: { id, name, inviteName: inviteName || null, gender, withFamily, companion } });
 }

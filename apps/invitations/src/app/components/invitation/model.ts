@@ -42,9 +42,11 @@ export type GuestInfo = {
   gender?: GuestGender;
   /** The invitation is for the guest together with their family. */
   withFamily?: boolean;
+  companion?: GuestCompanion;
 };
 
 export type GuestGender = 'male' | 'female' | null;
+export type GuestCompanion = 'wife' | 'spouse' | null;
 
 /**
  * The personal greeting line, e.g. "Hörmətli Orxan bəy" / "Hörmətli Amina xanım".
@@ -66,7 +68,9 @@ export function formatGreeting(name: string, gender: GuestGender | undefined, lo
 }
 
 /** "Sizi (ailənizlə birlikdə) toyumuza dəvət edirik" in the invitation's language. */
-export function formatInviteLine(withFamily: boolean | undefined, locale: Locale): string {
+export function formatInviteLine(withFamily: boolean | undefined, locale: Locale, companion?: GuestCompanion): string {
+  if (companion === 'wife') return copy[locale].youAreInvitedWife;
+  if (companion === 'spouse') return copy[locale].youAreInvitedSpouse;
   return withFamily ? copy[locale].youAreInvitedFamily : copy[locale].youAreInvited;
 }
 
@@ -139,7 +143,7 @@ export function buildModel(data: InvitationData, guest?: GuestInfo | null): Invi
     slug: data.slug ?? null,
     guest: guest ?? null,
     greeting: guest?.name ? formatGreeting(guest.name, guest.gender, locale) : null,
-    inviteLine: formatInviteLine(guest?.withFamily, locale),
+    inviteLine: formatInviteLine(guest?.withFamily, locale, guest?.companion),
     tableLabel: guest?.tableName ? formatTableLabel(guest.tableName, locale) : null,
     seatNumber: guest?.seatNumber ?? null,
   };

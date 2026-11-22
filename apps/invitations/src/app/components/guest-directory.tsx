@@ -14,6 +14,7 @@ export type DirectoryGuest = {
   inviteName: string | null;
   gender: GuestGender;
   withFamily: boolean;
+  companion: 'wife' | 'spouse' | null;
 };
 
 export type DirectoryLabels = {
@@ -31,6 +32,7 @@ export type ProfileLabels = {
   edit: string; close: string; nick: string; inviteName: string; inviteNameHint: string;
   gender: string; male: string; female: string; none: string; family: string; preview: string;
   save: string; saving: string; saved: string; error: string; familyBadge: string; inviteAs: string;
+  alone: string; wife: string; spouse: string;
 };
 
 /** The name a guest actually sees (the couple's nickname stays private). */
@@ -156,7 +158,7 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
                   <span className="guest-invite-as">{pl.inviteAs}: {formatGreeting(shownName(guest), guest.gender, inviteLocale)}</span>
                 )}
                 <span className="guest-badges">
-                  {guest.withFamily && <span className="guest-badge">{pl.familyBadge}</span>}
+                  {guest.companion ? <span className="guest-badge">{pl[guest.companion]}</span> : guest.withFamily && <span className="guest-badge">{pl.familyBadge}</span>}
                   {status && <span className={`guest-rsvp-status ${status.cls}`}>{status.text}</span>}
                 </span>
                 {guest.rsvpEnabled && guest.rsvpNote && <span className="guest-rsvp-note">“{guest.rsvpNote}”</span>}
@@ -199,7 +201,7 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
   );
 }
 
-type ProfilePatch = Pick<DirectoryGuest, 'id' | 'name' | 'inviteName' | 'gender' | 'withFamily'>;
+type ProfilePatch = Pick<DirectoryGuest, 'id' | 'name' | 'inviteName' | 'gender' | 'withFamily' | 'companion'>;
 
 /** Inline editor for how one guest is named and addressed, with a live preview. */
 function GuestEditor({ guest, labels: l, locale, onSaved }: {
@@ -208,15 +210,17 @@ function GuestEditor({ guest, labels: l, locale, onSaved }: {
   const [name, setName] = useState(guest.name);
   const [inviteName, setInviteName] = useState(guest.inviteName ?? '');
   const [gender, setGender] = useState<GuestGender>(guest.gender);
-  const [withFamily, setWithFamily] = useState(guest.withFamily);
+  const [invitedWith, setInvitedWith] = useState<'none' | 'family' | 'wife' | 'spouse'>(guest.companion ?? (guest.withFamily ? 'family' : 'none'));
+  const withFamily = invitedWith === 'family';
+  const companion = invitedWith === 'wife' || invitedWith === 'spouse' ? invitedWith : null;
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const preview = `${formatGreeting(inviteName.trim() || name.trim() || '…', gender, locale)} — ${formatInviteLine(withFamily, locale)}`;
+  const preview = `${formatGreeting(inviteName.trim() || name.trim() || '…', gender, locale)} — ${formatInviteLine(withFamily, locale, companion)}`;
 
   async function save(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim()) return;
     setState('saving');
-    const body: ProfilePatch = { id: guest.id, name: name.trim(), inviteName: inviteName.trim() || null, gender, withFamily };
+    const body: ProfilePatch = { id: guest.id, name: name.trim(), inviteName: inviteName.trim() || null, gender, withFamily, companion };
     try {
       const response = await fetch('/api/guests/profile', {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
@@ -251,11 +255,15 @@ function GuestEditor({ guest, labels: l, locale, onSaved }: {
           ))}
         </div>
       </div>
-      <button type="button" role="switch" aria-checked={withFamily}
-        className={`guest-rsvp-switch ${withFamily ? 'is-on' : ''}`} onClick={() => { setWithFamily(!withFamily); setState('idle'); }}>
-        <span className="guest-rsvp-track" aria-hidden="true"><i /></span>
+      <div className="guest-editor-field">
         <span>{l.family}</span>
-      </button>
+        <div className="guest-editor-segment" role="radiogroup" aria-label={l.family}>
+          {([['none', l.alone], ['family', l.familyBadge], ['wife', l.wife], ['spouse', l.spouse]] as const).map(([value, label]) => (
+            <button key={value} type="button" role="radio" aria-checked={invitedWith === value}
+              className={invitedWith === value ? 'is-active' : ''} onClick={() => { setInvitedWith(value); setState('idle'); }}>{label}</button>
+          ))}
+        </div>
+      </div>
       <p className="guest-editor-preview"><span>{l.preview}:</span> {preview}</p>
       <div className="guest-editor-actions">
         <button type="submit" className="guest-action guest-action--primary" disabled={state === 'saving' || !name.trim()}>

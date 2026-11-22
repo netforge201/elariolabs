@@ -28,7 +28,7 @@ const translations = {
     profile: { edit: 'Düzəliş et', close: 'Bağla', nick: 'Ləqəb (yalnız siz görürsünüz)', inviteName: 'Dəvətnamədə ad',
       inviteNameHint: 'Boş qalsa, ləqəb yazılacaq', gender: 'Müraciət', male: 'Kişi · bəy', female: 'Qadın · xanım', none: 'Göstərilməyib',
       family: 'Ailəsi ilə birlikdə', preview: 'Qonaq belə görəcək', save: 'Yadda saxla', saving: 'Saxlanılır…', saved: 'Saxlanıldı',
-      error: 'Yadda saxlamaq alınmadı', familyBadge: 'Ailə ilə', inviteAs: 'Dəvətnamədə' },
+      error: 'Yadda saxlamaq alınmadı', familyBadge: 'Ailə ilə', alone: 'Tək', wife: 'Xanımınızla', spouse: 'Həyat yoldaşınızla', inviteAs: 'Dəvətnamədə' },
   },
   ru: {
     eyebrow: 'ПЕРСОНАЛЬНЫЕ ПРИГЛАШЕНИЯ', title: 'Ваши гости',
@@ -47,7 +47,7 @@ const translations = {
     profile: { edit: 'Изменить', close: 'Закрыть', nick: 'Ник (видите только вы)', inviteName: 'Имя в приглашении',
       inviteNameHint: 'Если пусто — будет ник', gender: 'Обращение', male: 'Мужчина · bəy', female: 'Женщина · xanım', none: 'Не указано',
       family: 'Вместе с семьёй', preview: 'Гость увидит', save: 'Сохранить', saving: 'Сохраняем…', saved: 'Сохранено',
-      error: 'Не удалось сохранить', familyBadge: 'С семьёй', inviteAs: 'В приглашении' },
+      error: 'Не удалось сохранить', familyBadge: 'С семьёй', alone: 'Один', wife: 'С супругой', spouse: 'С супругом(-ой)', inviteAs: 'В приглашении' },
   },
   en: {
     eyebrow: 'PERSONAL INVITATIONS', title: 'Your guests',
@@ -66,7 +66,7 @@ const translations = {
     profile: { edit: 'Edit', close: 'Close', nick: 'Nickname (only you see it)', inviteName: 'Name on the invitation',
       inviteNameHint: 'Empty → the nickname is used', gender: 'Address as', male: 'Man · bəy', female: 'Woman · xanım', none: 'Not set',
       family: 'Together with family', preview: 'The guest will see', save: 'Save', saving: 'Saving…', saved: 'Saved',
-      error: 'Could not save', familyBadge: 'With family', inviteAs: 'On the invitation' },
+      error: 'Could not save', familyBadge: 'With family', alone: 'Alone', wife: 'With wife', spouse: 'With spouse', inviteAs: 'On the invitation' },
   },
 };
 
@@ -136,6 +136,7 @@ export default async function GuestsPage() {
               inviteName: guest.inviteName,
               gender: guest.gender === 'male' || guest.gender === 'female' ? guest.gender : null,
               withFamily: guest.withFamily,
+              companion: guest.companion === 'wife' || guest.companion === 'spouse' ? guest.companion : null,
             }))}
             rsvpLabels={t.rsvp}
             profileLabels={t.profile}
