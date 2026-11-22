@@ -288,6 +288,17 @@ class Planner {
     return this.seats.length - this.state.seatGuest.size;
   }
 
+  unseat(guestId: string) {
+    const seat = this.state.guestSeat.get(guestId);
+    if (!seat) return;
+    this.state.guestSeat.delete(guestId);
+    this.state.seatGuest.delete(seat.id);
+  }
+
+  freeAt(tableId: string) {
+    return (this.seatsByTable.get(tableId)?.length ?? 0) - this.occupantsAt(tableId).length;
+  }
+
   seat(guestId: string, seat: Seat) {
     this.state.seatGuest.set(seat.id, guestId);
     this.state.guestSeat.set(guestId, seat);
@@ -428,6 +439,7 @@ class Planner {
     remainingInGroup: number,
     key: string,
     anchorTableId?: string,
+    forcedTableId?: string,
   ): { tableId: string; seats: Seat[]; order: SeatingGuest[]; sidesMixed: boolean } | null {
     const candidates: Candidate[] = [];
     const ids = group.map(g => g.id);
@@ -439,6 +451,7 @@ class Planner {
     }
 
     for (const table of this.tables) {
+      if (forcedTableId && table.id !== forcedTableId) continue;
       const tableSeats = this.seatsByTable.get(table.id) ?? [];
       const capacity = tableSeats.length;
       const occupants = this.occupantsAt(table.id);
@@ -504,6 +517,22 @@ function generateProposal(
     }
   }
 
+  // "++" is a hard rule: a component must end up at one table. Kept seats of a
+  // component define its table; if they are split or the table lacks room, re-seat it.
+  const forcedTable = new Map<string, string>(); // guestId -> tableId
+  for (const component of getComponents(guests, plan)) {
+    if (component.length < 2) continue;
+    const keptTables = new Set(component.map(g => planner.state.guestSeat.get(g.id)?.tableId).filter(Boolean) as string[]);
+    if (!keptTables.size) continue;
+    const missing = component.filter(g => !planner.state.guestSeat.has(g.id)).length;
+    const [tableId] = [...keptTables];
+    if (keptTables.size > 1 || planner.freeAt(tableId) < missing) {
+      for (const g of component) if (planner.state.guestSeat.has(g.id)) { planner.unseat(g.id); kept--; }
+    } else {
+      for (const g of component) forcedTable.set(g.id, tableId);
+    }
+  }
+
   const toPlace = guests.filter(g => !planner.state.guestSeat.has(g.id));
   const components = getComponents(toPlace, plan);
 
@@ -551,8 +580,9 @@ function generateProposal(
     anchorTableId?: string,
   ) => {
     const remaining = Math.max(0, (remainingByGroup.get(key) ?? 0) - group.length);
+    const forced = anchorTableId ?? forcedTable.get(group[0].id);
     for (const mode of modes) {
-      const placement = planner.findPlacement(group, mode, remaining, key, anchorTableId);
+      const placement = planner.findPlacement(group, mode, remaining, key, anchorTableId, forced);
       if (!placement) continue;
       placement.order.forEach((guest, index) => planner.seat(guest.id, placement.seats[index]));
       if (placement.sidesMixed) group.forEach(g => mixedSides.add(g.id));
@@ -582,7 +612,8 @@ function generateProposal(
     let anchor: string | undefined;
     let placedAny = false;
     for (const guest of component) {
-      const result = place([guest], key, ['strict', 'mixed-sides'], anchor);
+      const result = place([guest], key, ['strict', 'mixed-sides', 'scattered'], anchor)
+        ?? (anchor ? place([guest], key, ['strict', 'mixed-sides']) : null);
       if (result) {
         anchor = anchor ?? result.tableId;
         placedAny = true;
