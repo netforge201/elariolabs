@@ -15,6 +15,7 @@ export type DirectoryGuest = {
   gender: GuestGender;
   withFamily: boolean;
   companion: 'wife' | 'spouse' | null;
+  side?: 'bride' | 'groom' | 'shared';
 };
 
 export type DirectoryLabels = {
@@ -39,7 +40,8 @@ export type ProfileLabels = {
 const shownName = (g: { name: string; inviteName: string | null }) => g.inviteName?.trim() || g.name;
 
 /** Guest rows with search, copy, native share and the per-guest RSVP switch. */
-export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r, profileLabels: pl, inviteLocale }: {
+export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r, profileLabels: pl, inviteLocale, exportLabels }: {
+  exportLabels?: { bride: string; groom: string; empty: string };
   guests: DirectoryGuest[]; labels: DirectoryLabels; rsvpLabels: RsvpLabels;
   profileLabels: ProfileLabels; inviteLocale: Locale;
 }) {
@@ -133,6 +135,22 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
         {error && <p className="guests-rsvp-error" role="alert">{error}</p>}
       </div>
 
+      {exportLabels && (
+        <div className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {(['bride', 'groom'] as const).map(side => (
+            <button key={side} type="button" className="guest-action" onClick={() => {
+              const rows = guests.filter(g => g.side === side);
+              if (!rows.length) { alert(exportLabels.empty); return; }
+              const text = rows.map(g => `${g.name} - ${urlFor(g.slug)}`).join('\n');
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+              link.download = `${side === 'bride' ? 'bride' : 'groom'}-invitations.txt`;
+              link.click();
+              URL.revokeObjectURL(link.href);
+            }}>{exportLabels[side]}</button>
+          ))}
+        </div>
+      )}
       {guests.length > 6 && (
         <div className="guests-search">
           <input type="search" value={query} onChange={event => setQuery(event.target.value)}

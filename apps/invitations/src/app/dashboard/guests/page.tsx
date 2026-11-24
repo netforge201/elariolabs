@@ -6,6 +6,7 @@ import DashboardShell from '@/app/components/dashboard-shell';
 import GuestDirectory from '@/app/components/guest-directory';
 import { resolveLocale } from '@/app/components/invitation/catalog';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
+import { normalizeSeatingPlan } from '@/lib/seating-types';
 import { ArrowUpRightIcon, CrestStarIcon, GuestsNavIcon } from '@/app/components/icons';
 
 export const dynamic = 'force-dynamic';
@@ -79,7 +80,7 @@ export default async function GuestsPage() {
 
   const wedding = await db.invitationWedding.findUnique({
     where: { accountId: account.id },
-    select: { id: true, partnerOne: true, partnerTwo: true, locale: true },
+    select: { id: true, partnerOne: true, partnerTwo: true, locale: true, theme: true },
   });
 
   const guests = wedding
@@ -88,6 +89,12 @@ export default async function GuestsPage() {
         orderBy: { createdAt: 'desc' },
       })
     : [];
+  const profiles = normalizeSeatingPlan((wedding?.theme as Record<string, unknown> | null)?.seatingPlan).guestProfiles;
+  const exportLabels = locale === 'ru'
+    ? { bride: 'Экспорт приглашений невесты', groom: 'Экспорт приглашений жениха', empty: 'Нет гостей этой стороны' }
+    : locale === 'en'
+      ? { bride: "Export bride's invitations", groom: "Export groom's invitations", empty: 'No guests on this side' }
+      : { bride: 'Gəlin tərəfinin dəvətnamələri', groom: 'Bəy tərəfinin dəvətnamələri', empty: 'Bu tərəfdə qonaq yoxdur' };
 
   const countLabel = guests.length === 1 ? t.invitation : t.invitations;
 
@@ -136,10 +143,12 @@ export default async function GuestsPage() {
               inviteName: guest.inviteName,
               gender: guest.gender === 'male' || guest.gender === 'female' ? guest.gender : null,
               withFamily: guest.withFamily,
+              side: profiles[guest.id]?.side ?? 'shared',
               companion: guest.companion === 'wife' || guest.companion === 'spouse' ? guest.companion : null,
             }))}
             rsvpLabels={t.rsvp}
             profileLabels={t.profile}
+            exportLabels={exportLabels}
             inviteLocale={resolveLocale(wedding.locale)}
             labels={{
               open: t.open, copy: t.copy, copied: t.copied, share: t.share, search: t.search,
