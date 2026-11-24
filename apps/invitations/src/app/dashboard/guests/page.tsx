@@ -91,10 +91,10 @@ export default async function GuestsPage() {
     : [];
   const profiles = normalizeSeatingPlan((wedding?.theme as Record<string, unknown> | null)?.seatingPlan).guestProfiles;
   const exportLabels = locale === 'ru'
-    ? { bride: 'Экспорт приглашений невесты', groom: 'Экспорт приглашений жениха', empty: 'Нет гостей этой стороны' }
+    ? { bride: 'Экспорт приглашений невесты', groom: 'Экспорт приглашений жениха', all: 'Экспорт всех приглашений', empty: 'Нет гостей этой стороны' }
     : locale === 'en'
-      ? { bride: "Export bride's invitations", groom: "Export groom's invitations", empty: 'No guests on this side' }
-      : { bride: 'Gəlin tərəfinin dəvətnamələri', groom: 'Bəy tərəfinin dəvətnamələri', empty: 'Bu tərəfdə qonaq yoxdur' };
+      ? { bride: "Export bride's invitations", groom: "Export groom's invitations", all: 'Export all invitations', empty: 'No guests on this side' }
+      : { bride: 'Gəlin tərəfinin dəvətnamələri', groom: 'Bəy tərəfinin dəvətnamələri', all: 'Bütün dəvətnamələr', empty: 'Bu tərəfdə qonaq yoxdur' };
 
   const countLabel = guests.length === 1 ? t.invitation : t.invitations;
 

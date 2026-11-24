@@ -41,7 +41,7 @@ const shownName = (g: { name: string; inviteName: string | null }) => g.inviteNa
 
 /** Guest rows with search, copy, native share and the per-guest RSVP switch. */
 export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r, profileLabels: pl, inviteLocale, exportLabels }: {
-  exportLabels?: { bride: string; groom: string; empty: string };
+  exportLabels?: { bride: string; groom: string; all: string; empty: string };
   guests: DirectoryGuest[]; labels: DirectoryLabels; rsvpLabels: RsvpLabels;
   profileLabels: ProfileLabels; inviteLocale: Locale;
 }) {
@@ -137,16 +137,16 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
 
       {exportLabels && (
         <div className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {(['bride', 'groom'] as const).map(side => (
+          {(['bride', 'groom', 'all'] as const).map(side => (
             <button key={side} type="button" className="guest-action" onClick={() => {
-              const rows = guests.filter(g => g.side === side);
+              const rows = side === 'all' ? guests : guests.filter(g => g.side === side);
               if (!rows.length) { alert(exportLabels.empty); return; }
               const text = rows.map(g => `${g.name} - ${urlFor(g.slug)}`).join('\n');
               const link = document.createElement('a');
               link.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-              link.download = `${side === 'bride' ? 'bride' : 'groom'}-invitations.txt`;
+              link.download = `${side}-invitations.txt`;
               link.click();
-              URL.revokeObjectURL(link.href);
+              setTimeout(() => URL.revokeObjectURL(link.href), 1000);
             }}>{exportLabels[side]}</button>
           ))}
         </div>
