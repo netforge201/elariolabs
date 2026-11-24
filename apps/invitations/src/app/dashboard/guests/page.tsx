@@ -89,7 +89,33 @@ export default async function GuestsPage() {
         orderBy: { createdAt: 'desc' },
       })
     : [];
-  const profiles = normalizeSeatingPlan((wedding?.theme as Record<string, unknown> | null)?.seatingPlan).guestProfiles;
+  const seatingPlan = normalizeSeatingPlan((wedding?.theme as Record<string, unknown> | null)?.seatingPlan);
+  const profiles = seatingPlan.guestProfiles;
+  const seatedIds = new Set(seatingPlan.assignments.map(a => a.guestId));
+  const fl = locale === 'ru'
+    ? { group: 'Группа', side: 'Сторона', vip: 'VIP', access: 'Особые потребности', seat: 'Место', rel: 'Совместимость', gender: 'Пол', with: 'С кем', rsvp: 'RSVP', answer: 'Ответ',
+        any: 'Все', noGroup: 'Без группы', bride: 'Невеста', groom: 'Жених', shared: 'Общая', yes: 'Да', no: 'Нет', seated: 'Рассажен', unseated: 'Не рассажен',
+        req: 'Есть «++»', pref: 'Есть «+»', excl: 'Есть «−»', none: 'Ничего', male: 'Мужчина', female: 'Женщина', unknown: 'Не указан',
+        alone: 'Один', family: 'С семьёй', wife: 'С супругой', spouse: 'С супругом(-ой)', on: 'Включён', off: 'Выключен',
+        coming: 'Придёт', declined: 'Не придёт', waiting: 'Нет ответа', reset: 'Сбросить', shown: 'Показано', of: 'из',
+        gFamily: 'Семья', gFriends: 'Друзья', gColleagues: 'Коллеги' }
+    : locale === 'en'
+      ? { group: 'Group', side: 'Side', vip: 'VIP', access: 'Accessibility', seat: 'Seat', rel: 'Compatibility', gender: 'Gender', with: 'Invited with', rsvp: 'RSVP', answer: 'Answer',
+          any: 'All', noGroup: 'No group', bride: 'Bride', groom: 'Groom', shared: 'Shared', yes: 'Yes', no: 'No', seated: 'Seated', unseated: 'Not seated',
+          req: 'Has "++"', pref: 'Has "+"', excl: 'Has "−"', none: 'None', male: 'Male', female: 'Female', unknown: 'Not set',
+          alone: 'Alone', family: 'With family', wife: 'With wife', spouse: 'With spouse', on: 'On', off: 'Off',
+          coming: 'Coming', declined: 'Not coming', waiting: 'No answer', reset: 'Reset', shown: 'Shown', of: 'of',
+          gFamily: 'Family', gFriends: 'Friends', gColleagues: 'Colleagues' }
+      : { group: 'Qrup', side: 'Tərəf', vip: 'VIP', access: 'Xüsusi ehtiyac', seat: 'Yer', rel: 'Uyğunluq', gender: 'Cins', with: 'Kiminlə', rsvp: 'RSVP', answer: 'Cavab',
+          any: 'Hamısı', noGroup: 'Qrupsuz', bride: 'Gəlin', groom: 'Bəy', shared: 'Ümumi', yes: 'Bəli', no: 'Xeyr', seated: 'Yerləşdirilib', unseated: 'Yerləşdirilməyib',
+          req: '«++» var', pref: '«+» var', excl: '«−» var', none: 'Heç biri', male: 'Kişi', female: 'Qadın', unknown: 'Göstərilməyib',
+          alone: 'Tək', family: 'Ailə ilə', wife: 'Xanımınızla', spouse: 'Həyat yoldaşınızla', on: 'Açıq', off: 'Bağlı',
+          coming: 'Gələcək', declined: 'Gəlməyəcək', waiting: 'Cavab yoxdur', reset: 'Sıfırla', shown: 'Göstərilir', of: '/',
+          gFamily: 'Ailə', gFriends: 'Dostlar', gColleagues: 'Həmkarlar' };
+  const groupOptions = [
+    { id: 'family', name: fl.gFamily }, { id: 'friends', name: fl.gFriends }, { id: 'colleagues', name: fl.gColleagues },
+    ...seatingPlan.guestGroups,
+  ];
   const exportLabels = locale === 'ru'
     ? { bride: 'Экспорт приглашений невесты', groom: 'Экспорт приглашений жениха', all: 'Экспорт всех приглашений', empty: 'Нет гостей этой стороны' }
     : locale === 'en'
@@ -144,11 +170,20 @@ export default async function GuestsPage() {
               gender: guest.gender === 'male' || guest.gender === 'female' ? guest.gender : null,
               withFamily: guest.withFamily,
               side: profiles[guest.id]?.side ?? 'shared',
+              group: profiles[guest.id]?.group ?? 'other',
+              isVip: Boolean(profiles[guest.id]?.isVip),
+              accessibility: Boolean(profiles[guest.id]?.accessibility),
+              seated: seatedIds.has(guest.id),
+              hasRequired: Boolean(profiles[guest.id]?.requiredNeighbors.length),
+              hasPreferred: Boolean(profiles[guest.id]?.preferredNeighbors.length),
+              hasExcluded: Boolean(profiles[guest.id]?.excludedNeighbors.length),
               companion: guest.companion === 'wife' || guest.companion === 'spouse' ? guest.companion : null,
             }))}
             rsvpLabels={t.rsvp}
             profileLabels={t.profile}
             exportLabels={exportLabels}
+            filterLabels={fl}
+            groupOptions={groupOptions}
             inviteLocale={resolveLocale(wedding.locale)}
             labels={{
               open: t.open, copy: t.copy, copied: t.copied, share: t.share, search: t.search,

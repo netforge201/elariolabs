@@ -16,7 +16,32 @@ export type DirectoryGuest = {
   withFamily: boolean;
   companion: 'wife' | 'spouse' | null;
   side?: 'bride' | 'groom' | 'shared';
+  group?: string;
+  isVip?: boolean;
+  accessibility?: boolean;
+  seated?: boolean;
+  hasRequired?: boolean;
+  hasPreferred?: boolean;
+  hasExcluded?: boolean;
 };
+
+type Filters = Record<'group' | 'side' | 'vip' | 'access' | 'seat' | 'rel' | 'gender' | 'with' | 'rsvp' | 'answer', string>;
+const NO_FILTERS: Filters = { group: '', side: '', vip: '', access: '', seat: '', rel: '', gender: '', with: '', rsvp: '', answer: '' };
+
+function matches(g: DirectoryGuest, f: Filters) {
+  const invitedWith = g.companion ?? (g.withFamily ? 'family' : 'alone');
+  const rel = g.hasRequired || g.hasPreferred || g.hasExcluded;
+  return (!f.group || (g.group ?? 'other') === f.group)
+    && (!f.side || (g.side ?? 'shared') === f.side)
+    && (!f.vip || String(Boolean(g.isVip)) === f.vip)
+    && (!f.access || String(Boolean(g.accessibility)) === f.access)
+    && (!f.seat || String(Boolean(g.seated)) === f.seat)
+    && (!f.rel || (f.rel === 'req' ? g.hasRequired : f.rel === 'pref' ? g.hasPreferred : f.rel === 'excl' ? g.hasExcluded : !rel))
+    && (!f.gender || (g.gender ?? 'unknown') === f.gender)
+    && (!f.with || invitedWith === f.with)
+    && (!f.rsvp || String(g.rsvpEnabled) === f.rsvp)
+    && (!f.answer || (g.rsvpStatus ?? 'waiting') === f.answer);
+}
 
 export type DirectoryLabels = {
   open: string; copy: string; copied: string; share: string;
@@ -40,13 +65,16 @@ export type ProfileLabels = {
 const shownName = (g: { name: string; inviteName: string | null }) => g.inviteName?.trim() || g.name;
 
 /** Guest rows with search, copy, native share and the per-guest RSVP switch. */
-export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r, profileLabels: pl, inviteLocale, exportLabels }: {
+export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r, profileLabels: pl, inviteLocale, exportLabels, filterLabels: fl, groupOptions = [] }: {
   exportLabels?: { bride: string; groom: string; all: string; empty: string };
+  filterLabels?: Record<string, string>;
+  groupOptions?: { id: string; name: string }[];
   guests: DirectoryGuest[]; labels: DirectoryLabels; rsvpLabels: RsvpLabels;
   profileLabels: ProfileLabels; inviteLocale: Locale;
 }) {
   const [guests, setGuests] = useState(initial);
   const [query, setQuery] = useState('');
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [canShare, setCanShare] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -71,9 +99,8 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
   }, [guests]);
 
   const needle = query.trim().toLocaleLowerCase();
-  const visible = needle
-    ? guests.filter(guest => `${guest.name} ${guest.inviteName ?? ''}`.toLocaleLowerCase().includes(needle))
-    : guests;
+  const visible = guests.filter(guest => matches(guest, filters) &&
+    (!needle || `${guest.name} ${guest.inviteName ?? ''}`.toLocaleLowerCase().includes(needle)));
   const urlFor = (slug: string) => `${window.location.origin}/guest/${slug}`;
 
   async function copy(guest: DirectoryGuest) {
@@ -135,11 +162,38 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
         {error && <p className="guests-rsvp-error" role="alert">{error}</p>}
       </div>
 
+      {fl && (
+        <div className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {([
+            ['group', [...groupOptions.map(o => [o.id, o.name]), ['other', fl.noGroup]]],
+            ['side', [['bride', fl.bride], ['groom', fl.groom], ['shared', fl.shared]]],
+            ['vip', [['true', fl.yes], ['false', fl.no]]],
+            ['access', [['true', fl.yes], ['false', fl.no]]],
+            ['seat', [['true', fl.seated], ['false', fl.unseated]]],
+            ['rel', [['req', fl.req], ['pref', fl.pref], ['excl', fl.excl], ['none', fl.none]]],
+            ['gender', [['male', fl.male], ['female', fl.female], ['unknown', fl.unknown]]],
+            ['with', [['alone', fl.alone], ['family', fl.family], ['wife', fl.wife], ['spouse', fl.spouse]]],
+            ['rsvp', [['true', fl.on], ['false', fl.off]]],
+            ['answer', [['yes', fl.coming], ['no', fl.declined], ['waiting', fl.waiting]]],
+          ] as [keyof Filters, string[][]][]).map(([key, options]) => (
+            <label key={key} style={{ display: 'flex', flexDirection: 'column', fontSize: 12, gap: 2 }}>
+              <span>{fl[key]}</span>
+              <select value={filters[key]} onChange={event => setFilters({ ...filters, [key]: event.target.value })}>
+                <option value="">{fl.any}</option>
+                {options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </label>
+          ))}
+          <button type="button" className="guest-action" onClick={() => setFilters(NO_FILTERS)}>{fl.reset}</button>
+          <span style={{ fontSize: 12 }}>{fl.shown} {visible.length} {fl.of} {guests.length}</span>
+        </div>
+      )}
+
       {exportLabels && (
         <div className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {(['bride', 'groom', 'all'] as const).map(side => (
             <button key={side} type="button" className="guest-action" onClick={() => {
-              const rows = side === 'all' ? guests : guests.filter(g => g.side === side);
+              const rows = side === 'all' ? visible : visible.filter(g => g.side === side);
               if (!rows.length) { alert(exportLabels.empty); return; }
               const text = rows.map(g => `${g.name} - ${urlFor(g.slug)}`).join('\n');
               const link = document.createElement('a');
