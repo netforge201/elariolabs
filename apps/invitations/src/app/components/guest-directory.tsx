@@ -241,15 +241,43 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
       {exportLabels && (
         <div className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {(['bride', 'groom', 'all'] as const).map(side => (
-            <button key={side} type="button" className="guest-action" onClick={() => {
+            <button key={side} type="button" className="guest-action" onClick={async () => {
               const rows = side === 'all' ? visible : visible.filter(g => g.side === side);
               if (!rows.length) { alert(exportLabels.empty); return; }
-              const text = rows.map(g => `${g.name} - ${urlFor(g.slug)}`).join('\n');
-              const link = document.createElement('a');
-              link.href = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-              link.download = `${side}-invitations.txt`;
-              link.click();
-              setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+              const H = inviteLocale === 'ru'
+                ? { n: '№', name: 'Имя', link: 'Ссылка', side: 'Сторона', group: 'Группа', with: 'С кем', guests: 'гостей', one: 'Один', fam: 'С семьёй', wife: 'С женой', spouse: 'С супругой' }
+                : inviteLocale === 'en'
+                  ? { n: '#', name: 'Name', link: 'Link', side: 'Side', group: 'Group', with: 'With', guests: 'guests', one: 'Alone', fam: 'With family', wife: 'With wife', spouse: 'With spouse' }
+                  : { n: '№', name: 'Ad', link: 'Keçid', side: 'Tərəf', group: 'Qrup', with: 'Kimlə', guests: 'qonaq', one: 'Tək', fam: 'Ailə ilə', wife: 'Xanımınızla', spouse: 'Həyat yoldaşınızla' };
+              const sideName = (g: DirectoryGuest) => g.side === 'bride' ? (fl?.bride ?? 'Gəlin') : g.side === 'groom' ? (fl?.groom ?? 'Bəy') : (fl?.shared ?? '—');
+              const withName = (g: DirectoryGuest) => g.companion === 'wife' ? H.wife : g.companion === 'spouse' ? H.spouse : g.withFamily ? H.fam : H.one;
+              const order = [...groupOptions.map(o => o.id), ''];
+              const known = new Set(groupOptions.map(o => o.id));
+              const XLSX = await import('xlsx');
+              const aoa: (string | number)[][] = [[H.n, H.name, H.link, H.side, H.group, H.with]];
+              const headerRows: number[] = [];
+              const links: [number, string][] = [];
+              let n = 0;
+              for (const gid of order) {
+                const list = rows.filter(g => (g.group && known.has(g.group) ? g.group : '') === gid)
+                  .sort((a, b) => a.name.localeCompare(b.name));
+                if (!list.length) continue;
+                const gname = gid ? groupOptions.find(o => o.id === gid)!.name : (fl?.noGroup ?? '—');
+                if (aoa.length > 1) aoa.push([]);
+                headerRows.push(aoa.length);
+                aoa.push([`${gname} — ${list.length} ${H.guests}`]);
+                for (const g of list) {
+                  links.push([aoa.length, urlFor(g.slug)]);
+                  aoa.push([++n, g.name, urlFor(g.slug), sideName(g), gname, withName(g)]);
+                }
+              }
+              const ws = XLSX.utils.aoa_to_sheet(aoa);
+              ws['!cols'] = [{ wch: 5 }, { wch: 28 }, { wch: 52 }, { wch: 12 }, { wch: 20 }, { wch: 18 }];
+              ws['!merges'] = headerRows.map(r => ({ s: { r, c: 0 }, e: { r, c: 5 } }));
+              for (const [r, url] of links) { const c = ws[XLSX.utils.encode_cell({ r, c: 2 })]; if (c) c.l = { Target: url }; }
+              const wb = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(wb, ws, 'Dəvətnamələr');
+              XLSX.writeFile(wb, `${side}-invitations.xlsx`);
             }}>{exportLabels[side]}</button>
           ))}
         </div>
