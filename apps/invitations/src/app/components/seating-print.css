@@ -162,3 +162,4 @@
   .pr-table-grid { grid-template-columns: minmax(0, 1fr); }
   .pr-index, .pr-unseated { column-count: 1; }
 }
+.pr-no-seats .pr-seat-no { display: none; }

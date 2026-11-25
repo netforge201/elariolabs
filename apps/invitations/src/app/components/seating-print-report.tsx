@@ -43,7 +43,7 @@ const WORDS = {
     warnDeclined: 'Gəlməyəcəyini bildirib, amma yeri saxlanılıb', contents: 'Tərkib', generated: 'Tarix', page: 'səh.',
     taken: 'Tutulub', freeLegend: 'Boş', print: 'PDF kimi saxla', back: 'Redaktora qayıt',
     hint: 'Çap pəncərəsində “PDF kimi saxla” seçin.', include: 'Daxil et', paper: 'Kağız', namesLabel: 'Adlar',
-    namesInvite: 'Dəvətnamədəki ad', namesNick: 'Ləqəb', rsvpLabel: 'RSVP', on: 'Göstər', off: 'Gizlət',
+    namesInvite: 'Dəvətnamədəki ad', namesNick: 'Ləqəb', rsvpLabel: 'RSVP', on: 'Göstər', off: 'Gizlət', seatsLabel: 'Stullar', seatsOn: 'Masalar və stullar', seatsOff: 'Yalnız masalar',
     noSections: 'Ən azı bir bölmə seçin.', cut: 'Kəsik xətti üzrə kəsin', noTables: 'Planda hələ masa yoxdur.',
     sections: { summary: 'Xülasə', plan: 'Zalın sxemi', tables: 'Masalar', index: 'Əlifba göstəricisi', unseated: 'Yersiz qonaqlar', tablecards: 'Masa nömrələri', placecards: 'Ad kartları' },
   },
@@ -57,7 +57,7 @@ const WORDS = {
     warnDeclined: 'Отказались (RSVP), но место за ними занято', contents: 'Содержание', generated: 'Дата', page: 'стр.',
     taken: 'Занято', freeLegend: 'Свободно', print: 'Сохранить PDF', back: 'Вернуться к редактору',
     hint: 'В окне печати выберите «Сохранить как PDF».', include: 'Включить', paper: 'Бумага', namesLabel: 'Имена',
-    namesInvite: 'Имя из приглашения', namesNick: 'Ник', rsvpLabel: 'RSVP', on: 'Показать', off: 'Скрыть',
+    namesInvite: 'Имя из приглашения', namesNick: 'Ник', rsvpLabel: 'RSVP', on: 'Показать', off: 'Скрыть', seatsLabel: 'Стулья', seatsOn: 'Столы и стулья', seatsOff: 'Только столы',
     noSections: 'Выберите хотя бы один раздел.', cut: 'Разрежьте по пунктиру', noTables: 'На плане пока нет столов.',
     sections: { summary: 'Сводка', plan: 'Схема зала', tables: 'Столы', index: 'Алфавитный указатель', unseated: 'Гости без места', tablecards: 'Номера столов', placecards: 'Именные карточки' },
   },
@@ -71,7 +71,7 @@ const WORDS = {
     warnDeclined: 'Declined (RSVP) but still holding a seat', contents: 'Contents', generated: 'Date', page: 'p.',
     taken: 'Taken', freeLegend: 'Free', print: 'Save as PDF', back: 'Back to editor',
     hint: 'Choose “Save as PDF” in the print dialog.', include: 'Include', paper: 'Paper', namesLabel: 'Names',
-    namesInvite: 'Invitation name', namesNick: 'Nickname', rsvpLabel: 'RSVP', on: 'Show', off: 'Hide',
+    namesInvite: 'Invitation name', namesNick: 'Nickname', rsvpLabel: 'RSVP', on: 'Show', off: 'Hide', seatsLabel: 'Chairs', seatsOn: 'Tables and chairs', seatsOff: 'Tables only',
     noSections: 'Choose at least one section.', cut: 'Cut along the dashed lines', noTables: 'There are no tables on the plan yet.',
     sections: { summary: 'Summary', plan: 'Floor plan', tables: 'Tables', index: 'Alphabetical index', unseated: 'Guests without a seat', tablecards: 'Table numbers', placecards: 'Place cards' },
   },
@@ -88,6 +88,7 @@ export default function SeatingPrintReport({
 }: Props) {
   const w = WORDS[locale];
   const [options, setOptions] = useState<PrintOptions>(initialOptions);
+  const [showSeats, setShowSeats] = useState(true);
 
   // Keep the choices in the URL so a reload or a shared link reproduces the same PDF.
   useEffect(() => {
@@ -212,6 +213,8 @@ export default function SeatingPrintReport({
             items={[['a4', 'A4'], ['a3', 'A3']]} />
           <Segment label={w.namesLabel} value={options.names} onChange={names => setOptions(o => ({ ...o, names }))}
             items={[['invite', w.namesInvite], ['nick', w.namesNick]]} />
+          <Segment label={w.seatsLabel} value={showSeats ? 'on' : 'off'} onChange={v => setShowSeats(v === 'on')}
+            items={[['on', w.seatsOn], ['off', w.seatsOff]]} />
           {data.rsvp.any && (
             <Segment label={w.rsvpLabel} value={options.rsvp ? 'on' : 'off'} onChange={v => setOptions(o => ({ ...o, rsvp: v === 'on' }))}
               items={[['on', w.on], ['off', w.off]]} />
@@ -220,7 +223,7 @@ export default function SeatingPrintReport({
         {options.sections.length === 0 && <p className="pr-warning" role="alert">{w.noSections}</p>}
       </aside>
 
-      <div className="pr-document">
+      <div className={`pr-document ${showSeats ? '' : 'pr-no-seats'}`}>
         {has('summary') && (
           <section className="pr-sheet pr-summary">
             <p className="pr-kicker">ELARIO</p>
@@ -253,7 +256,7 @@ export default function SeatingPrintReport({
                 <strong>{w.warnDeclined}: {data.declinedSeated.length}</strong>
                 <ul>
                   {data.declinedSeated.map(row => (
-                    <li key={row.guest.id}>{shown(row.guest)} — {row.table.name}, {w.seatShort} {row.seat}</li>
+                    <li key={row.guest.id}>{shown(row.guest)} — {row.table.name}{showSeats ? `, ${w.seatShort} ${row.seat}` : ''}</li>
                   ))}
                 </ul>
               </div>
@@ -276,7 +279,7 @@ export default function SeatingPrintReport({
                 <i aria-hidden="true" />{w.freeLegend}
               </span>
             </header>
-            <FloorPlan plan={plan} tables={data.tables} byTable={data.byTable} label={w.plan} />
+            <FloorPlan plan={plan} tables={showSeats ? data.tables : []} byTable={data.byTable} label={w.plan} />
           </section>
         )}
 
@@ -335,7 +338,7 @@ export default function SeatingPrintReport({
                       <p className="pr-index-row" key={guest.id}>
                         <span className="pr-index-name">{shown(guest)}</span>
                         <span className="pr-index-dots" aria-hidden="true" />
-                        <span className="pr-index-seat">{seat ? `${seat.table.name} · ${seat.seat}` : '—'}</span>
+                        <span className="pr-index-seat">{seat ? (showSeats ? `${seat.table.name} · ${seat.seat}` : seat.table.name) : '—'}</span>
                       </p>
                     );
                   })}
@@ -379,7 +382,7 @@ export default function SeatingPrintReport({
             {cards.map(row => (
               <div className="pr-placecard" key={row.guest.id}>
                 <p className="pr-placecard-name">{placeName(row.guest)}</p>
-                <p className="pr-placecard-seat">{row.table.name} · {w.seatShort} {row.seat}</p>
+                <p className="pr-placecard-seat">{row.table.name}{showSeats ? ` · ${w.seatShort} ${row.seat}` : ''}</p>
                 {row.guest.withFamily && <p className="pr-placecard-family">{w.family}</p>}
               </div>
             ))}
