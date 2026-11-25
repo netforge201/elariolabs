@@ -513,3 +513,12 @@ model InvitationMusicFile {
   @@map("invitation_music_files")
 }
 
+/// Uploaded site images stored in the database (free, no external host).
+model MediaFile {
+  key       String   @id
+  mimeType  String   @map("mime_type")
+  data      Bytes
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("media_files")
+}

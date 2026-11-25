@@ -2,6 +2,7 @@ import {S3Client,PutObjectCommand,DeleteObjectCommand} from '@aws-sdk/client-s3'
 import {randomUUID} from 'node:crypto';
 import {mkdir,writeFile,unlink} from 'node:fs/promises';
 import path from 'node:path';
+import {db} from '@/lib/db';
 
 export interface MediaStorage {
  put(bytes:Buffer,mime:string,ext:string):Promise<{key:string;url:string;deleteUrl?:string}>;
@@ -10,6 +11,14 @@ export interface MediaStorage {
 
 export function mediaStorage():MediaStorage{
  const configuredDriver=process.env.STORAGE_DRIVER;
+ // ImgBB blocks images embedded on other sites, so in production everything
+ // except an explicitly configured S3 bucket is stored in the database.
+ if(process.env.NODE_ENV==='production'&&configuredDriver!=='s3'||configuredDriver==='db'){
+  return {
+   async put(bytes,mime,ext){const key=`${randomUUID()}.${ext}`;await db.mediaFile.create({data:{key,mimeType:mime,data:new Uint8Array(bytes)}});return{key,url:`/media/${key}`}},
+   async remove(key){await db.mediaFile.deleteMany({where:{key:path.basename(key)}})}
+  };
+ }
  const driver=process.env.NODE_ENV==='production'&&configuredDriver==='local'&&process.env.IMGBB_API_KEY
   ?'imgbb'
   :configuredDriver??(process.env.NODE_ENV==='production'&&process.env.IMGBB_API_KEY?'imgbb':'local');
