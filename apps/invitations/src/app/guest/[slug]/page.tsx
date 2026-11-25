@@ -53,9 +53,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${result.wedding.partnerOne} & ${result.wedding.partnerTwo}`;
 
+  const who = result.guest.inviteName?.trim() || result.guest.name;
+  const loc = result.wedding.locale;
+  const full = loc === 'ru' ? `${title} - Приглашение для ${who}` : loc === 'en' ? `${title} - Invitation for ${who}` : `${title} - ${who} dəvətnaməsi`;
   return {
-    title: { absolute: `${title} — ${INVITE_WORD[result.wedding.locale] ?? INVITE_WORD.az}` },
-    description: `${title} — ${INVITE_WORD[result.wedding.locale] ?? INVITE_WORD.az}`,
+    title: { absolute: full },
+    description: `${title} — ${INVITE_WORD[loc] ?? INVITE_WORD.az}`,
+    openGraph: { title: full, description: `${title} — ${INVITE_WORD[loc] ?? INVITE_WORD.az}`, type: 'website' },
     robots: { index: false, follow: false },
   };
 }

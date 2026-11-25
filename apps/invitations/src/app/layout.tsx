@@ -4,6 +4,8 @@ import './mobile.css';
 import './bento.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://invitations.elariolabs.com'),
+  openGraph: { siteName: 'ElarioLabs Invitations', type: 'website' },
   title: {
     default: 'Invitations — ElarioLabs',
     template: '%s — Invitations',

@@ -56,7 +56,8 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
 
 function ScrollCue({ label }: { label: string }) {
   return (
-    <span className="inv-scroll-cue" aria-hidden="true" title={label}>
+    <span className="inv-scroll-cue" aria-hidden="true">
+      <span className="inv-scroll-label">{label}</span>
       <ChevronDown className="inv-scroll-icon" />
     </span>
   );
