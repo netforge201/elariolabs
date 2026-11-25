@@ -51,7 +51,7 @@ function ClassicHero({ m }: HeroProps) {
               {m.time && <span>{m.time}</span>}
             </p>
           )}
-          {m.venueName && <p className="inv-hero-venue inv-rise">{m.venueName}</p>}
+          {m.venueName && <p className="inv-hero-venue inv-rise"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></p>}
         </div>
       </div>
       <ScrollCue label={m.t.scroll} />
@@ -78,7 +78,7 @@ function ModernHero({ m }: HeroProps) {
           <div className="inv-modern-line inv-rise">
             {m.date && <span className="inv-modern-num">{m.date.numeric}</span>}
             {m.time && <span>{m.time}</span>}
-            {m.venueName && <span className="inv-modern-venue">{m.venueName}</span>}
+            {m.venueName && <span className="inv-modern-venue"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
           </div>
         )}
       </div>
@@ -102,7 +102,7 @@ function MinimalHero({ m }: HeroProps) {
         <div className="inv-minimal-bottom inv-rise">
           {m.date && <span>{m.date.weekday}, {m.date.full}</span>}
           {m.time && <span>{m.time}</span>}
-          {m.venueName && <span>{m.venueName}</span>}
+          {m.venueName && <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
         </div>
       )}
       <ScrollCue label={m.t.scroll} />

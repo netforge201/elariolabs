@@ -47,7 +47,7 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
       {m.venueName && (
         <p className="kx-meta kx-venue inv-rise">
           <MapPinIcon className="kx-icon" aria-hidden="true" />
-          <span>{m.venueName}</span>
+          <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>
         </p>
       )}
     </div>

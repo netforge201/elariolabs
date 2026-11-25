@@ -150,7 +150,7 @@ export function Details({ m, preview }: SectionProps & { preview: boolean }) {
           {hasVenue && (
             <div className="inv-detail inv-detail--venue">
               <span className="inv-label">{m.t.venue}</span>
-              {m.venueName && <p className="inv-detail-main inv-venue-name">{m.venueName}</p>}
+              {m.venueName && <p className="inv-detail-main inv-venue-name"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></p>}
               {m.venueAddress && <p className="inv-detail-sub">{m.venueAddress}</p>}
               <div className="inv-actions">
                 <a className="inv-btn" href={mapUrl} target="_blank" rel="noreferrer">
