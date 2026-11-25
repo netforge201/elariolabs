@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node ../../scripts/check-schemas.mjs --from-app && prisma generate && next build",
+    "build": "node scripts/check-schemas.mjs && prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "verify:music": "tsx scripts/verify-music.ts"
