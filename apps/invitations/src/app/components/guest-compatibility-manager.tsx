@@ -14,9 +14,9 @@ const copy = {
     subtitle: 'Укажите, кого нужно посадить вместе, кого желательно объединить, а кого разделить.',
     required: 'Обязательно вместе',
     preferred: 'Желательно вместе',
-    excluded: 'Не сажать вместе',
-    none: 'Без предпочтений',
-    legend: 'Нажимайте на ячейку, чтобы изменить отношение. Изменение применяется к обоим гостям.',
+    excluded: 'Не рядом',
+    none: 'Неважно',
+    legend: 'Выберите гостя и для каждого другого гостя отметьте: обязательно за одним столом, желательно за одним столом или не рядом (за одним столом можно, но не на соседних стульях). Связь сохраняется для обоих гостей.',
     guests: 'Гости',
     groups: 'Группы',
     group: 'Группа гостя',
@@ -36,7 +36,7 @@ const copy = {
     error: 'Не удалось сохранить изменения',
     empty: 'Пока нет гостей. Сначала добавьте гостей в разделе «Гости».',
     matrix: 'Матрица совместимости',
-    mobile: 'Отношения выбранного гостя',
+    mobile: 'С кем должен сидеть этот гость',
     conflict: 'Конфликт: гости, которых нужно посадить вместе, отмечены как нежелательные соседи.',
     noRelations: 'Отношения пока не заданы',
   },
@@ -44,10 +44,10 @@ const copy = {
     title: 'Qonaqların uyğunluğu',
     subtitle: 'Birlikdə oturmalı, birlikdə oturması arzu olunan və ayrı oturmalı qonaqları seçin.',
     required: 'Mütləq birlikdə',
-    preferred: 'Birlikdə olması arzuolunandır',
-    excluded: 'Birlikdə oturmasın',
-    none: 'Seçim yoxdur',
-    legend: 'Münasibəti dəyişmək üçün xanaya klikləyin. Dəyişiklik hər iki qonağa tətbiq olunur.',
+    preferred: 'Arzuolunan birlikdə',
+    excluded: 'Yan-yana yox',
+    none: 'Fərqi yoxdur',
+    legend: 'Qonağı seçin və digər qonaqlar üçün qeyd edin: mütləq eyni masada, arzuolunan eyni masada və ya yan-yana yox (eyni masada ola bilər, amma qonşu stulda yox). Əlaqə hər iki qonaq üçün saxlanılır.',
     guests: 'Qonaqlar',
     groups: 'Qruplar',
     group: 'Qonağın qrupu',
@@ -67,7 +67,7 @@ const copy = {
     error: 'Dəyişiklikləri saxlamaq mümkün olmadı',
     empty: 'Hələ qonaq yoxdur. Əvvəlcə «Qonaqlar» bölməsində qonaq əlavə edin.',
     matrix: 'Uyğunluq matrisi',
-    mobile: 'Seçilmiş qonağın münasibətləri',
+    mobile: 'Bu qonaq kimlə oturmalıdır',
     conflict: 'Ziddiyyət: birlikdə oturmalı qonaqlar arzuolunmaz qonşu kimi qeyd edilib.',
     noRelations: 'Hələ münasibət təyin edilməyib',
   },
@@ -76,9 +76,9 @@ const copy = {
     subtitle: 'Choose who must sit together, who would prefer to sit together, and who should be separated.',
     required: 'Must sit together',
     preferred: 'Prefer together',
-    excluded: 'Keep apart',
-    none: 'No preference',
-    legend: 'Click a cell to change the relationship. Changes apply to both guests.',
+    excluded: 'Not next to',
+    none: "Doesn't matter",
+    legend: 'Pick a guest, then for every other guest mark: must share a table, prefer the same table, or not next to (same table is fine, just not neighbouring chairs). The link is saved for both guests.',
     guests: 'Guests',
     groups: 'Groups',
     group: 'Guest group',
@@ -98,7 +98,7 @@ const copy = {
     error: 'Could not save changes',
     empty: 'No guests yet. Add guests in the Guests section first.',
     matrix: 'Compatibility matrix',
-    mobile: 'Selected guest relationships',
+    mobile: 'Who this guest should sit with',
     conflict: 'Conflict: guests required to sit together are marked as incompatible.',
     noRelations: 'No relationships defined yet',
   },
@@ -208,6 +208,7 @@ export default function CompatibilityManager({
   const [selectedGuest, setSelectedGuest] = useState(guests[0]?.id ?? '');
   const [newGroupName, setNewGroupName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [showMatrix, setShowMatrix] = useState(false);
   const [saved, setSaved] = useState(true);
   const [error, setError] = useState('');
 
@@ -466,7 +467,7 @@ export default function CompatibilityManager({
                           aria-label={`${guest.name}: ${relationName(option)}`}
                           title={relationName(option)}
                         >
-                          {relationLabel(option)}
+                          {relationName(option)}
                         </button>
                       ))}
                     </div>
@@ -478,7 +479,13 @@ export default function CompatibilityManager({
         )}
       </div>
 
-      <div className="gc-desktop-matrix">
+      <button type="button" className="gc-save-button gc-matrix-toggle" onClick={() => setShowMatrix(v => !v)}>
+        {showMatrix
+          ? (locale === 'ru' ? 'Скрыть таблицу' : locale === 'az' ? 'Cədvəli gizlət' : 'Hide table')
+          : (locale === 'ru' ? 'Показать всех таблицей (для опытных)' : locale === 'az' ? 'Hamısını cədvəldə göstər (təcrübəlilər üçün)' : 'Show everyone as a table (advanced)')}
+      </button>
+
+      <div className={`gc-desktop-matrix ${showMatrix ? '' : 'is-hidden'}`}>
         <div className="gc-matrix-title">
           <h2>{t.matrix}</h2>
           <span>{guests.length} {t.guests.toLowerCase()}</span>
