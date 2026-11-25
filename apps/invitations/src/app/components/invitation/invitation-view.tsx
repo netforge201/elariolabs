@@ -98,11 +98,11 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
           {!isThumb && (
             <>
               <Countdown m={m} />
+              <Intro m={m} />
+              <Photo m={m} />
               <Details m={m} preview={preview} />
               {/* RSVP exists only on personal invitations whose guest has it switched on. */}
               {m.guest?.rsvp && <Rsvp m={m} rsvp={m.guest.rsvp} slug={m.guest.slug} preview={preview} />}
-              <Intro m={m} />
-              <Photo m={m} />
               <Story m={m} />
               <Closing m={m} />
             </>
