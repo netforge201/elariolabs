@@ -40,6 +40,8 @@ async function getGuestInvitation(slug: string) {
   return { guest, wedding };
 }
 
+const INVITE_WORD: Record<string, string> = { az: 'toy dəvətnaməsi', ru: 'свадебное приглашение', en: 'wedding invitation' };
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const result = await getGuestInvitation(slug);
@@ -52,8 +54,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${result.wedding.partnerOne} & ${result.wedding.partnerTwo}`;
 
   return {
-    title: `${title} — Personal Invitation`,
-    description: 'A personal wedding invitation',
+    title: { absolute: `${title} — ${INVITE_WORD[result.wedding.locale] ?? INVITE_WORD.az}` },
+    description: `${title} — ${INVITE_WORD[result.wedding.locale] ?? INVITE_WORD.az}`,
     robots: { index: false, follow: false },
   };
 }

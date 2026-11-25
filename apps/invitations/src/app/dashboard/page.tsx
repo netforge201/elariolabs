@@ -123,6 +123,25 @@ export default async function DashboardPage() {
           : <Link href="/dashboard/studio" className="bx-button bx-button--dark bx-head-cta">{t.publishCta}</Link>}
       </header>
 
+      <section className="bx-tile" style={{ marginBottom: 16 }}>
+        <p className="bx-tile-label">{locale === 'ru' ? 'С чего начать — 4 шага' : locale === 'en' ? 'Getting started — 4 steps' : 'Necə başlamaq — 4 addım'}</p>
+        <ol style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, margin: '8px 0 0', padding: 0, listStyle: 'none' }}>
+          {([
+            ['/dashboard/studio', published, locale === 'ru' ? 'Заполните имена, дату, место и выберите дизайн' : locale === 'en' ? 'Fill in names, date, venue and pick a design' : 'Adları, tarixi, məkanı yazın və dizayn seçin', locale === 'ru' ? 'Приглашение' : locale === 'en' ? 'Invitation' : 'Dəvətnamə'],
+            ['/dashboard/studio#st-guests-title', guests.length > 0, locale === 'ru' ? 'Добавьте гостей — у каждого будет своя ссылка' : locale === 'en' ? 'Add guests — each gets a personal link' : 'Qonaqları əlavə edin — hər birinə ayrıca keçid', locale === 'ru' ? 'Гости' : locale === 'en' ? 'Guests' : 'Qonaqlar'],
+            ['/dashboard/seating', guests.length > 0 && seated === guests.length, locale === 'ru' ? 'Расставьте столы и рассадите гостей (можно автоматически)' : locale === 'en' ? 'Place tables and seat guests (can be automatic)' : 'Masaları qoyun və qonaqları oturdun (avtomatik də olar)', locale === 'ru' ? 'Рассадка' : locale === 'en' ? 'Seating' : 'Oturacaq'],
+            ['/dashboard/guests', false, locale === 'ru' ? 'Скопируйте ссылки и отправьте гостям' : locale === 'en' ? 'Copy the links and send them to guests' : 'Keçidləri kopyalayıb qonaqlara göndərin', locale === 'ru' ? 'Отправка' : locale === 'en' ? 'Send' : 'Göndərmə'],
+          ] as [string, boolean, string, string][]).map(([href, done, text, name], i) => (
+            <li key={href}>
+              <Link href={href} style={{ display: 'block', padding: 12, borderRadius: 12, border: '1px solid rgba(0,0,0,.08)', height: '100%' }}>
+                <strong>{done ? '✓' : i + 1}. {name}</strong>
+                <span style={{ display: 'block', fontSize: 13, opacity: .75, marginTop: 4 }}>{text}</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <div className="bx-grid">
         <section className="bx-tile bx-tile--hero bx-span-2">
           <p className="bx-tile-label">{t.countdown}</p>

@@ -16,18 +16,18 @@ type Section = 'overview' | 'studio' | 'guests' | 'seating' | 'compatibility';
 
 const translations = {
   az: {
-    labels: { overview: 'Ümumi baxış', studio: 'Dəvətnamə studiyası', guests: 'Qonaqlar', seating: 'Oturacaq planı', compatibility: 'Uyğunluq' },
-    short: { overview: 'Baxış', studio: 'Studiya', guests: 'Qonaqlar', seating: 'Masalar', compatibility: 'Uyğunluq' },
+    labels: { overview: 'Əsas səhifə', studio: 'Dəvətnamənin dizaynı və mətni', guests: 'Qonaqlar və keçidlər', seating: 'Masalar və oturacaq planı', compatibility: 'Kim kimlə oturmalıdır' },
+    short: { overview: 'Əsas', studio: 'Dəvətnamə', guests: 'Qonaqlar', seating: 'Oturacaq', compatibility: 'Kim kimlə' },
     menu: 'Bölmələr', logout: 'Hesabdan çıxış',
   },
   ru: {
-    labels: { overview: 'Обзор', studio: 'Студия приглашений', guests: 'Гости', seating: 'План рассадки', compatibility: 'Совместимость' },
-    short: { overview: 'Обзор', studio: 'Студия', guests: 'Гости', seating: 'Столы', compatibility: 'Связи' },
+    labels: { overview: 'Главная', studio: 'Дизайн и текст приглашения', guests: 'Гости и ссылки', seating: 'Столы и план рассадки', compatibility: 'Кто с кем должен сидеть' },
+    short: { overview: 'Главная', studio: 'Приглашение', guests: 'Гости', seating: 'Рассадка', compatibility: 'Кто с кем' },
     menu: 'Разделы', logout: 'Выйти из аккаунта',
   },
   en: {
     labels: { overview: 'Overview', studio: 'Invitation studio', guests: 'Guests', seating: 'Seating plan', compatibility: 'Compatibility' },
-    short: { overview: 'Overview', studio: 'Studio', guests: 'Guests', seating: 'Tables', compatibility: 'Relations' },
+    short: { overview: 'Home', studio: 'Invitation', guests: 'Guests', seating: 'Seating', compatibility: 'Who with whom' },
     menu: 'Sections', logout: 'Sign out',
   },
 };

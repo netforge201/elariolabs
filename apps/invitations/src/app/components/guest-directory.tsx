@@ -163,7 +163,9 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
       </div>
 
       {fl && (
-        <div className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <details className="guests-search" open={Object.values(filters).some(Boolean)}>
+        <summary style={{ cursor: 'pointer', fontWeight: 600 }}>{fl.title}{Object.values(filters).some(Boolean) ? ` · ${fl.shown} ${visible.length} ${fl.of} ${guests.length}` : ''}</summary>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 }}>
           {([
             ['group', [...groupOptions.map(o => [o.id, o.name]), ['other', fl.noGroup]]],
             ['side', [['bride', fl.bride], ['groom', fl.groom], ['shared', fl.shared]]],
@@ -187,6 +189,7 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
           <button type="button" className="guest-action" onClick={() => setFilters(NO_FILTERS)}>{fl.reset}</button>
           <span style={{ fontSize: 12 }}>{fl.shown} {visible.length} {fl.of} {guests.length}</span>
         </div>
+        </details>
       )}
 
       {exportLabels && (

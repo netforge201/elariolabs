@@ -21,6 +21,8 @@ async function getWedding(slug: string) {
   return wedding;
 }
 
+const INVITE_WORD: Record<string, string> = { az: 'toy dəvətnaməsi', ru: 'свадебное приглашение', en: 'wedding invitation' };
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const wedding = await getWedding(slug);
@@ -28,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${wedding.partnerOne} & ${wedding.partnerTwo}`;
   return {
-    title: `${title} — Wedding Invitation`,
+    title: { absolute: `${title} — ${INVITE_WORD[wedding.locale] ?? INVITE_WORD.az}` },
     description: wedding.welcomeText || `Wedding invitation for ${title}`,
     openGraph: { title, description: wedding.welcomeText || 'Wedding invitation' },
   };
