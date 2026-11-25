@@ -511,12 +511,34 @@ function seatPointUnrotated(table: SeatingObject, index: number) {
       y: table.y + table.height / 2 + Math.sin(angle) * (table.height / 2 + 23),
     };
   }
-  const perimeter = 2 * (table.width + table.height);
-  const distance = (index / count) * perimeter;
-  if (distance < table.width) return { x: table.x + distance, y: table.y - 24 };
-  if (distance < table.width + table.height) return { x: table.x + table.width + 24, y: table.y + distance - table.width };
-  if (distance < 2 * table.width + table.height) return { x: table.x + table.width - (distance - table.width - table.height), y: table.y + table.height + 24 };
-  return { x: table.x - 24, y: table.y + table.height - (distance - 2 * table.width - table.height) };
+  // Rectangular tables: seats split over the four sides in proportion to their
+  // length, centred and evenly spaced on each side.
+  const { top, right, bottom } = rectSideCounts(count, table.width, table.height);
+  const gap = 24;
+  if (index < top) {
+    return { x: table.x + ((index + 0.5) * table.width) / top, y: table.y - gap };
+  }
+  if (index < top + right) {
+    const i = index - top;
+    return { x: table.x + table.width + gap, y: table.y + ((i + 0.5) * table.height) / right };
+  }
+  if (index < top + right + bottom) {
+    const i = index - top - right;
+    return { x: table.x + table.width - ((i + 0.5) * table.width) / bottom, y: table.y + table.height + gap };
+  }
+  const left = count - top - right - bottom;
+  const i = index - top - right - bottom;
+  return { x: table.x - gap, y: table.y + table.height - ((i + 0.5) * table.height) / left };
+}
+
+/** How many seats go on each side of a rectangular table (top, right, bottom, left). */
+function rectSideCounts(count: number, width: number, height: number) {
+  const across = Math.min(Math.floor(count / 2), Math.round((count * width) / (2 * (width + height))));
+  const top = across;
+  const bottom = across;
+  const rest = count - top - bottom;
+  const right = Math.ceil(rest / 2);
+  return { top, right, bottom, left: rest - right };
 }
 
 function chunk<T>(items: T[], size: number): T[][] {
