@@ -4509,3 +4509,8 @@ body.sp-guest-dragging, body.sp-guest-dragging * { cursor: grabbing !important; 
 @media (max-width: 760px) {
   .sp-validation-item { align-items: flex-start; flex-direction: column; }
 }
+
+/* Seating editor: collapsed venue size row, extra objects */
+.sp-venue-toolbar.is-collapsed > :not(.sp-venue-toggle) { display: none; }
+.sp-venue-toggle { font-weight: 600; background: transparent; border: 0; cursor: pointer; }
+.sp-more-objects > button { display: flex; width: 100%; }

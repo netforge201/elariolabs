@@ -367,6 +367,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
   const [preferredNeighborDraft, setPreferredNeighborDraft] = useState('');
   const [excludedNeighborDraft, setExcludedNeighborDraft] = useState('');
   const [newGuestGroupName, setNewGuestGroupName] = useState('');
+  const [showVenue, setShowVenue] = useState(false);
   const [autoProposals, setAutoProposals] = useState<SeatingProposal[]>([]);
   const [showAutoSeating, setShowAutoSeating] = useState(false);
   const [keepExistingSeats, setKeepExistingSeats] = useState(true);
@@ -1186,6 +1187,13 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
     zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, nextZoom);
   }
 
+  useEffect(() => {
+    if (saved) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [saved]);
+
   async function save(target: SeatingPlanV2 = plan) {
     setSaving(true);
     setError('');
@@ -1304,6 +1312,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           <span className="sp-eyebrow">{ui.eyebrow}</span>
           <h1>{t.title}</h1>
           <p>{couple} · {t.subtitle}</p>
+          <p className="sp-steps" style={{ marginTop: 6, fontSize: 13, opacity: .8 }}>{locale === 'ru' ? '1. Добавьте столы слева  →  2. Перетащите гостей справа на стулья или нажмите «Умная рассадка»  →  3. Нажмите «Сохранить»' : locale === 'az' ? '1. Soldan masaları əlavə edin  →  2. Qonaqları sağdan stullara sürüşdürün və ya «Ağıllı yerləşdirmə» basın  →  3. «Yadda saxla» basın' : '1. Add tables on the left  →  2. Drag guests from the right onto chairs or press “Smart Seating”  →  3. Press Save'}</p>
         </div>
         <div className="sp-top-actions">
           <span className={saved ? 'sp-save-state' : 'sp-save-state dirty'}>{saved ? t.saved : t.unsaved}</span>
@@ -1325,9 +1334,15 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
           <button onClick={() => addObject('rect-table')} className="flex items-center gap-1.5"><RectTableIcon className="w-4 h-4 inline-block" /> {t.addRect}</button>
           <button onClick={() => addObject('oval-table')} className="flex items-center gap-1.5"><OvalTableIcon className="w-4 h-4 inline-block" /> {t.addOval}</button>
           <div className="sp-tool-divider" />
-          {(['wall', 'column', 'door', 'window', 'stage', 'dancefloor', 'bar', 'buffet', 'entrance'] as SeatingObjectType[]).map(type => (
+          {(['stage', 'dancefloor', 'entrance'] as SeatingObjectType[]).map(type => (
             <button key={type} onClick={() => addObject(type)}>{objectLabel(type, t)}</button>
           ))}
+          <details className="sp-more-objects">
+            <summary style={{ cursor: 'pointer', padding: '6px 0', fontSize: 13 }}>{locale === 'ru' ? 'Ещё объекты' : locale === 'az' ? 'Digər obyektlər' : 'More objects'}</summary>
+            {(['wall', 'column', 'door', 'window', 'bar', 'buffet'] as SeatingObjectType[]).map(type => (
+              <button key={type} onClick={() => addObject(type)}>{objectLabel(type, t)}</button>
+            ))}
+          </details>
           <div className="sp-tool-divider" />
           <span className="sp-panel-label">{locale === 'ru' ? 'В приглашении гостя показывать' : locale === 'az' ? 'Qonağın dəvətnaməsində göstər' : "Show on the guest's invitation"}</span>
           <select value={plan.settings.seatDisplay} onChange={event => { const next = { ...plan, settings: { ...plan.settings, seatDisplay: event.target.value as SeatingPlanV2['settings']['seatDisplay'] } }; updatePlan(next); void save(next); }}>
@@ -1381,7 +1396,8 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
             </div>
           </div>
 
-          <div className="sp-venue-toolbar">
+          <div className={`sp-venue-toolbar ${showVenue ? '' : 'is-collapsed'}`}>
+            <button type="button" className="sp-venue-toggle" onClick={() => setShowVenue(v => !v)}>{showVenue ? '▾' : '▸'} {locale === 'ru' ? 'Размер зала' : locale === 'az' ? 'Zalın ölçüsü' : 'Venue size'}</button>
             <span>{locale === 'ru' ? 'Размер зала' : locale === 'az' ? 'Zalın ölçüsü' : 'Venue size'}</span>
             <button onClick={() => setVenueSize(1200, 800)}>{ui.small} · 1200 × 800</button>
             <button onClick={() => setVenueSize(1600, 1100)}>{ui.medium} · 1600 × 1100</button>

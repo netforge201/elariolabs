@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { GuestSeatingProfile, SeatingGuest } from '@/lib/seating-types';
 
 type Locale = 'ru' | 'az' | 'en';
@@ -210,6 +210,12 @@ export default function CompatibilityManager({
   const [saving, setSaving] = useState(false);
   const [showMatrix, setShowMatrix] = useState(false);
   const [saved, setSaved] = useState(true);
+  useEffect(() => {
+    if (saved) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [saved]);
   const [error, setError] = useState('');
 
   const guestMap = useMemo(() => new Map(guests.map(g => [g.id, g.name])), [guests]);
