@@ -4,8 +4,12 @@
 // Fail the build when they drift apart.
 import { readFileSync } from 'node:fs';
 
-const a = 'prisma/schema.prisma';
-const b = 'apps/invitations/prisma/schema.prisma';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+// Paths are resolved from the repo root, so this works from either app's build.
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const a = path.join(root, 'prisma/schema.prisma');
+const b = path.join(root, 'apps/invitations/prisma/schema.prisma');
 let left, right;
 try {
   left = readFileSync(a, 'utf8');
