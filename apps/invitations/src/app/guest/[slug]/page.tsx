@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const who = result.guest.inviteName?.trim() || result.guest.name;
   const loc = result.wedding.locale;
-  const full = loc === 'ru' ? `${title} - Приглашение для ${who}` : loc === 'en' ? `${title} - Invitation for ${who}` : `${title} - ${who} dəvətnaməsi`;
+  const full = loc === 'ru' ? `${title} - Приглашение для ${who}` : loc === 'en' ? `${title} - Invitation for ${who}` : `${title} - Dəvətnamə ${who}`;
   return {
     title: { absolute: full },
     description: `${title} — ${INVITE_WORD[loc] ?? INVITE_WORD.az}`,
