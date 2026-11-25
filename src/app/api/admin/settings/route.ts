@@ -12,7 +12,7 @@ export async function POST(req:Request){
   if(!await requirePermission('settings.manage'))return new Response('Forbidden',{status:403});
 
   const form=await req.formData();
-  for(const key of ['contact.email','contact.phone','copyright','home.tagline','seo.title','seo.description']){
+  for(const key of ['contact.email','contact.phone','invitations.contact.phone','copyright','home.tagline','seo.title','seo.description']){
     const value=form.get(key);
     if(typeof value==='string')await db.siteSetting.upsert({where:{key},create:{key,value},update:{value}});
   }

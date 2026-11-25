@@ -41,6 +41,7 @@ return <>
 <form action="/api/admin/settings" method="post">
 <label className="field">Contact email<input type="email" name="contact.email" defaultValue={String(values.get('contact.email')||'')} placeholder="hello@example.com"/></label>
 <label className="field">Contact phone<input type="tel" name="contact.phone" defaultValue={String(values.get('contact.phone')||'')} placeholder="+1 555 123 4567"/></label>
+<label className="field">Invitations: phone for new customers (login page)<input type="tel" name="invitations.contact.phone" defaultValue={String(values.get('invitations.contact.phone')||'')} placeholder="+994 50 123 45 67"/></label>
 <label className="field">Copyright<input name="copyright" defaultValue={String(values.get('copyright')||'© ElarioLabs')}/></label>
 <label className="field">Homepage tagline<input name="home.tagline" defaultValue={String(values.get('home.tagline')||'')}/></label>
 <h2>Social profiles</h2>

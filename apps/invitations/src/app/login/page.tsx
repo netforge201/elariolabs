@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { db } from '@/lib/db';
 import { currentInvitationAccount } from '@/lib/auth';
 import { getDashboardLocale } from '@/lib/dashboard-locale';
 import LanguageSwitcher from '@/app/components/language-switcher';
@@ -15,7 +16,7 @@ const copy = {
     welcome: 'Xoş gəldiniz', title: 'Daxil olun', intro: 'Sizə verilmiş hesab məlumatlarını daxil edin.',
     error: 'Daxil olmaq alınmadı. E-poçtu və şifrəni yoxlayın və ya administratorla əlaqə saxlayın.',
     email: 'E-poçt ünvanı', password: 'Şifrə', passwordPlaceholder: 'Şifrənizi daxil edin', submit: 'Hesaba daxil ol',
-    note: 'Giriş administrator tərəfindən verilir.', noteTwo: 'Açıq qeydiyyat mövcud deyil.',
+    note: 'Giriş administrator tərəfindən verilir.', noteTwo: 'Açıq qeydiyyat mövcud deyil.', contact: 'Proqramdan istifadə etmək istəyirsiniz? Zəng edin və ya yazın:',
   },
   ru: {
     kicker: 'Новое начало', headline: 'Каждый особенный момент достоин красивого приглашения.',
@@ -23,7 +24,7 @@ const copy = {
     welcome: 'С возвращением', title: 'Вход', intro: 'Введите данные аккаунта, которые вам выдали.',
     error: 'Не удалось войти. Проверьте e-mail и пароль или свяжитесь с администратором.',
     email: 'E-mail', password: 'Пароль', passwordPlaceholder: 'Введите пароль', submit: 'Войти в аккаунт',
-    note: 'Доступ выдаёт администратор.', noteTwo: 'Открытой регистрации нет.',
+    note: 'Доступ выдаёт администратор.', noteTwo: 'Открытой регистрации нет.', contact: 'Хотите пользоваться программой? Позвоните или напишите:',
   },
   en: {
     kicker: 'A new beginning', headline: 'Every special moment deserves a beautiful invitation.',
@@ -31,7 +32,7 @@ const copy = {
     welcome: 'Welcome back', title: 'Sign in', intro: 'Enter the account details provided to you.',
     error: 'Unable to sign in. Check your email and password or contact your administrator.',
     email: 'Email address', password: 'Password', passwordPlaceholder: 'Enter your password', submit: 'Sign in to your account',
-    note: 'Access is provided by your administrator.', noteTwo: 'Public registration is not available.',
+    note: 'Access is provided by your administrator.', noteTwo: 'Public registration is not available.', contact: 'Want to use the app? Call or message us:',
   },
 };
 
@@ -49,6 +50,9 @@ export default async function LoginPage({
   const hasError = Boolean(params.error);
   const locale = await getDashboardLocale();
   const t = copy[locale];
+  // Separate from the main site's contact.phone; edited in the main admin (Studio Settings).
+  const phoneSetting = await db.siteSetting.findUnique({ where: { key: 'invitations.contact.phone' } }).catch(() => null);
+  const phone = typeof phoneSetting?.value === 'string' ? phoneSetting.value.trim() : '';
 
   return (
     <>
@@ -107,6 +111,15 @@ export default async function LoginPage({
             {t.note}
             <br />{t.noteTwo}
           </p>
+          {phone && (
+            <p className="mt-4 text-center text-sm leading-6 text-[#1f3a2e]">
+              {t.contact}
+              <br />
+              <a href={`tel:${phone.replace(/[^+\d]/g, '')}`} className="text-lg font-bold underline">{phone}</a>
+              {' · '}
+              <a href={`https://wa.me/${phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="font-semibold underline">WhatsApp</a>
+            </p>
+          )}
         </section>
       </div>
     </main>
