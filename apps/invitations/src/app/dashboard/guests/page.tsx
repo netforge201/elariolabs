@@ -93,20 +93,20 @@ export default async function GuestsPage() {
   const profiles = seatingPlan.guestProfiles;
   const seatedIds = new Set(seatingPlan.assignments.map(a => a.guestId));
   const fl = locale === 'ru'
-    ? { title: 'Фильтры', group: 'Группа', side: 'Сторона', vip: 'VIP', access: 'Особые потребности', seat: 'Место', rel: 'Совместимость', gender: 'Пол', with: 'С кем', rsvp: 'RSVP', answer: 'Ответ',
+    ? { addPh: 'Имя гостя или семьи, например: Алиевы', add: 'Добавить', import: 'Загрузить список (Excel, Word, PDF, TXT)', confirmImport: 'Добавить гостей из файла:', addError: 'Не удалось добавить', title: 'Фильтры', group: 'Группа', side: 'Сторона', vip: 'VIP', access: 'Особые потребности', seat: 'Место', rel: 'Совместимость', gender: 'Пол', with: 'С кем', rsvp: 'RSVP', answer: 'Ответ',
         any: 'Все', noGroup: 'Без группы', bride: 'Невеста', groom: 'Жених', shared: 'Общая', yes: 'Да', no: 'Нет', seated: 'Рассажен', unseated: 'Не рассажен',
         req: 'Есть «++»', pref: 'Есть «+»', excl: 'Есть «−»', none: 'Ничего', male: 'Мужчина', female: 'Женщина', unknown: 'Не указан',
         alone: 'Один', family: 'С семьёй', wife: 'С супругой', spouse: 'С супругом(-ой)', on: 'Включён', off: 'Выключен',
         coming: 'Придёт', declined: 'Не придёт', waiting: 'Нет ответа', reset: 'Сбросить', shown: 'Показано', of: 'из',
         gFamily: 'Семья', gFriends: 'Друзья', gColleagues: 'Коллеги' }
     : locale === 'en'
-      ? { title: 'Filters', group: 'Group', side: 'Side', vip: 'VIP', access: 'Accessibility', seat: 'Seat', rel: 'Compatibility', gender: 'Gender', with: 'Invited with', rsvp: 'RSVP', answer: 'Answer',
+      ? { addPh: 'Guest or family name', add: 'Add', import: 'Upload a list (Excel, Word, PDF, TXT)', confirmImport: 'Add guests from the file:', addError: 'Could not add', title: 'Filters', group: 'Group', side: 'Side', vip: 'VIP', access: 'Accessibility', seat: 'Seat', rel: 'Compatibility', gender: 'Gender', with: 'Invited with', rsvp: 'RSVP', answer: 'Answer',
           any: 'All', noGroup: 'No group', bride: 'Bride', groom: 'Groom', shared: 'Shared', yes: 'Yes', no: 'No', seated: 'Seated', unseated: 'Not seated',
           req: 'Has "++"', pref: 'Has "+"', excl: 'Has "−"', none: 'None', male: 'Male', female: 'Female', unknown: 'Not set',
           alone: 'Alone', family: 'With family', wife: 'With wife', spouse: 'With spouse', on: 'On', off: 'Off',
           coming: 'Coming', declined: 'Not coming', waiting: 'No answer', reset: 'Reset', shown: 'Shown', of: 'of',
           gFamily: 'Family', gFriends: 'Friends', gColleagues: 'Colleagues' }
-      : { title: 'Filtrlər', group: 'Qrup', side: 'Tərəf', vip: 'VIP', access: 'Xüsusi ehtiyac', seat: 'Yer', rel: 'Uyğunluq', gender: 'Cins', with: 'Kiminlə', rsvp: 'RSVP', answer: 'Cavab',
+      : { addPh: 'Qonağın və ya ailənin adı, məs.: Əliyevlər ailəsi', add: 'Əlavə et', import: 'Siyahı yüklə (Excel, Word, PDF, TXT)', confirmImport: 'Fayldan qonaqlar əlavə edilsin:', addError: 'Əlavə etmək alınmadı', title: 'Filtrlər', group: 'Qrup', side: 'Tərəf', vip: 'VIP', access: 'Xüsusi ehtiyac', seat: 'Yer', rel: 'Uyğunluq', gender: 'Cins', with: 'Kiminlə', rsvp: 'RSVP', answer: 'Cavab',
           any: 'Hamısı', noGroup: 'Qrupsuz', bride: 'Gəlin', groom: 'Bəy', shared: 'Ümumi', yes: 'Bəli', no: 'Xeyr', seated: 'Yerləşdirilib', unseated: 'Yerləşdirilməyib',
           req: '«++» var', pref: '«+» var', excl: '«−» var', none: 'Heç biri', male: 'Kişi', female: 'Qadın', unknown: 'Göstərilməyib',
           alone: 'Tək', family: 'Ailə ilə', wife: 'Xanımınızla', spouse: 'Həyat yoldaşınızla', on: 'Açıq', off: 'Bağlı',
@@ -132,7 +132,7 @@ export default async function GuestsPage() {
           <h1>{t.title}</h1>
           <p>{t.description}</p>
         </div>
-        <Link href="/dashboard/studio#st-guests-title" className="elario-button-dark">{t.manage} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
+        <Link href="#add-guest" className="elario-button-dark">{t.manage} <ArrowUpRightIcon className="w-3.5 h-3.5 inline-block" /></Link>
       </div>
 
       <section className="guests-summary">

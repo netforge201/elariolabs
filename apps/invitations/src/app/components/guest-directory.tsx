@@ -75,6 +75,36 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
   const [guests, setGuests] = useState(initial);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [newName, setNewName] = useState('');
+  const [adding, setAdding] = useState(false);
+
+  async function addGuest(event: React.FormEvent) {
+    event.preventDefault();
+    if (!newName.trim() || !fl) return;
+    setAdding(true);
+    const response = await fetch('/api/guests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: newName.trim() }) }).catch(() => null);
+    if (response?.ok) window.location.reload(); else { alert(fl.addError); setAdding(false); }
+  }
+
+  async function importFile(file: File | undefined) {
+    if (!file || !fl) return;
+    setAdding(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const preview = await fetch('/api/guests/import/preview', { method: 'POST', body: form });
+      const result = await preview.json();
+      if (!preview.ok) throw new Error(result.error);
+      const names: string[] = result.names || [];
+      if (!names.length || !window.confirm(`${fl.confirmImport}\n\n${names.join('\n')}`)) { setAdding(false); return; }
+      const saved = await fetch('/api/guests/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ names }) });
+      if (!saved.ok) throw new Error();
+      window.location.reload();
+    } catch (err) {
+      alert(err instanceof Error && err.message ? err.message : fl.addError);
+      setAdding(false);
+    }
+  }
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [canShare, setCanShare] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -161,6 +191,17 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
         </dl>
         {error && <p className="guests-rsvp-error" role="alert">{error}</p>}
       </div>
+
+      {fl && (
+        <form id="add-guest" onSubmit={addGuest} className="guests-search" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <input value={newName} onChange={event => setNewName(event.target.value)} placeholder={fl.addPh} style={{ flex: '1 1 260px' }} disabled={adding} />
+          <button type="submit" className="guest-action guest-action--primary" disabled={adding || !newName.trim()}>{fl.add}</button>
+          <label className="guest-action" style={{ cursor: 'pointer' }}>
+            {fl.import}
+            <input type="file" hidden accept=".csv,.xls,.xlsx,.doc,.docx,.txt,.pdf" disabled={adding} onChange={event => void importFile(event.target.files?.[0])} />
+          </label>
+        </form>
+      )}
 
       {fl && (
         <details className="guests-search" open={Object.values(filters).some(Boolean)}>

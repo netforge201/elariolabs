@@ -368,6 +368,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
   const [excludedNeighborDraft, setExcludedNeighborDraft] = useState('');
   const [newGuestGroupName, setNewGuestGroupName] = useState('');
   const [showVenue, setShowVenue] = useState(false);
+  const latestPlan = useRef<SeatingPlanV2 | null>(null);
   const [autoProposals, setAutoProposals] = useState<SeatingProposal[]>([]);
   const [showAutoSeating, setShowAutoSeating] = useState(false);
   const [keepExistingSeats, setKeepExistingSeats] = useState(true);
@@ -1188,12 +1189,20 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
   }
 
   useEffect(() => {
+    if (saved || saving) return;
+    const timer = window.setTimeout(() => { void save(); }, 1500);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan, saved, saving]);
+
+  useEffect(() => {
     if (saved) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
   }, [saved]);
 
+  latestPlan.current = plan;
   async function save(target: SeatingPlanV2 = plan) {
     setSaving(true);
     setError('');
@@ -1207,7 +1216,7 @@ export default function SeatingPlanner({ locale, couple, guests, initialPlan }: 
         const result = await response.json().catch(() => null);
         throw new Error(result?.error || t.error);
       }
-      setSaved(true);
+      if (latestPlan.current === target) setSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : t.error);
     } finally {

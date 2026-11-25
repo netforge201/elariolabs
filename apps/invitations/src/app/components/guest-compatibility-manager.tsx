@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { GuestSeatingProfile, SeatingGuest } from '@/lib/seating-types';
 
 type Locale = 'ru' | 'az' | 'en';
@@ -211,6 +211,13 @@ export default function CompatibilityManager({
   const [showMatrix, setShowMatrix] = useState(false);
   const [saved, setSaved] = useState(true);
   useEffect(() => {
+    if (saved || saving) return;
+    const timer = window.setTimeout(() => { void save(); }, 1500);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profiles, groups, saved, saving]);
+
+  useEffect(() => {
     if (saved) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
     window.addEventListener('beforeunload', warn);
@@ -310,7 +317,11 @@ export default function CompatibilityManager({
     setSaved(false);
   }
 
+  const latest = useRef({ profiles, groups });
+  latest.current = { profiles, groups };
+
   async function save() {
+    const sent = { profiles, groups };
     setSaving(true);
     setError('');
 
@@ -318,7 +329,7 @@ export default function CompatibilityManager({
       const response = await fetch('/api/guests/compatibility', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profiles, guestGroups: groups }),
+        body: JSON.stringify({ profiles: sent.profiles, guestGroups: sent.groups }),
       });
 
       if (!response.ok) {
@@ -326,7 +337,7 @@ export default function CompatibilityManager({
         throw new Error(result?.error || t.error);
       }
 
-      setSaved(true);
+      if (latest.current.profiles === sent.profiles && latest.current.groups === sent.groups) setSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : t.error);
     } finally {
