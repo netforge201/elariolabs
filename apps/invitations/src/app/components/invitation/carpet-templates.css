@@ -98,7 +98,7 @@ html:has(.inv-mode-live.inv-t-heritage), html:has(.inv-mode-live.inv-t-heritage)
   display: grid;
   place-items: center;
   padding: clamp(10px, 3.2cqi, 48px);
-  padding-bottom: clamp(44px, 7cqi, 64px);
+  padding-bottom: 84px;
 }
 .kx-hero--carpet { background: radial-gradient(120% 70% at 50% 0%, #f6ecd7, transparent 70%), var(--bg); }
 .kx-hero--buta { background: radial-gradient(90% 60% at 50% 30%, #1a2350, transparent 75%), var(--bg); }
