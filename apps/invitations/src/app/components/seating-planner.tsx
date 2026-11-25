@@ -268,7 +268,22 @@ function isTable(object: SeatingObject) {
   return ['round-table', 'rect-table', 'oval-table'].includes(object.type);
 }
 
+/** Seat centre, rotated together with its table around the table's centre. */
 function seatPoint(table: SeatingObject, index: number) {
+  const point = seatPointUnrotated(table, index);
+  if (!table.rotation) return point;
+  const cx = table.x + table.width / 2;
+  const cy = table.y + table.height / 2;
+  const angle = (table.rotation * Math.PI) / 180;
+  const dx = point.x - cx;
+  const dy = point.y - cy;
+  return {
+    x: cx + dx * Math.cos(angle) - dy * Math.sin(angle),
+    y: cy + dx * Math.sin(angle) + dy * Math.cos(angle),
+  };
+}
+
+function seatPointUnrotated(table: SeatingObject, index: number) {
   const count = table.capacity ?? 8;
   const angle = (Math.PI * 2 * index) / count - Math.PI / 2;
 
