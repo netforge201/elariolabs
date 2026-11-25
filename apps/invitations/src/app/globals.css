@@ -4514,3 +4514,20 @@ body.sp-guest-dragging, body.sp-guest-dragging * { cursor: grabbing !important; 
 .sp-venue-toolbar.is-collapsed > :not(.sp-venue-toggle) { display: none; }
 .sp-venue-toggle { font-weight: 600; background: transparent; border: 0; cursor: pointer; }
 .sp-more-objects > button { display: flex; width: 100%; }
+
+/* Compatibility: word buttons instead of 40px symbol squares */
+.gc-mobile-controls .gc-relation-picker { display: flex; flex-wrap: wrap; justify-content: flex-end; grid-template-columns: none; gap: 6px; }
+.gc-mobile-controls .gc-pick { width: auto; height: auto; min-height: 36px; padding: 6px 12px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+@media (max-width: 760px) { .gc-mobile-controls .gc-relation-picker { justify-content: flex-start; } }
+
+/* Guests: filter panel */
+.gd-filters { padding: 14px 27px; border-bottom: 1px solid var(--el-line); }
+@media (max-width: 760px) { .gd-filters { padding: 12px 16px; } }
+.gd-filters > summary { display: inline-flex; align-items: center; gap: 8px; list-style: none; cursor: pointer; }
+.gd-filters > summary::-webkit-details-marker { display: none; }
+.gd-filter-count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: #806a78; color: #fff; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+.gd-filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px 12px; margin-top: 12px; padding: 16px; border: 1px solid #ece8e2; border-radius: 14px; background: #fff; }
+.gd-filter { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #766e64; }
+.gd-filter select { width: 100%; padding: 9px 10px; border: 1px solid #e4dfd7; border-radius: 10px; background: #fff; color: #3d3730; font-size: 14px; }
+.gd-filter.is-set select { border-color: #806a78; background: #f6f1f5; }
+.gd-filter-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 13px; color: #766e64; }

@@ -204,9 +204,12 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
       )}
 
       {fl && (
-        <details className="guests-search" open={Object.values(filters).some(Boolean)}>
-        <summary style={{ cursor: 'pointer', fontWeight: 600 }}>{fl.title}{Object.values(filters).some(Boolean) ? ` · ${fl.shown} ${visible.length} ${fl.of} ${guests.length}` : ''}</summary>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 }}>
+        <details className="gd-filters" open={Object.values(filters).some(Boolean)}>
+        <summary className="guest-action">
+          {fl.title}
+          {Object.values(filters).filter(Boolean).length > 0 && <span className="gd-filter-count">{Object.values(filters).filter(Boolean).length}</span>}
+        </summary>
+        <div className="gd-filter-grid">
           {([
             ['group', [...groupOptions.map(o => [o.id, o.name]), ['other', fl.noGroup]]],
             ['side', [['bride', fl.bride], ['groom', fl.groom], ['shared', fl.shared]]],
@@ -219,7 +222,7 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
             ['rsvp', [['true', fl.on], ['false', fl.off]]],
             ['answer', [['yes', fl.coming], ['no', fl.declined], ['waiting', fl.waiting]]],
           ] as [keyof Filters, string[][]][]).map(([key, options]) => (
-            <label key={key} style={{ display: 'flex', flexDirection: 'column', fontSize: 12, gap: 2 }}>
+            <label key={key} className={`gd-filter ${filters[key] ? 'is-set' : ''}`}>
               <span>{fl[key]}</span>
               <select value={filters[key]} onChange={event => setFilters({ ...filters, [key]: event.target.value })}>
                 <option value="">{fl.any}</option>
@@ -227,8 +230,10 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
               </select>
             </label>
           ))}
-          <button type="button" className="guest-action" onClick={() => setFilters(NO_FILTERS)}>{fl.reset}</button>
-          <span style={{ fontSize: 12 }}>{fl.shown} {visible.length} {fl.of} {guests.length}</span>
+        </div>
+        <div className="gd-filter-foot">
+          <span>{fl.shown} <b>{visible.length}</b> {fl.of} {guests.length}</span>
+          <button type="button" className="guest-action" onClick={() => setFilters(NO_FILTERS)} disabled={!Object.values(filters).some(Boolean)}>{fl.reset}</button>
         </div>
         </details>
       )}
