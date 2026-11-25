@@ -179,6 +179,12 @@ export function icsFile(event: CalendarEvent): string {
     r.allDay ? `DTSTART;VALUE=DATE:${r.start}` : `DTSTART:${r.start}`,
     r.allDay ? `DTEND;VALUE=DATE:${r.end}` : `DTEND:${r.end}`,
     'STATUS:CONFIRMED',
+    // Reminder 3 days before the wedding (Apple Calendar, Outlook and others honour it).
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    `DESCRIPTION:${icsText(event.title)}`,
+    'TRIGGER:-P3D',
+    'END:VALARM',
     'END:VEVENT',
     'END:VCALENDAR',
   ].filter(Boolean).join('\r\n');
