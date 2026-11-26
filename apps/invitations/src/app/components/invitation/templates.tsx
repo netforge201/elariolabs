@@ -21,9 +21,9 @@ function Names({ m, as: Tag = 'h1', className = '' }: { m: InvitationModel; as?:
 
 function ScrollCue({ label }: { label: string }) {
   return (
-    <span className="inv-scroll-cue" aria-hidden="true">
+    <span className="inv-scroll-cue inv-rise" aria-hidden="true">
+      <span className="inv-scroll-ring"><ChevronDown className="inv-scroll-icon" /></span>
       <span className="inv-scroll-label">{label}</span>
-      <ChevronDown className="inv-scroll-icon" />
     </span>
   );
 }
@@ -53,9 +53,9 @@ function ClassicHero({ m }: HeroProps) {
             </p>
           )}
           {m.venueName && <p className="inv-hero-venue inv-rise"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></p>}
+          <ScrollCue label={m.t.scroll} />
         </div>
       </div>
-      <ScrollCue label={m.t.scroll} />
     </section>
   );
 }
@@ -82,8 +82,8 @@ function ModernHero({ m }: HeroProps) {
             {m.venueName && <span className="inv-modern-venue"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
           </div>
         )}
+        <ScrollCue label={m.t.scroll} />
       </div>
-      <ScrollCue label={m.t.scroll} />
     </section>
   );
 }

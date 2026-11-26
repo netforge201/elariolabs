@@ -50,15 +50,16 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
           <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>
         </p>
       )}
+      <ScrollCue label={m.t.scroll} />
     </div>
   );
 }
 
 function ScrollCue({ label }: { label: string }) {
   return (
-    <span className="inv-scroll-cue" aria-hidden="true">
+    <span className="inv-scroll-cue inv-rise" aria-hidden="true">
+      <span className="inv-scroll-ring"><ChevronDown className="inv-scroll-icon" /></span>
       <span className="inv-scroll-label">{label}</span>
-      <ChevronDown className="inv-scroll-icon" />
     </span>
   );
 }
@@ -68,7 +69,6 @@ function Shell({ id, m, children }: { id: CarpetTemplateId; m: InvitationModel; 
   return (
     <section className={`inv-hero inv-hero--k kx-hero--${id}`}>
       <div className={`kx-card kx-card--${id}`}>{children}</div>
-      <ScrollCue label={m.t.scroll} />
     </section>
   );
 }
