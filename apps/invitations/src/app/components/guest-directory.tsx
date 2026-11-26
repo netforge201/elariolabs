@@ -56,7 +56,7 @@ export type RsvpLabels = {
 };
 
 export type ProfileLabels = {
-  views: string;
+  views: string; sortViews: string; sortNone: string; sortDesc: string; sortAsc: string;
   edit: string; close: string; nick: string; inviteName: string; inviteNameHint: string;
   gender: string; male: string; female: string; none: string; family: string; preview: string;
   save: string; saving: string; saved: string; error: string; familyBadge: string; inviteAs: string;
@@ -77,6 +77,7 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
   const [guests, setGuests] = useState(initial);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [viewSort, setViewSort] = useState<'' | 'desc' | 'asc'>('');
   const [newName, setNewName] = useState('');
   const [adding, setAdding] = useState(false);
 
@@ -132,7 +133,8 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
 
   const needle = query.trim().toLocaleLowerCase();
   const visible = guests.filter(guest => matches(guest, filters) &&
-    (!needle || `${guest.name} ${guest.inviteName ?? ''}`.toLocaleLowerCase().includes(needle)));
+    (!needle || `${guest.name} ${guest.inviteName ?? ''}`.toLocaleLowerCase().includes(needle)))
+    .sort((a, b) => viewSort === 'desc' ? (b.views ?? 0) - (a.views ?? 0) : viewSort === 'asc' ? (a.views ?? 0) - (b.views ?? 0) : 0);
   const urlFor = (slug: string) => `${window.location.origin}/guest/${slug}`;
 
   async function copy(guest: DirectoryGuest) {
@@ -204,6 +206,15 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
           </label>
         </form>
       )}
+
+      <label className="guests-search" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span>{pl.sortViews}</span>
+        <select value={viewSort} onChange={e => setViewSort(e.target.value as '' | 'desc' | 'asc')}>
+          <option value="">{pl.sortNone}</option>
+          <option value="desc">{pl.sortDesc}</option>
+          <option value="asc">{pl.sortAsc}</option>
+        </select>
+      </label>
 
       {fl && (
         <details className="gd-filters" open={Object.values(filters).some(Boolean)}>
