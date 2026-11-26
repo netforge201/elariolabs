@@ -884,3 +884,5 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 .inv-t-minimal .inv-hdate { justify-content: flex-start; }
 .inv-t-minimal .inv-hvenue { text-align: left; }
 .inv-cover-cta::after { animation-duration: .9s; }
+.inv-table > div { text-align: center; }
+.inv-hvenue strong { font-size: 17px; }
