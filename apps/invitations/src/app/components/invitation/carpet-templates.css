@@ -429,7 +429,7 @@ html:has(.inv-mode-live.inv-t-heritage), html:has(.inv-mode-live.inv-t-heritage)
 }
 .inv-cover--k.is-opening .kx-cover-plaque { opacity: 0; transform: scale(.96); }
 .kx-cover-medallion { position: absolute; top: -42px; left: 50%; width: 84px; height: 84px; margin-left: -42px; shape-rendering: crispEdges; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35)); }
-.inv-cover--k .inv-cover-to { color: var(--k-ink); opacity: .8; }
+.inv-cover--k .inv-cover-to { color: var(--k-accent); opacity: 1; }
 .kx-cover-names { color: var(--k-accent); font-family: var(--f-serif); font-style: italic; font-weight: 600; font-size: clamp(2.2rem, 10.5cqi, 3.4rem); line-height: .98; }
 .kx-cover-names.inv-names--long, .kx-cover-names.inv-names--xlong { font-size: clamp(1.6rem, 7.4cqi, 2.4rem); }
 .kx-cover-names .inv-amp { color: var(--k-gold); font-family: 'Marck Script', var(--f-serif); font-style: normal; }

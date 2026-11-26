@@ -540,7 +540,7 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
   transition: opacity .3s ease;
 }
 .inv-cover--modern.is-opening .inv-cover-stage { opacity: 0; }
-.inv-cover--modern .inv-cover-to { color: rgba(244, 237, 226, .7); }
+.inv-cover--modern .inv-cover-to { color: #f4ede2; }
 .inv-cover--modern .inv-cover-names { font-size: clamp(2.3rem, 11cqi, 4.6rem); line-height: .95; }
 .inv-cover--modern .inv-cover-names.inv-names--long,
 .inv-cover--modern .inv-cover-names.inv-names--xlong { font-size: clamp(1.8rem, 8cqi, 3.4rem); }
@@ -856,4 +856,4 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 
 /* Guest name: bold everywhere; bigger and in the accent colour on the cover. */
 .inv-guest-name { font-weight: 700; }
-.inv-cover-to .inv-guest-name { font-size: 1.3em; font-style: normal; color: var(--k-accent, var(--accent-ink, var(--accent))); }
+.inv-cover-to { font-size: clamp(1.6rem, 7cqi, 2.1rem); font-style: normal; font-weight: 700; color: var(--k-accent, var(--accent-ink, var(--accent))); opacity: 1; }
