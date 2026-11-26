@@ -853,3 +853,7 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 .inv-mode-live .inv-hero { --inv-h: 88svh; }
 
 @media (prefers-reduced-motion: reduce) { .inv-cover-cta::after { animation: none; opacity: 0; } }
+
+/* Guest name: bold everywhere; bigger and in the accent colour on the cover. */
+.inv-guest-name { font-weight: 700; }
+.inv-cover-to .inv-guest-name { font-size: 1.3em; font-style: normal; color: var(--k-accent, var(--accent-ink, var(--accent))); }

@@ -6,6 +6,7 @@
 // comes from the InvitationModel, and the sections below the hero (details,
 // countdown, story, …) are the shared ones, themed in invitation.css.
 
+import { boldName } from './greet';
 import './carpet-templates.css';
 import type { CarpetTemplateId } from './catalog';
 import type { InvitationModel } from './model';
@@ -34,7 +35,7 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
       <p className="inv-eyebrow kx-eyebrow inv-rise">{m.t.weddingInvitation}</p>
       <Names m={m} className="kx-names inv-rise" />
       <Art name="divider" className="kx-divider inv-rise" />
-      <p className="kx-invite inv-rise">{m.greeting ? `${m.greeting}, ${m.inviteLine.charAt(0).toLocaleLowerCase(m.locale)}${m.inviteLine.slice(1)}` : m.inviteLine}</p>
+      <p className="kx-invite inv-rise">{m.greeting ? boldName(`${m.greeting}, ${m.inviteLine.charAt(0).toLocaleLowerCase(m.locale)}${m.inviteLine.slice(1)}`, m.guest?.name) : m.inviteLine}</p>
       {(m.date || m.time) && (
         <p className="kx-meta kx-date inv-rise">
           <CalendarIcon className="kx-icon" aria-hidden="true" />
@@ -264,7 +265,7 @@ export function KCover({ id, m, phase, hasMusic, focus, onOpen }: {
       ))}
       <div className="kx-cover-plaque">
         <Art name={COVER_MEDALLION[id]} className="kx-cover-medallion" />
-        <p className="inv-cover-to">{m.greeting ?? m.t.youAreInvited}</p>
+        <p className="inv-cover-to">{m.greeting ? boldName(m.greeting, m.guest?.name) : m.t.youAreInvited}</p>
         <Names m={m} as="p" className="inv-cover-names kx-cover-names" />
         <button type="button" className="inv-cover-button" onClick={onOpen} disabled={phase !== 'closed'} autoFocus={focus}>
           <span className="inv-cover-prompt">

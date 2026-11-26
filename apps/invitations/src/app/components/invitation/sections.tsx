@@ -1,5 +1,6 @@
 'use client';
 
+import { boldName } from './greet';
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import Reveal from '../reveal';
 import {
@@ -31,7 +32,7 @@ export function Intro({ m }: SectionProps) {
       {m.greeting && (
         <div className="inv-greeting">
           <span className="inv-label">{m.t.personalInvitation}</span>
-          <p className="inv-greeting-name">{m.greeting}</p>
+          <p className="inv-greeting-name">{boldName(m.greeting, m.guest?.name)}</p>
           {/* Carpet designs already print this line in their hero. */}
           {!isCarpetTemplate(m.template) && <p className="inv-greeting-invite">{m.inviteLine}</p>}
         </div>
