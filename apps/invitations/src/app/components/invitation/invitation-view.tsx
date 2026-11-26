@@ -77,6 +77,15 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
     if (music().getSnapshot().owner === INVITATION_OWNER) music().setVolume(m.musicVolume);
   }, [m.musicVolume, isThumb]);
 
+  // Once open, nudge the page up and back so guests see there is more below.
+  useEffect(() => {
+    if (mode !== 'live' || phase !== 'open') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t1 = window.setTimeout(() => { if (window.scrollY < 10) window.scrollTo({ top: 70, behavior: 'smooth' }); }, 1500);
+    const t2 = window.setTimeout(() => { if (window.scrollY > 0 && window.scrollY <= 80) window.scrollTo({ top: 0, behavior: 'smooth' }); }, 2200);
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
+  }, [mode, phase]);
+
   // Keep the page still while the live cover is showing.
   useEffect(() => {
     if (mode !== 'live' || phase === 'open') return;
