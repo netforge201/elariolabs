@@ -865,3 +865,22 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 .inv-hero-count .inv-count-cell span { font-size: 9px; }
 .inv-t-modern .inv-hero-count .inv-count-cell strong, .inv-t-modern .inv-hero-count .inv-count-cell span { color: #f4ede2; }
 .inv-t-minimal .inv-hero-count { margin-left: 0; }
+
+/* Hero date (one line) and venue */
+.inv-hblock { margin-top: 18px; }
+.inv-hdate {
+  margin: 0; display: flex; align-items: center; justify-content: center; gap: clamp(5px, 2cqi, 10px);
+  flex-wrap: nowrap; white-space: nowrap; color: var(--k-ink, var(--ink));
+  font-family: var(--f-serif); font-variant-numeric: lining-nums;
+}
+.inv-hdate-w {
+  padding: 4px 0; border-top: 1px solid var(--k-gold, var(--accent)); border-bottom: 1px solid var(--k-gold, var(--accent));
+  font-size: clamp(9px, 2.9cqi, 12px); font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+}
+.inv-hdate-d { font-size: clamp(2rem, 10cqi, 2.6rem); font-weight: 500; line-height: 1; color: var(--k-accent, var(--accent)); font-variant-numeric: lining-nums; }
+.inv-hvenue { margin: 12px 0 0; text-align: center; font-family: var(--f-serif); overflow-wrap: anywhere; }
+.inv-hvenue strong { font-size: 15px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--k-accent, var(--accent)); }
+.inv-t-modern .inv-hdate, .inv-t-modern .inv-hvenue strong, .inv-t-modern .inv-hdate-d { color: #f4ede2; }
+.inv-t-minimal .inv-hdate { justify-content: flex-start; }
+.inv-t-minimal .inv-hvenue { text-align: left; }
+.inv-cover-cta::after { animation-duration: .9s; }

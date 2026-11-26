@@ -379,3 +379,23 @@ export function HeroCountdown({ m }: SectionProps) {
     </div>
   );
 }
+
+/** One-line hero date: WEEKDAY · MONTH · 18 · YEAR · TIME, with the day large. */
+export function HeroDate({ m }: SectionProps) {
+  if (!m.date) return null;
+  return (
+    <p className="inv-hdate inv-rise">
+      <span className="inv-hdate-w">{m.date.weekday}</span>
+      <span className="inv-hdate-w">{m.date.month}</span>
+      <strong className="inv-hdate-d">{m.date.day}</strong>
+      <span className="inv-hdate-w">{m.date.year}</span>
+      {m.time && <span className="inv-hdate-w">{m.time}</span>}
+    </p>
+  );
+}
+
+/** Venue name in the hero: bold, accent colour, no icon. */
+export function HeroVenue({ m }: SectionProps) {
+  if (!m.venueName) return null;
+  return <p className="inv-hvenue inv-rise"><strong>{m.venueName}</strong></p>;
+}

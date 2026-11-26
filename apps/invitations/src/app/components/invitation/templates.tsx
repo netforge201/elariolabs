@@ -1,7 +1,7 @@
 // Template-specific compositions: the opening cover and the hero of each design.
 // Shared sections (details, countdown, story, …) live in sections.tsx and are themed via CSS.
 
-import { HeroCountdown } from './sections';
+import { HeroCountdown, HeroDate, HeroVenue } from './sections';
 import { boldName } from './greet';
 import type { InvitationModel } from './model';
 import { ChevronDown, Flourish, RoseCorner, Sprig } from './ornaments';
@@ -47,14 +47,10 @@ function ClassicHero({ m }: HeroProps) {
           <p className="inv-eyebrow inv-rise">{m.t.weddingInvitation}</p>
           <Names m={m} className="inv-rise" />
           <Flourish className="inv-flourish inv-rise" />
-          {m.date && (
-            <p className="inv-hero-date inv-rise">
-              <span>{m.date.weekday}</span>
-              <strong>{m.date.full}</strong>
-              {m.time && <span>{m.time}</span>}
-            </p>
-          )}
-          {m.venueName && <p className="inv-hero-venue inv-rise"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></p>}
+          <div className="inv-hblock">
+            <HeroDate m={m} />
+            <HeroVenue m={m} />
+          </div>
           <HeroCountdown m={m} />
           <ScrollCue label={m.t.scroll} />
         </div>
@@ -78,13 +74,10 @@ function ModernHero({ m }: HeroProps) {
       <div className="inv-modern-content">
         <p className="inv-eyebrow inv-rise">{m.t.weddingInvitation}</p>
         <Names m={m} className="inv-rise" />
-        {(m.date || m.venueName) && (
-          <div className="inv-modern-line inv-rise">
-            {m.date && <span className="inv-modern-num">{m.date.numeric}</span>}
-            {m.time && <span>{m.time}</span>}
-            {m.venueName && <span className="inv-modern-venue"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
-          </div>
-        )}
+        <div className="inv-hblock">
+          <HeroDate m={m} />
+          <HeroVenue m={m} />
+        </div>
         <HeroCountdown m={m} />
           <ScrollCue label={m.t.scroll} />
       </div>
@@ -103,13 +96,10 @@ function MinimalHero({ m }: HeroProps) {
         <Names m={m} className="inv-rise" />
         <Sprig className="inv-sprig" />
       </div>
-      {(m.date || m.venueName) && (
-        <div className="inv-minimal-bottom inv-rise">
-          {m.date && <span>{m.date.weekday}, {m.date.full}</span>}
-          {m.time && <span>{m.time}</span>}
-          {m.venueName && <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
-        </div>
-      )}
+      <div className="inv-minimal-bottom inv-hblock">
+        <HeroDate m={m} />
+        <HeroVenue m={m} />
+      </div>
       <HeroCountdown m={m} />
           <ScrollCue label={m.t.scroll} />
     </section>

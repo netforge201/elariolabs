@@ -6,7 +6,7 @@
 // comes from the InvitationModel, and the sections below the hero (details,
 // countdown, story, …) are the shared ones, themed in invitation.css.
 
-import { HeroCountdown } from './sections';
+import { HeroCountdown, HeroDate, HeroVenue } from './sections';
 import { boldName } from './greet';
 import './carpet-templates.css';
 import type { CarpetTemplateId } from './catalog';
@@ -36,21 +36,10 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
       <p className="inv-eyebrow kx-eyebrow inv-rise">{m.t.weddingInvitation}</p>
       <Names m={m} className="kx-names inv-rise" />
       <Art name="divider" className="kx-divider inv-rise" />
-      {(m.date || m.time) && (
-        <p className="kx-meta kx-date inv-rise">
-          <CalendarIcon className="kx-icon" aria-hidden="true" />
-          <span>
-            {m.date && <><span className="kx-weekday">{m.date.weekday}</span> <strong>{m.date.full}</strong></>}
-            {m.time && <span className="kx-time">{m.date ? ' · ' : ''}{m.time}</span>}
-          </span>
-        </p>
-      )}
-      {m.venueName && (
-        <p className="kx-meta kx-venue inv-rise">
-          <MapPinIcon className="kx-icon" aria-hidden="true" />
-          <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>
-        </p>
-      )}
+      <div className="inv-hblock">
+        <HeroDate m={m} />
+        <HeroVenue m={m} />
+      </div>
       <HeroCountdown m={m} />
       <ScrollCue label={m.t.scroll} />
     </div>
