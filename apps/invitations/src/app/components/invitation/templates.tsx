@@ -2,7 +2,6 @@
 // Shared sections (details, countdown, story, …) live in sections.tsx and are themed via CSS.
 
 import { HeroCountdown, HeroDate, HeroVenue } from './sections';
-import { boldName } from './greet';
 import type { InvitationModel } from './model';
 import { ChevronDown, Flourish, RoseCorner, Sprig } from './ornaments';
 import { isCarpetTemplate } from './catalog';
@@ -138,7 +137,6 @@ function CoverPrompt({ m, hasMusic }: { m: InvitationModel; hasMusic: boolean })
 function ClassicCover({ m, phase, hasMusic, focus, onOpen }: CoverProps) {
   return (
     <div className={`inv-cover inv-cover--classic is-${phase}`}>
-      <p className="inv-cover-to">{m.greeting ? boldName(m.greeting, m.guest?.name) : m.t.youAreInvited}</p>
       <button type="button" className="inv-cover-button" onClick={onOpen} disabled={phase !== 'closed'} autoFocus={focus}>
         <span className="inv-envelope" aria-hidden="true">
           <span className="inv-envelope-back" />
@@ -161,7 +159,6 @@ function ModernCover({ m, phase, hasMusic, focus, onOpen }: CoverProps) {
       <span className="inv-curtain inv-curtain--top" aria-hidden="true" />
       <span className="inv-curtain inv-curtain--bottom" aria-hidden="true" />
       <div className="inv-cover-stage">
-        <p className="inv-cover-to">{m.greeting ? boldName(m.greeting, m.guest?.name) : m.t.youAreInvited}</p>
         <Names m={m} as="p" className="inv-cover-names" />
         <span className="inv-cover-rule" aria-hidden="true" />
         <button type="button" className="inv-cover-button" onClick={onOpen} disabled={phase !== 'closed'} autoFocus={focus}>
@@ -177,7 +174,6 @@ function MinimalCover({ m, phase, hasMusic, focus, onOpen }: CoverProps) {
     <div className={`inv-cover inv-cover--minimal is-${phase}`}>
       <div className="inv-cover-stage">
         <Sprig className="inv-cover-sprig" />
-        <p className="inv-cover-to">{m.greeting ? boldName(m.greeting, m.guest?.name) : m.t.youAreInvited}</p>
         <Names m={m} as="p" className="inv-cover-names" />
         <button type="button" className="inv-cover-button" onClick={onOpen} disabled={phase !== 'closed'} autoFocus={focus}>
           <CoverPrompt m={m} hasMusic={hasMusic} />
