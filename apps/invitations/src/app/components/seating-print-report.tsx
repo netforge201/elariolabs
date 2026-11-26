@@ -42,7 +42,7 @@ const WORDS = {
     invitationsShort: 'dəvətnamə', family: 'ailə ilə', expected: 'Gözlənilir', emptyTable: 'Boş masa', freeSeats: 'boş yer',
     warnDeclined: 'Gəlməyəcəyini bildirib, amma yeri saxlanılıb', contents: 'Tərkib', generated: 'Tarix', page: 'səh.',
     taken: 'Tutulub', freeLegend: 'Boş', print: 'PDF kimi saxla', back: 'Redaktora qayıt',
-    hint: 'Çap pəncərəsində “PDF kimi saxla” seçin.', include: 'Daxil et', paper: 'Kağız', namesLabel: 'Adlar',
+    hint: 'Çap pəncərəsində “PDF kimi saxla” seçin.', include: 'Daxil et', idxTable: 'Masa', idxGuest: 'Qonaq', paper: 'Kağız', namesLabel: 'Adlar',
     namesInvite: 'Dəvətnamədəki ad', namesNick: 'Ləqəb', rsvpLabel: 'RSVP', on: 'Göstər', off: 'Gizlət', seatsLabel: 'Stullar', seatsOn: 'Masalar və stullar', seatsOff: 'Yalnız masalar',
     noSections: 'Ən azı bir bölmə seçin.', cut: 'Kəsik xətti üzrə kəsin', noTables: 'Planda hələ masa yoxdur.',
     sections: { summary: 'Xülasə', plan: 'Zalın sxemi', tables: 'Masalar', index: 'Əlifba göstəricisi', unseated: 'Yersiz qonaqlar', tablecards: 'Masa nömrələri', placecards: 'Ad kartları' },
@@ -56,7 +56,7 @@ const WORDS = {
     invitationsShort: 'приглаш.', family: 'с семьёй', expected: 'Ожидается', emptyTable: 'Пустой стол', freeSeats: 'свободных мест',
     warnDeclined: 'Отказались (RSVP), но место за ними занято', contents: 'Содержание', generated: 'Дата', page: 'стр.',
     taken: 'Занято', freeLegend: 'Свободно', print: 'Сохранить PDF', back: 'Вернуться к редактору',
-    hint: 'В окне печати выберите «Сохранить как PDF».', include: 'Включить', paper: 'Бумага', namesLabel: 'Имена',
+    hint: 'В окне печати выберите «Сохранить как PDF».', include: 'Включить', idxTable: 'Стол', idxGuest: 'Гость', paper: 'Бумага', namesLabel: 'Имена',
     namesInvite: 'Имя из приглашения', namesNick: 'Ник', rsvpLabel: 'RSVP', on: 'Показать', off: 'Скрыть', seatsLabel: 'Стулья', seatsOn: 'Столы и стулья', seatsOff: 'Только столы',
     noSections: 'Выберите хотя бы один раздел.', cut: 'Разрежьте по пунктиру', noTables: 'На плане пока нет столов.',
     sections: { summary: 'Сводка', plan: 'Схема зала', tables: 'Столы', index: 'Алфавитный указатель', unseated: 'Гости без места', tablecards: 'Номера столов', placecards: 'Именные карточки' },
@@ -70,7 +70,7 @@ const WORDS = {
     invitationsShort: 'invitations', family: 'with family', expected: 'Expected', emptyTable: 'Empty table', freeSeats: 'free seats',
     warnDeclined: 'Declined (RSVP) but still holding a seat', contents: 'Contents', generated: 'Date', page: 'p.',
     taken: 'Taken', freeLegend: 'Free', print: 'Save as PDF', back: 'Back to editor',
-    hint: 'Choose “Save as PDF” in the print dialog.', include: 'Include', paper: 'Paper', namesLabel: 'Names',
+    hint: 'Choose “Save as PDF” in the print dialog.', include: 'Include', idxTable: 'Table', idxGuest: 'Guest', paper: 'Paper', namesLabel: 'Names',
     namesInvite: 'Invitation name', namesNick: 'Nickname', rsvpLabel: 'RSVP', on: 'Show', off: 'Hide', seatsLabel: 'Chairs', seatsOn: 'Tables and chairs', seatsOff: 'Tables only',
     noSections: 'Choose at least one section.', cut: 'Cut along the dashed lines', noTables: 'There are no tables on the plan yet.',
     sections: { summary: 'Summary', plan: 'Floor plan', tables: 'Tables', index: 'Alphabetical index', unseated: 'Guests without a seat', tablecards: 'Table numbers', placecards: 'Place cards' },
@@ -186,6 +186,15 @@ export default function SeatingPrintReport({
   const tableCardPages = chunk(data.tables, 2);
   const placeCardPages = chunk([...data.seated].sort((a, b) => compareNames(shown(a.guest), shown(b.guest), locale)), 8);
   const indexGroups = groupByLetter(sortedGuests, shown);
+  // Alphabetical index: rows split into fixed-height columns, 2 per A4 page (3 on A3).
+  type IxItem = { kind: 'letter'; letter: string } | { kind: 'guest'; guest: PrintGuest };
+  const ixItems: IxItem[] = indexGroups.flatMap(([letter, items]) => [{ kind: 'letter' as const, letter }, ...items.map(guest => ({ kind: 'guest' as const, guest }))]);
+  const ixRows = options.paper === 'a3' ? 60 : 42;
+  const ixPerPage = options.paper === 'a3' ? 3 : 2;
+  const ixCols: IxItem[][] = [];
+  for (let i = 0; i < ixItems.length; i += ixRows) ixCols.push(ixItems.slice(i, i + ixRows));
+  const indexPages: IxItem[][][] = [];
+  for (let i = 0; i < ixCols.length; i += ixPerPage) indexPages.push(ixCols.slice(i, i + ixPerPage));
 
   return (
     <div className={`pr-root pr-paper-${options.paper}`}>
@@ -256,7 +265,7 @@ export default function SeatingPrintReport({
                 <strong>{w.warnDeclined}: {data.declinedSeated.length}</strong>
                 <ul>
                   {data.declinedSeated.map(row => (
-                    <li key={row.guest.id}>{shown(row.guest)} — {row.table.name}{showSeats ? `, ${w.seatShort} ${row.seat}` : ''}</li>
+                    <li key={row.guest.id}>{shown(row.guest)} — {tableNo(row.table.name)}{showSeats ? `, ${w.seatShort} ${row.seat}` : ''}</li>
                   ))}
                 </ul>
               </div>
@@ -294,7 +303,7 @@ export default function SeatingPrintReport({
                   return (
                     <article className="pr-table-card" key={table.id}>
                       <header>
-                        <h3>{table.name}</h3>
+                        <h3>{tableNo(table.name)}</h3>
                         <span className="pr-occupancy">{rows.length}/{capacityOf(table)}</span>
                       </header>
                       {rows.length === 0 ? <p className="pr-muted">{w.emptyTable}</p> : (
@@ -325,28 +334,31 @@ export default function SeatingPrintReport({
           </section>
         )}
 
-        {has('index') && (
-          <section className="pr-sheet">
-            <header className="pr-section-head"><h2>{w.index}</h2><span>{w.indexHint}</span></header>
-            <div className="pr-index">
-              {indexGroups.map(([letter, items]) => (
-                <div className="pr-index-group" key={letter}>
-                  <p className="pr-index-letter">{letter}</p>
-                  {items.map(guest => {
-                    const seat = data.seatOf.get(guest.id);
-                    return (
-                      <p className="pr-index-row" key={guest.id}>
-                        <span className="pr-index-name">{shown(guest)}</span>
-                        <span className="pr-index-dots" aria-hidden="true" />
-                        <span className="pr-index-seat">{seat ? (showSeats ? `${seat.table.name} · ${seat.seat}` : seat.table.name) : '—'}</span>
-                      </p>
-                    );
-                  })}
-                </div>
+        {has('index') && indexPages.map((page, pageIndex) => (
+          <section className="pr-sheet" key={`ix-${pageIndex}`}>
+            {pageIndex === 0 && <header className="pr-section-head"><h2>{w.index}</h2><span>{w.indexHint}</span></header>}
+            <div className="pr-ix-cols">
+              {page.map((col, colIndex) => (
+                <table className="pr-ix" key={colIndex}>
+                  <thead><tr><th className="pr-ix-no">{w.idxTable}</th><th>{w.idxGuest}</th></tr></thead>
+                  <tbody>
+                    {col.map(item => item.kind === 'letter'
+                      ? <tr className="pr-ix-letter" key={`l-${item.letter}`}><td colSpan={2}>{item.letter}</td></tr>
+                      : (() => {
+                        const seat = data.seatOf.get(item.guest.id);
+                        return (
+                          <tr key={item.guest.id}>
+                            <td className="pr-ix-no">{seat ? (showSeats ? `${tableNo(seat.table.name)} - ${seat.seat}` : tableNo(seat.table.name)) : '—'}</td>
+                            <td>{shown(item.guest)}</td>
+                          </tr>
+                        );
+                      })())}
+                  </tbody>
+                </table>
               ))}
             </div>
           </section>
-        )}
+        ))}
 
         {has('unseated') && (
           <section className={`pr-sheet ${has('index') ? 'pr-continue' : ''}`}>
@@ -370,7 +382,7 @@ export default function SeatingPrintReport({
             {pair.map(table => (
               <div className="pr-tablecard" key={table.id}>
                 <p className="pr-tablecard-couple">{couple}</p>
-                <p className="pr-tablecard-name">{table.name}</p>
+                <p className="pr-tablecard-name">{tableNo(table.name)}</p>
                 {date && <p className="pr-tablecard-date">{date.full}</p>}
               </div>
             ))}
@@ -382,7 +394,7 @@ export default function SeatingPrintReport({
             {cards.map(row => (
               <div className="pr-placecard" key={row.guest.id}>
                 <p className="pr-placecard-name">{placeName(row.guest)}</p>
-                <p className="pr-placecard-seat">{row.table.name}{showSeats ? ` · ${w.seatShort} ${row.seat}` : ''}</p>
+                <p className="pr-placecard-seat">{tableNo(row.table.name)}{showSeats ? ` · ${w.seatShort} ${row.seat}` : ''}</p>
                 {row.guest.withFamily && <p className="pr-placecard-family">{w.family}</p>}
               </div>
             ))}
@@ -458,7 +470,7 @@ function FloorPlan({ plan, tables, byTable, label }: {
               )}
               {table ? (
                 <>
-                  <text x={cx} y={cy - 4 * unit} textAnchor="middle" fontSize={19 * unit} fontWeight="700" fill="#1f3a2e" fontFamily="Sora, DM Sans, sans-serif">{object.name}</text>
+                  <text x={cx} y={cy - 4 * unit} textAnchor="middle" fontSize={19 * unit} fontWeight="700" fill="#1f3a2e" fontFamily="Sora, DM Sans, sans-serif">{tableNo(object.name)}</text>
                   <text x={cx} y={cy + 17 * unit} textAnchor="middle" fontSize={13 * unit} fill="#4d6358" fontFamily="DM Sans, sans-serif">{rows.length}/{capacityOf(object)}</text>
                 </>
               ) : object.type !== 'wall' && (
@@ -597,3 +609,8 @@ function compareNames(a: string, b: string, locale: string) {
   return ka < kb ? -1 : ka > kb ? 1 : 0;
 }
 
+
+/** PDF shows only the number from a table name ("ВАФЛЯ 13" → "13"); names without digits stay as they are. */
+function tableNo(name: string) {
+  return name.match(/\d+/)?.[0] ?? name;
+}

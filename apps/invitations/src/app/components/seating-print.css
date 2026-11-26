@@ -163,3 +163,13 @@
   .pr-index, .pr-unseated { column-count: 1; }
 }
 .pr-no-seats .pr-seat-no { display: none; }
+
+/* Alphabetical index as bordered tables: table number left, name right. */
+.pr-ix-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5mm; align-items: start; }
+.pr-paper-a3 .pr-ix-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pr-ix { width: 100%; border-collapse: collapse; font-size: 9.5pt; line-height: 1.25; }
+.pr-ix th, .pr-ix td { border: 1px solid #222; padding: .6mm 1.6mm; text-align: left; }
+.pr-ix th { background: #e9ece9; font-weight: 700; font-size: 8.5pt; }
+.pr-ix .pr-ix-no { width: 14mm; text-align: center; font-weight: 700; white-space: nowrap; }
+.pr-ix-letter td { background: #f2f4f2; font-weight: 700; }
+.pr-ix tr { break-inside: avoid; }
