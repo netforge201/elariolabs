@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import PublicInvitation from '@/app/components/public-invitation';
@@ -71,6 +72,12 @@ export default async function GuestInvitationPage({ params }: Props) {
   if (!result) notFound();
 
   const { guest, wedding } = result;
+
+  // Count real opens only: link-preview bots (WhatsApp, Telegram, …) fetch the page too.
+  const ua = (await headers()).get('user-agent') ?? '';
+  if (ua && !/bot|crawl|spider|preview|whatsapp|telegram|facebookexternalhit|slack|discord|skype|vkshare|curl|wget|python|headless/i.test(ua)) {
+    await db.invitationGuest.update({ where: { id: guest.id }, data: { viewCount: { increment: 1 }, lastViewedAt: new Date() } }).catch(() => {});
+  }
 
   const theme = wedding.theme && typeof wedding.theme === 'object' && !Array.isArray(wedding.theme)
     ? wedding.theme as Record<string, unknown>

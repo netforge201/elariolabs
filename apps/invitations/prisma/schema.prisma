@@ -489,6 +489,9 @@ model InvitationGuest {
   rsvpGuests  Int?            @map("rsvp_guests")
   rsvpNote    String?         @map("rsvp_note")
   rsvpAt      DateTime?       @map("rsvp_at")
+  /// Times the personal link was opened by a person (link-preview bots excluded). Migration 015.
+  viewCount   Int             @default(0) @map("view_count")
+  lastViewedAt DateTime?      @map("last_viewed_at")
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
   wedding   InvitationWedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)

@@ -12,6 +12,7 @@ export type DirectoryGuest = {
   rsvpGuests: number | null;
   rsvpNote: string | null;
   inviteName: string | null;
+  views?: number;
   gender: GuestGender;
   withFamily: boolean;
   companion: 'wife' | 'spouse' | null;
@@ -55,6 +56,7 @@ export type RsvpLabels = {
 };
 
 export type ProfileLabels = {
+  views: string;
   edit: string; close: string; nick: string; inviteName: string; inviteNameHint: string;
   gender: string; male: string; female: string; none: string; family: string; preview: string;
   save: string; saving: string; saved: string; error: string; familyBadge: string; inviteAs: string;
@@ -309,6 +311,7 @@ export default function GuestDirectory({ guests: initial, labels, rsvpLabels: r,
                 <span className="guest-badges">
                   {guest.companion ? <span className="guest-badge">{pl[guest.companion]}</span> : guest.withFamily && <span className="guest-badge">{pl.familyBadge}</span>}
                   {status && <span className={`guest-rsvp-status ${status.cls}`}>{status.text}</span>}
+                  <span className="guest-badge" title={pl.views}>👁 {guest.views ?? 0} {pl.views}</span>
                 </span>
                 {guest.rsvpEnabled && guest.rsvpNote && <span className="guest-rsvp-note">“{guest.rsvpNote}”</span>}
               </span>

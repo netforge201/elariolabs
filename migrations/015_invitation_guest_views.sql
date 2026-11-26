@@ -1,0 +1,2 @@
+ALTER TABLE invitation_guests ADD COLUMN IF NOT EXISTS view_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE invitation_guests ADD COLUMN IF NOT EXISTS last_viewed_at TIMESTAMP(3);
