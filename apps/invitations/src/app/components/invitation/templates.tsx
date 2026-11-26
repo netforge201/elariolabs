@@ -1,6 +1,7 @@
 // Template-specific compositions: the opening cover and the hero of each design.
 // Shared sections (details, countdown, story, …) live in sections.tsx and are themed via CSS.
 
+import { HeroCountdown } from './sections';
 import { boldName } from './greet';
 import type { InvitationModel } from './model';
 import { ChevronDown, Flourish, RoseCorner, Sprig } from './ornaments';
@@ -54,6 +55,7 @@ function ClassicHero({ m }: HeroProps) {
             </p>
           )}
           {m.venueName && <p className="inv-hero-venue inv-rise"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></p>}
+          <HeroCountdown m={m} />
           <ScrollCue label={m.t.scroll} />
         </div>
       </div>
@@ -83,7 +85,8 @@ function ModernHero({ m }: HeroProps) {
             {m.venueName && <span className="inv-modern-venue"><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
           </div>
         )}
-        <ScrollCue label={m.t.scroll} />
+        <HeroCountdown m={m} />
+          <ScrollCue label={m.t.scroll} />
       </div>
     </section>
   );
@@ -107,7 +110,8 @@ function MinimalHero({ m }: HeroProps) {
           {m.venueName && <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>}
         </div>
       )}
-      <ScrollCue label={m.t.scroll} />
+      <HeroCountdown m={m} />
+          <ScrollCue label={m.t.scroll} />
     </section>
   );
 }

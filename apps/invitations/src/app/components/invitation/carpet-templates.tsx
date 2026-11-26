@@ -6,6 +6,7 @@
 // comes from the InvitationModel, and the sections below the hero (details,
 // countdown, story, …) are the shared ones, themed in invitation.css.
 
+import { HeroCountdown } from './sections';
 import { boldName } from './greet';
 import './carpet-templates.css';
 import type { CarpetTemplateId } from './catalog';
@@ -35,7 +36,6 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
       <p className="inv-eyebrow kx-eyebrow inv-rise">{m.t.weddingInvitation}</p>
       <Names m={m} className="kx-names inv-rise" />
       <Art name="divider" className="kx-divider inv-rise" />
-      <p className="kx-invite inv-rise">{m.greeting ? boldName(`${m.greeting}, ${m.inviteLine.charAt(0).toLocaleLowerCase(m.locale)}${m.inviteLine.slice(1)}`, m.guest?.name) : m.inviteLine}</p>
       {(m.date || m.time) && (
         <p className="kx-meta kx-date inv-rise">
           <CalendarIcon className="kx-icon" aria-hidden="true" />
@@ -51,6 +51,7 @@ function KText({ m, className = '' }: HeroProps & { className?: string }) {
           <span><strong style={{ fontWeight: 700 }}>{m.venueName}</strong></span>
         </p>
       )}
+      <HeroCountdown m={m} />
       <ScrollCue label={m.t.scroll} />
     </div>
   );

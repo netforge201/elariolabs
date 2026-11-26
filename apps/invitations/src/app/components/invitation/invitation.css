@@ -857,3 +857,11 @@ html:has(.inv-mode-live.inv-t-minimal), html:has(.inv-mode-live.inv-t-minimal) b
 /* Guest name: bold everywhere; bigger and in the accent colour on the cover. */
 .inv-guest-name { font-weight: 700; }
 .inv-cover-to { font-size: clamp(1.6rem, 7cqi, 2.1rem); font-style: normal; font-weight: 700; color: var(--k-accent, var(--accent-ink, var(--accent))); opacity: 1; }
+
+/* Countdown inside the hero */
+.inv-hero-count { max-width: 300px; margin: 18px auto 0; }
+.inv-hero-count .inv-count-cell { gap: 4px; }
+.inv-hero-count .inv-count-cell strong { font-size: clamp(1.6rem, 7cqi, 2.2rem); color: var(--k-accent, var(--accent)); }
+.inv-hero-count .inv-count-cell span { font-size: 9px; }
+.inv-t-modern .inv-hero-count .inv-count-cell strong, .inv-t-modern .inv-hero-count .inv-count-cell span { color: #f4ede2; }
+.inv-t-minimal .inv-hero-count { margin-left: 0; }

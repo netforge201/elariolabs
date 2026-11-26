@@ -4,7 +4,7 @@ import './invitation.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildModel, type GuestInfo, type InvitationData } from './model';
 import { Cover, Hero, OPENING_DURATION } from './templates';
-import { Closing, Countdown, Details, Intro, Photo, Rsvp, Story } from './sections';
+import { Closing, Details, Intro, Photo, Rsvp, Story } from './sections';
 import MusicControl, { INVITATION_OWNER } from './music-control';
 import { music } from './music-engine';
 import { musicSourceKey } from './catalog';
@@ -106,7 +106,6 @@ export default function InvitationView({ data, guest, mode = 'live' }: {
           <Hero m={m} />
           {!isThumb && (
             <>
-              <Countdown m={m} />
               <Intro m={m} />
               <Photo m={m} />
               <Details m={m} preview={preview} />

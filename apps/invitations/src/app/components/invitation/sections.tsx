@@ -355,3 +355,27 @@ export function Closing({ m }: SectionProps) {
     </footer>
   );
 }
+
+/** Compact countdown shown inside the hero, under the date and venue. */
+export function HeroCountdown({ m }: SectionProps) {
+  const target = m.day ? eventInstant(m.day, m.time, m.timezone).getTime() : 0;
+  const [values, setValues] = useState<number[] | null>(null);
+  useEffect(() => {
+    if (!target) return;
+    const update = () => setValues(remaining(target));
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [target]);
+  if (!target || (values && values.every(v => v === 0))) return null;
+  return (
+    <div className="inv-count inv-hero-count inv-rise" role="timer" aria-live="off" aria-label={m.t.countdown}>
+      {m.t.units.map((unit, i) => (
+        <div key={unit} className="inv-count-cell">
+          <strong>{values ? String(values[i]).padStart(2, '0') : '––'}</strong>
+          <span>{unit}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
